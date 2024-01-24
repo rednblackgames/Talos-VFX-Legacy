@@ -4,25 +4,17 @@ allprojects {
 
 
     group = "com.talosvfx"
-    version = '1.4.2'
+    version = '1.5.0'
 
     if(project.hasProperty("release")) {
     } else {
         version += "-SNAPSHOT"
     }
 
-    ext {
-        appName = "talos"
-        gdxVersion = '1.10.0'
-        lwjgl3Version = '3.3.0-SNAPSHOT'
-        visuiVersion = '1.5.0'
-    }
-
 
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
         google()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }

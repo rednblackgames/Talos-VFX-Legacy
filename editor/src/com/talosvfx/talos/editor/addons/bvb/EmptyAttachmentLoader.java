@@ -10,14 +10,14 @@ public class EmptyAttachmentLoader implements AttachmentLoader {
 
     }
 
-    public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
+    public RegionAttachment newRegionAttachment (Skin skin, String name, String path, Sequence sequence) {
         RegionAttachment attachment = new RegionAttachment(name);
         TextureRegion region = new TextureRegion();
         attachment.setRegion(region);
         return attachment;
     }
 
-    public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
+    public MeshAttachment newMeshAttachment (Skin skin, String name, String path, Sequence sequence) {
         MeshAttachment attachment = new MeshAttachment(name);
         TextureRegion region = new TextureRegion();
         attachment.setRegion(region);

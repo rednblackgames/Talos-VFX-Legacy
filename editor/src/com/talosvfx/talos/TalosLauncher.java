@@ -27,6 +27,8 @@ public class TalosLauncher {
 		config.setMaximized(true);
 		config.setTitle("Talos");
 		config.useVsync(false);
+		config.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
+		config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 3, 2);
 		config.setBackBufferConfig(1,1,1,1,8,8, 16);
 		config.setWindowIcon("icon/talos-64x64.png");
 
