@@ -1,23 +1,86 @@
-allprojects {
-
-    apply plugin: "java-library"
-
-
-    group = "com.talosvfx"
-    version = '1.5.0'
-
-    if(project.hasProperty("release")) {
-    } else {
-        version += "-SNAPSHOT"
-    }
-
-
+buildscript {
     repositories {
-        mavenLocal()
         mavenCentral()
-        google()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url "https://jitpack.io" }
     }
+}
+
+plugins {
+    id 'java'
+}
+
+allprojects {
+    version '1.5.0'
+}
+
+group 'games.rednblack'
+
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url 'https://jitpack.io' }
+}
+
+ext {
+    appName = 'Talos'
+}
+
+sourceSets.main.java.srcDirs = [ "src/main" ]
+sourceSets.main.resources.srcDirs = ["assets"]
+
+project.ext.mainClassName = "games.rednblack.talos.TalosLauncher"
+project.ext.assetsDir = new File("assets/");
+def osName = System.getProperty('os.name').toLowerCase(Locale.ROOT)
+
+def getBuildVersion = {
+    if (osName.contains('mac')) {
+        return getVersion().toString().replaceAll("0\\.", "")
+    }
+    if (project.hasProperty('SNAPSHOT')) {
+        return getVersion() + (project.hasProperty('WORKFLOW_RUN') ? WORKFLOW_RUN : "$System.env.WORKFLOW_RUN")
+    } else {
+        return getVersion()
+    }
+}
+
+task runTalos(dependsOn: classes, type: JavaExec) {
+    mainClass = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    jvmArgs = ['-verbose:gc','-XX:+UseZGC','-Xms128m']
+    ignoreExitValue = true
+}
+
+task dist(type: Jar) {
+    archiveVersion.set(getBuildVersion())
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    from files(project.assetsDir);
+
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+
+    destinationDirectory = file("$buildDir/lib")
+}
+
+dependencies {
+    implementation project(":runtimes:talos-libgdx")
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
+    implementation "info.debatty:java-string-similarity:1.2.1"
+    implementation "com.esotericsoftware.spine:spine-libgdx:$spineVersion"
+    implementation "org.yaml:snakeyaml:1.21"
+    implementation 'com.sparkjava:spark-core:2.9.4'
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation "ch.qos.logback:logback-core:1.2.3"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "space.earlygrey:shapedrawer:$shapedrawerVersion"
 }
