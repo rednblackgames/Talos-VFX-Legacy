@@ -57,7 +57,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final IEmitter particleEmitter = particleEffectInstance.getEmitters().get(i);
-			if(!particleEmitter.isVisible()) continue;
+			if(!particleEmitter.isVisible() || particleEmitter.getEmitterModule() == null) continue;
 			if(particleEmitter.isBlendAdd()) {
 				batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
 			} else {

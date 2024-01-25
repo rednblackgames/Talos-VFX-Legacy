@@ -35,7 +35,6 @@ import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.project.TalosProject;
 import com.talosvfx.talos.editor.project.ProjectController;
-import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
@@ -46,9 +45,7 @@ import org.lwjgl.glfw.GLFWDropCallback;
 import org.lwjgl.glfw.GLFWWindowFocusCallback;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
@@ -281,13 +278,6 @@ public class TalosMain extends ApplicationAdapter {
 	public void render () {
 		CursorUtil.checkAndReset();
 
-
-		try {
-			Thread.sleep(16);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
 		if (currentWorkplaceStage != null) {
 			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
 		} else {
@@ -313,6 +303,7 @@ public class TalosMain extends ApplicationAdapter {
 		errorReporting.reportException(e);
 	}
 
+	@Override
 	public void resize (int width, int height) {
 		if(currentWorkplaceStage != null) {
 			currentWorkplaceStage.resize(width, height);
@@ -327,7 +318,6 @@ public class TalosMain extends ApplicationAdapter {
 			currentWorkplaceStage.getStage().dispose();
 		}
 		uiStage.getStage().dispose();
-		SocketServer.dispose();
 	}
 
 	public Skin getSkin() {
