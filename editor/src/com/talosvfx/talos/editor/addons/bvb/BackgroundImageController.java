@@ -1,11 +1,6 @@
 package com.talosvfx.talos.editor.addons.bvb;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
-import com.talosvfx.talos.editor.project.IProject;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 
 public class BackgroundImageController implements IPropertyProvider {

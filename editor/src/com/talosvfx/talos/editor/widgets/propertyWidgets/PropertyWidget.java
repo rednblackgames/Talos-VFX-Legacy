@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
 import com.talosvfx.talos.editor.notifications.Notifications;
 
 import java.util.function.Supplier;
@@ -125,10 +124,6 @@ public abstract class PropertyWidget<T> extends Table {
 
 	protected void callValueChanged (T value) {
 		valueChanged(value);
-		PropertyHolderEdited event = Notifications.obtainEvent(PropertyHolderEdited.class);
-		event.parentOfPropertyHolder = this.parent;
-		event.fastChange = isFastChange(this);
-		Notifications.fireEvent(event);
 	}
 
 	protected boolean  isFastChange (PropertyWidget<?> propertyWidget) {

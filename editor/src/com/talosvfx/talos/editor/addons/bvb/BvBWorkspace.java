@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.project.FileTracker;
 import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
@@ -246,7 +245,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                         effectUnselected(selectedEffect);
                     }
                 }
-                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
+                if (isEnterPressed(keycode)) {
                     camera.position.set(0, 0, 0);
                     setWorldSize(getWorldWidth());
                 }

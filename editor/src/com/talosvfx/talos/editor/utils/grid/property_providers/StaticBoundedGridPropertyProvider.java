@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.utils.grid.GridLine;
 
 public class StaticBoundedGridPropertyProvider extends StaticGridPropertyProvider {
@@ -44,34 +42,5 @@ public class StaticBoundedGridPropertyProvider extends StaticGridPropertyProvide
             gridLines.add(new GridLine(new Vector2(-totalWidth / 2, y), new Vector2(totalWidth / 2, y), (y == 0 && shouldHighlightZero()) ? zeroColor : color, thickness));
             endY = y;
         }
-    }
-
-    @Override
-    public float getWorldHeight () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-            if (selectedLayer == null) {
-                return -1;
-            } else {
-                return selectedLayer.getMapHeight();
-            }
-        }
-
-        return -1;
-    }
-
-    @Override
-    public float getWorldWidth () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-
-            if (selectedLayer == null) {
-                return -1;
-            } else {
-                return selectedLayer.getMapWidth();
-            }
-        }
-
-        return -1;
     }
 }

@@ -47,7 +47,6 @@ import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneListener;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.IAddon;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorAddon;
 import com.talosvfx.talos.editor.dialogs.BatchConvertDialog;
 import com.talosvfx.talos.editor.dialogs.NewProjectDialog;
 import com.talosvfx.talos.editor.dialogs.SettingsDialog;
@@ -152,7 +151,7 @@ public class UIStage {
 			FileHandle handle = Gdx.files.absolute(path);
 			if(handle.exists()) {
 				String extension = handle.extension();
-				if(extension.equals("tls") && TalosMain.Instance().ProjectController().getProject() != SceneEditorAddon.SE) {
+				if(extension.equals("tls")) {
 					// load project file
 					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
 					TalosMain.Instance().ProjectController().loadProject(handle);

@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.maps.TalosLayer;
 import com.talosvfx.talos.editor.utils.grid.GridLine;
 import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
 
@@ -114,31 +112,11 @@ public class StaticGridPropertyProvider implements GridPropertyProvider {
 
     @Override
     public float getUnitX () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-
-            if (selectedLayer == null) {
-                return 1;
-            } else {
-                return selectedLayer.getTileSizeX();
-            }
-        }
-
         return 1;
     }
 
     @Override
     public float getUnitY () {
-        if (SceneEditorWorkspace.getInstance().mapEditorState.isEditing()) {
-            TalosLayer selectedLayer = SceneEditorWorkspace.getInstance().mapEditorState.getLayerSelected();
-
-            if (selectedLayer == null) {
-                return 1;
-            } else {
-                return selectedLayer.getTileSizeY();
-            }
-        }
-
         return 1;
     }
 

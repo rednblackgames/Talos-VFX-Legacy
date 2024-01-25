@@ -1,6 +1,5 @@
 package com.talosvfx.talos.editor.nodes.widgets;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -9,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
-import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ClippedNinePatchDrawable;
+import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class ValueWidget extends AbstractWidget<Float> {
@@ -165,7 +164,7 @@ public class ValueWidget extends AbstractWidget<Float> {
         textField.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (SceneEditorWorkspace.isEnterPressed(keycode)) {
+                if (ViewportWidget.isEnterPressed(keycode)) {
                     hideEditMode();
                 }
 
