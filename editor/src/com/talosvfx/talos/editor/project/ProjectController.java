@@ -253,6 +253,7 @@ public class ProjectController {
         } else {
             currentProject.initUIContent();
         }
+        TalosMain.Instance().resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     public void removeTab(FileTab tab) {

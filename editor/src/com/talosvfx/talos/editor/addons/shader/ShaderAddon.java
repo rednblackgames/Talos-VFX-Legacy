@@ -51,7 +51,6 @@ public class ShaderAddon implements IAddon {
 
         // now need to disable some menu tabs
         TalosMain.Instance().UIStage().Menu().disableTalosSpecific();
-        nodeStage.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     @Override
