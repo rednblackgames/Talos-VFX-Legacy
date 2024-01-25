@@ -24,7 +24,7 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
     Table subWidgetTable;
 
     public TalosLayerPropertiesWidget (String name, Supplier<TalosLayer> supplier, ValueChanged<TalosLayer> valueChanged) {
-        super(name, supplier, valueChanged);
+        super(name, supplier, valueChanged, true);
     }
 
     @Override

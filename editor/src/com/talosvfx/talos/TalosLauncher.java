@@ -29,7 +29,7 @@ public class TalosLauncher {
 		config.useVsync(false);
 		config.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
 		config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 3, 2);
-		config.setBackBufferConfig(1,1,1,1,8,8, 16);
+		config.setBackBufferConfig(8,8,8,8,16,8, 16);
 		config.setWindowIcon("icon/talos-64x64.png");
 
 		TalosMain talos = new TalosMain();

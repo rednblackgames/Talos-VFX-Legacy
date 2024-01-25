@@ -28,8 +28,9 @@ public class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoin
 
 
     public GlobalValuePointsWidget(Supplier<Array<AttachmentPoint>> supplier, Supplier<Array<Bone>> boneListSuppler) {
-        super(supplier, null);
+        super(null, supplier, null, false);
         this.boneListSuppler = boneListSuppler;
+        build(null);
     }
 
     @Override
