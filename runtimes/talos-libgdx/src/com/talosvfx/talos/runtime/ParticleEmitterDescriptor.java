@@ -58,7 +58,6 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(Vector2Module.class);
             registeredModules.add(ColorModule.class);
             registeredModules.add(DynamicRangeModule.class);
-            registeredModules.add(ScriptModule.class);
             registeredModules.add(GradientColorModule.class);
             registeredModules.add(TextureModule.class);
             registeredModules.add(EmConfigModule.class);

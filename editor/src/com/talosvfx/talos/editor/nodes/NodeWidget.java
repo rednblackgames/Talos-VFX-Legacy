@@ -19,7 +19,6 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
-import com.talosvfx.talos.runtime.script.ScriptCompiler;
 
 public abstract class NodeWidget extends EmptyWindow implements Json.Serializable {
 
