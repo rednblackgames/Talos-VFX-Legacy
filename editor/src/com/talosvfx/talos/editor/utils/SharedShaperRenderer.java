@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -17,19 +16,22 @@ public class SharedShaperRenderer {
     }
 
     private final ObjectMap<Batch, ShapeDrawer> shapeDrawers = new ObjectMap<>();
+    private Texture whiteTexture;
 
     private SharedShaperRenderer() {
     }
 
     public ShapeDrawer getShapeDrawer(Batch batch) {
         if (shapeDrawers.get(batch) == null) {
-            TextureRegion region = new TextureRegion(new Texture(Gdx.files.internal("white.png"))); //TODO: not cool
+            if (whiteTexture == null)
+                whiteTexture = new Texture(Gdx.files.internal("white.png"));
+            TextureRegion region = new TextureRegion(whiteTexture); //TODO: not cool
             shapeDrawers.put(batch, new ShapeDrawer(batch, region));
         }
         return shapeDrawers.get(batch);
     }
 
     public void dispose() {
-
+        whiteTexture.dispose();
     }
 }

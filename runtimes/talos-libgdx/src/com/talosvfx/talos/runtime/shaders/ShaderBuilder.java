@@ -45,7 +45,7 @@ public class ShaderBuilder {
         String template =
                 "#ifdef GL_ES\n" +
                 "#define LOWP lowp\n" +
-                "   precision mediump float;\n" +
+                "   precision highp float;\n" +
                 "#else\n" +
                 "   #define LOWP\n" +
                 "#endif\n\n";
