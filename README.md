@@ -1,11 +1,9 @@
-# talos vfx
-![Build Status](http://jenkins.svc.rockbitegames.com:8080/buildStatus/icon?job=Talos)[![Github All Releases](https://img.shields.io/github/downloads/rockbite/talos/total.svg)]()
+# Talos VFX Legacy
 
-Travis
-[![Build Status](https://travis-ci.com/rockbite/talos.svg?branch=master)](https://travis-ci.com/rockbite/talos)
+![maven-central](https://img.shields.io/maven-central/v/games.rednblack.talos/runtime-libgdx?color=blue&label=release)
+![sonatype-nexus](https://img.shields.io/nexus/s/games.rednblack.talos/runtime-libgdx?label=snapshot&server=https%3A%2F%2Foss.sonatype.org)
 
-Website: [https://talosvfx.com/](https://talosvfx.com/)
-Discord Server: [https://discord.gg/EQqYGcyMfr](https://discord.gg/EQqYGcyMfr)
+Talos VFX Legacy is a fork of latest open source Talos V1. Official development went far beyond the VFX concept, becoming difficult to integrate in already complex scenarios. This Legacy development is made to keep Talos a pure VFX toolkit and nothing else for 2D games.
 
 ![alt text](https://i.imgur.com/Fxw1Unn.jpg)
 
@@ -47,6 +45,4 @@ Node based, open source VFX Editor with powerfull interface and a ready to use l
   * Interpolation - Same as Curve but instead of custom points it is procedural meaning it's a formula
   * Math Operations - Add, substract, multiply, devide, sin, cos functions to be used with A and B values
   * Beam Position - Converts From and To positoin values into Rotation, Position & Size values that are used by Beam Renderer
-  * Emitter Config - Wraps emitter configuration checkboxes into one UI. 
-  * Script (Java) - Modules with 5 inputs and 5 outputs that can take a Java code as string to act open this values.
-  
+  * Emitter Config - Wraps emitter configuration checkboxes into one UI.
