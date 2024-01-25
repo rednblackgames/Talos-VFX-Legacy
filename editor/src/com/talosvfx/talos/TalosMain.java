@@ -19,7 +19,6 @@ package com.talosvfx.talos;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -38,7 +37,7 @@ import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
-import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
+import com.talosvfx.talos.editor.utils.SharedShapeDrawer;
 import com.talosvfx.talos.runtime.ScopePayload;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
@@ -319,7 +318,7 @@ public class TalosMain extends ApplicationAdapter {
 			currentWorkplaceStage.getStage().dispose();
 		}
 		uiStage.getStage().dispose();
-		SharedShaperRenderer.getInstance().dispose();
+		SharedShapeDrawer.getInstance().dispose();
 	}
 
 	public Skin getSkin() {

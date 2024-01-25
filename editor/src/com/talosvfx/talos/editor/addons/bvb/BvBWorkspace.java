@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
+import com.talosvfx.talos.editor.utils.SharedShapeDrawer;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
@@ -293,7 +293,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
         gridPropertyProvider.update(camera, parentAlpha);
-        gridRenderer.drawGrid(batch, SharedShaperRenderer.getInstance().getShapeDrawer(batch));
+        gridRenderer.drawGrid(batch, SharedShapeDrawer.getInstance().getShapeDrawer(batch));
 
         if (backgroundImage.getDrawable() != null) {
             renderBackgroundImage(batch, parentAlpha);
@@ -375,7 +375,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             }
 
             // now iterate through other non static attachments
-            SharedShaperRenderer.getInstance().getShapeDrawer(batch).setColor(Color.GREEN);
+            SharedShapeDrawer.getInstance().getShapeDrawer(batch).setColor(Color.GREEN);
             for (AttachmentPoint point : effect.getAttachments()) {
                 if (!point.isStatic()) {
                     Vector2 pos = getAttachmentPosition(point);
@@ -400,14 +400,14 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 Bone bone = skeletonContainer.getBoneByName(movingPoint.getBoneName());
                 tmp3.set(bone.getWorldX(), bone.getWorldY());
 
-                SharedShaperRenderer.getInstance().getShapeDrawer(batch).setColor(Color.PURPLE);
-                SharedShaperRenderer.getInstance().getShapeDrawer(batch).line(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
+                SharedShapeDrawer.getInstance().getShapeDrawer(batch).setColor(Color.PURPLE);
+                SharedShapeDrawer.getInstance().getShapeDrawer(batch).line(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
             } else {
                 Bone bone = skeletonContainer.findClosestBone(tmp2);
                 tmp3.set(bone.getWorldX(), bone.getWorldY());
 
-                SharedShaperRenderer.getInstance().getShapeDrawer(batch).setColor(Color.WHITE);
-                SharedShaperRenderer.getInstance().getShapeDrawer(batch).line(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
+                SharedShapeDrawer.getInstance().getShapeDrawer(batch).setColor(Color.WHITE);
+                SharedShapeDrawer.getInstance().getShapeDrawer(batch).line(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
             }
 
         }

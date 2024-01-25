@@ -7,18 +7,18 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ObjectMap;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
-public class SharedShaperRenderer {
-    private static SharedShaperRenderer instance = null;
+public class SharedShapeDrawer {
+    private static SharedShapeDrawer instance = null;
 
-    public static SharedShaperRenderer getInstance() {
-        if (instance == null) instance = new SharedShaperRenderer();
+    public static SharedShapeDrawer getInstance() {
+        if (instance == null) instance = new SharedShapeDrawer();
         return instance;
     }
 
     private final ObjectMap<Batch, ShapeDrawer> shapeDrawers = new ObjectMap<>();
     private Texture whiteTexture;
 
-    private SharedShaperRenderer() {
+    private SharedShapeDrawer() {
     }
 
     public ShapeDrawer getShapeDrawer(Batch batch) {

@@ -36,7 +36,7 @@ import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
-import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
+import com.talosvfx.talos.editor.utils.SharedShapeDrawer;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
@@ -299,7 +299,7 @@ public class PreviewWidget extends ViewportWidget {
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
-        ShapeDrawer shapeDrawer = SharedShaperRenderer.getInstance().getShapeDrawer(batch);
+        ShapeDrawer shapeDrawer = SharedShapeDrawer.getInstance().getShapeDrawer(batch);
         if (previewController.isGridVisible()) {
             gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
             ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);

@@ -18,9 +18,7 @@ package com.talosvfx.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -34,7 +32,7 @@ import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
-import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
+import com.talosvfx.talos.editor.utils.SharedShapeDrawer;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.wrappers.*;
@@ -559,7 +557,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     private void drawCurves(Batch batch) {
         if(currentEmitterWrapper == null) return;
 
-        ShapeDrawer shapeDrawer = SharedShaperRenderer.getInstance().getShapeDrawer(batch);
+        ShapeDrawer shapeDrawer = SharedShapeDrawer.getInstance().getShapeDrawer(batch);
         // draw active curve
         if(activeCurve != null) {
             shapeDrawer.setColor(0, 203/255f, 124/255f, 1f);

@@ -26,7 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
+import com.talosvfx.talos.editor.utils.SharedShapeDrawer;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.util.Comparator;
@@ -234,7 +234,7 @@ public class CurveWidget extends Actor implements CurveDataProvider {
 
 
         /// Shape renderer stuff
-        ShapeDrawer shapeDrawer = SharedShaperRenderer.getInstance().getShapeDrawer(batch);
+        ShapeDrawer shapeDrawer = SharedShapeDrawer.getInstance().getShapeDrawer(batch);
         drawLegend(shapeDrawer);
 
         drawCurve(shapeDrawer, parentAlpha);
