@@ -34,16 +34,15 @@ import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.NodeStage;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
-import com.talosvfx.talos.runtime.modules.ParticleModule;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
 import com.talosvfx.talos.runtime.serialization.ConnectionData;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.wrappers.*;
 import com.talosvfx.talos.runtime.*;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class ModuleBoardWidget extends WidgetGroup {
-    ShapeRenderer shapeRenderer;
-
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
     public ObjectMap<ParticleEmitterWrapper, Array<NodeConnection>> nodeConnections = new ObjectMap<>();
     private ParticleEmitterWrapper currentEmitterWrapper;
@@ -86,8 +85,6 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         addActor(groupContainer);
         addActor(moduleContainer);
-
-        shapeRenderer = new ShapeRenderer();
 
         addListener(new ClickListener() {
 
@@ -554,27 +551,22 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.end();
-        shapeRenderer.setProjectionMatrix(getStage().getCamera().combined);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        drawCurves();
-        shapeRenderer.end();
-        batch.begin();
+        drawCurves(batch);
 
         super.draw(batch, parentAlpha);
     }
 
-    private void drawCurves() {
+    private void drawCurves(Batch batch) {
         if(currentEmitterWrapper == null) return;
 
+        ShapeDrawer shapeDrawer = SharedShaperRenderer.getInstance().getShapeDrawer(batch);
         // draw active curve
         if(activeCurve != null) {
-            shapeRenderer.setColor(0, 203/255f, 124/255f, 1f);
-            drawCurve(activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y);
+            shapeDrawer.setColor(0, 203/255f, 124/255f, 1f);
+            drawCurve(shapeDrawer, activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y);
         }
 
-        shapeRenderer.setColor(1, 1, 1, 0.4f);
+        shapeDrawer.setColor(1, 1, 1, 0.4f);
         // draw nodes
         for(NodeConnection connection: getCurrentConnections()) {
             connection.fromModule.getOutputSlotPos(connection.fromSlot, tmp);
@@ -583,11 +575,11 @@ public class ModuleBoardWidget extends WidgetGroup {
             connection.toModule.getInputSlotPos(connection.toSlot, tmp);
             float toX = tmp.x;
             float toY = tmp.y;
-            drawCurve(x, y, toX, toY);
+            drawCurve(shapeDrawer, x, y, toX, toY);
         }
     }
 
-    private void drawCurve(float x, float y, float toX, float toY) {
+    private void drawCurve(ShapeDrawer shapeDrawer, float x, float y, float toX, float toY) {
         //shapeRenderer.setColor(1, 1, 1, 1f);
         //shapeRenderer.rectLine(x, y, toX, toY, 2f);
 
@@ -612,7 +604,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         for(float i = 0; i < 1f; i+=resolution) {
             bezier.valueAt(tmp, i);
             if(i > 0) {
-                shapeRenderer.rectLine(prev.x, prev.y, tmp.x, tmp.y, 2f);
+                shapeDrawer.line(prev.x, prev.y, tmp.x, tmp.y, 2f);
             }
             prev.set(tmp);
         }

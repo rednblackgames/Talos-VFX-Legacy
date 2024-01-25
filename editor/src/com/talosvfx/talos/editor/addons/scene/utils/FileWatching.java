@@ -49,12 +49,12 @@ public class FileWatching {
     }
 
     public FileWatching () {
-        workingThread = new Thread(this::run, "Watcher thread");
-        workingThread.start();
+        /*workingThread = new Thread(this::run, "Watcher thread");
+        workingThread.start();*/
     }
 
     public void startWatchingCurrentProject () throws IOException {
-        synchronized (lock) {
+        /*synchronized (lock) {
 
             if (watchService != null) {
                 watchService.close();
@@ -68,7 +68,7 @@ public class FileWatching {
             if (exportedScriptsFolderHandle.exists()) {
                 directoryModification(exportedScriptsFolderHandle.file().toPath(), this::registerDirectory);
             }
-        }
+        }*/
     }
 
     private void directoryModification (Path path, Function<Path, FileVisitResult> function) {

@@ -24,7 +24,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -77,7 +76,6 @@ public abstract class ViewportWidget extends Table {
 	protected float maxZoom = 0.01f;
 	protected float minZoom = 200f;
 
-	protected ShapeRenderer shapeRenderer;
 	protected final EntitySelectionBuffer entitySelectionBuffer;
 
 	private float gridSize;
@@ -107,7 +105,6 @@ public abstract class ViewportWidget extends Table {
 	protected GroupSelectionGizmo groupSelectionGizmo;
 
 	public ViewportWidget () {
-		shapeRenderer = new ShapeRenderer();
 		entitySelectionBuffer = new EntitySelectionBuffer();
 		camera = new OrthographicCamera();
 		camera.viewportWidth = 10;

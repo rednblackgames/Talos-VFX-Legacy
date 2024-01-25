@@ -16,11 +16,8 @@
 
 package com.talosvfx.talos.editor.widgets;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -29,6 +26,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.util.Comparator;
 
@@ -39,8 +38,6 @@ public class CurveWidget extends Actor implements CurveDataProvider {
     private Color pointColor = new Color(175/255f, 42/255f, 67/255f, 1f);
     private Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.4f);
     private Vector2 tmp = new Vector2();
-
-    private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     float width;
     float height;
@@ -235,35 +232,27 @@ public class CurveWidget extends Actor implements CurveDataProvider {
         Drawable background = getSkin().getDrawable("white");
         background.draw(batch, getX()+1, getY()+1, getWidth()-2, getHeight()-2.5f);
 
+
         /// Shape renderer stuff
+        ShapeDrawer shapeDrawer = SharedShaperRenderer.getInstance().getShapeDrawer(batch);
+        drawLegend(shapeDrawer);
 
-        batch.end();
-        shapeRenderer.setProjectionMatrix(getStage().getCamera().combined);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        drawLegend();
-
-        drawCurve(batch, parentAlpha);
-
-        shapeRenderer.end();
-        batch.begin();
+        drawCurve(shapeDrawer, parentAlpha);
     }
 
-    private void drawLegend() {
-        shapeRenderer.setColor(gridColor);
+    private void drawLegend(ShapeDrawer shapeDrawer) {
+        shapeDrawer.setColor(gridColor);
         for(float i = 0; i < 1f; i+=0.1f) {
-            drawLine(i, 0f, i, 1f, 1f);
-            drawLine(0f, i, 1f, i, 1f);
+            drawLine(shapeDrawer, i, 0f, i, 1f, 1f);
+            drawLine(shapeDrawer, 0f, i, 1f, i, 1f);
         }
     }
 
-    private void drawCurve(Batch batch, float parentAlpha) {
+    private void drawCurve(ShapeDrawer shapeDrawer, float parentAlpha) {
         tmp.set(3, 2);
-        localToStageCoordinates(tmp);
+        localToParentCoordinates(tmp);
 
-        shapeRenderer.setColor(lineColor);
+        shapeDrawer.setColor(lineColor);
 
         if(curveDataProvider == null) return;
 
@@ -273,41 +262,41 @@ public class CurveWidget extends Actor implements CurveDataProvider {
 
         if(points.get(0).x > 0) {
             // draw a line from (0, v) to that point (u, v)
-            drawLine(0, points.get(0).y, points.get(0).x, points.get(0).y);
+            drawLine(shapeDrawer, 0, points.get(0).y, points.get(0).x, points.get(0).y);
         }
 
         for(int i = 0; i < points.size - 1; i++) {
             Vector2 from = points.get(i);
             Vector2 to = points.get(i+1);
-            drawLine(from.x, from.y, to.x, to.y);
+            drawLine(shapeDrawer, from.x, from.y, to.x, to.y);
         }
 
         if(points.get(points.size-1).x < 1f) {
             // draw a line from that point(u,v) to (1, v)
-            drawLine(points.get(points.size-1).x, points.get(points.size-1).y, 1f, points.get(points.size-1).y);
+            drawLine(shapeDrawer, points.get(points.size-1).x, points.get(points.size-1).y, 1f, points.get(points.size-1).y);
         }
 
-        shapeRenderer.setColor(pointColor);
+        shapeDrawer.setColor(pointColor);
         // draw points
         for(int i = 0; i < points.size; i++) {
             Vector2 point = points.get(i);
-            drawPoint(point.x, point.y);
+            drawPoint(shapeDrawer, point.x, point.y);
         }
     }
 
     /**
      * values supplied from 0 to 1 range
      */
-    private void drawLine(float x1, float y1, float x2, float y2) {
-        drawLine(x1, y1, x2, y2, 2.5f);
+    private void drawLine(ShapeDrawer shapeDrawer,float x1, float y1, float x2, float y2) {
+        drawLine(shapeDrawer, x1, y1, x2, y2, 2.5f);
     }
 
-    private void drawLine(float x1, float y1, float x2, float y2, float thickness) {
-        shapeRenderer.rectLine(tmp.x + x1 *width, tmp.y + y1 * height, tmp.x + x2 * width, tmp.y + y2 * height, thickness);
+    private void drawLine(ShapeDrawer shapeDrawer, float x1, float y1, float x2, float y2, float thickness) {
+        shapeDrawer.line(tmp.x + x1 *width, tmp.y + y1 * height, tmp.x + x2 * width, tmp.y + y2 * height, thickness);
     }
 
-    private void drawPoint(float x, float y) {
-        shapeRenderer.circle(tmp.x + x * width, tmp.y + y * height, pointSize/1.5f);
+    private void drawPoint(ShapeDrawer shapeDrawer, float x, float y) {
+        shapeDrawer.filledCircle(tmp.x + x * width, tmp.y + y * height, pointSize/1.5f);
     }
 
     public Skin getSkin() {

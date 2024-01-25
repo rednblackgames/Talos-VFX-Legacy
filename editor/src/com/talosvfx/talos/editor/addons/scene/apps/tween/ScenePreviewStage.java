@@ -45,7 +45,7 @@ public class ScenePreviewStage extends ViewportWidget implements Notifications.O
         ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
 
         gridPropertyProvider.update(camera, parentAlpha);
-        gridRenderer.drawGrid(batch, shapeRenderer);
+        //gridRenderer.drawGrid(batch, shapeRenderer);
         renderer.setRenderParentTiles(false);
         batch.begin();
 

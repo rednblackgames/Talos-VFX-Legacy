@@ -28,6 +28,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import static com.talosvfx.talos.runtime.modules.OffsetModule.*;
 
@@ -36,7 +38,6 @@ public class ShapeWidget extends Actor {
     Skin skin;
     Color tmpColor;
     Vector2 tmp = new Vector2();
-    ShapeRenderer shapeRenderer;
 
     Vector2 shapePos = new Vector2();
     Vector2 shapeSize = new Vector2();
@@ -57,7 +58,6 @@ public class ShapeWidget extends Actor {
     public ShapeWidget(Skin skin) {
         this.skin = skin;
         tmpColor = new Color();
-        shapeRenderer = new ShapeRenderer();
 
         shapePos.set(0, 0);
         shapeSize.set(30, 30);
@@ -222,69 +222,61 @@ public class ShapeWidget extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         tmp.set(0, 0);
-        localToStageCoordinates(tmp);
+        localToParentCoordinates(tmp);
 
         drawBg(batch, parentAlpha);
 
-        batch.end();
-        shapeRenderer.setProjectionMatrix(getStage().getCamera().combined);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        ShapeDrawer shapeDrawer = SharedShaperRenderer.getInstance().getShapeDrawer(batch);
 
-        drawGrid(batch, parentAlpha);
-        drawShape(batch, parentAlpha);
-        drawTools(batch, parentAlpha);
-
-        shapeRenderer.end();
-        batch.begin();
-
+        drawGrid(shapeDrawer, parentAlpha);
+        drawShape(shapeDrawer, parentAlpha);
+        drawTools(shapeDrawer, parentAlpha);
     }
 
-    private void drawTools(Batch batch, float parentAlpha) {
-        shapeRenderer.setColor(1f, 1, 0, 0.3f);
-        shapeRenderer.rect(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, shapeSize.x, shapeSize.y);
+    private void drawTools(ShapeDrawer shapeDrawer, float parentAlpha) {
+        shapeDrawer.setColor(1f, 1, 0, 0.3f);
+        shapeDrawer.rectangle(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, shapeSize.x, shapeSize.y);
 
         if(centerHover) {
-            shapeRenderer.setColor(1f, 1, 0, 1f);
+            shapeDrawer.setColor(1f, 1, 0, 1f);
         } else {
-            shapeRenderer.setColor(1f, 1, 1, 1f);
+            shapeDrawer.setColor(1f, 1, 1, 1f);
         }
-        shapeRenderer.circle(tmp.x + getWidth()/2f + shapePos.x, tmp.y + getHeight()/2f + shapePos.y, 4f);
+        shapeDrawer.circle(tmp.x + getWidth()/2f + shapePos.x, tmp.y + getHeight()/2f + shapePos.y, 4f);
 
 
-        shapeRenderer.setColor(207/255f, 86/255f, 62/255f, 1f);
+        shapeDrawer.setColor(207/255f, 86/255f, 62/255f, 1f);
         if(selectedSide == LEFT) {
-            shapeRenderer.rectLine(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f, 1f);
+            shapeDrawer.line(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f, 1f);
         }
         if(selectedSide == RIGHT) {
-            shapeRenderer.rectLine(tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f, 1f);
+            shapeDrawer.line(tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f, 1f);
         }
         if(selectedSide == TOP) {
-            shapeRenderer.rectLine(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f, tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f, 1f);
+            shapeDrawer.line(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f, tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f, 1f);
         }
         if(selectedSide == BOTTOM) {
-            shapeRenderer.rectLine(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, 1f);
+            shapeDrawer.line(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, 1f);
         }
     }
 
-    private void drawShape(Batch batch, float parentAlpha) {
-        shapeRenderer.setColor(1f, 0, 0, 1f);
+    private void drawShape(ShapeDrawer shapeDrawer, float parentAlpha) {
+        shapeDrawer.setColor(1f, 0, 0, 1f);
 
         if(shapeType == TYPE_SQUARE) {
-            shapeRenderer.rect(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, shapeSize.x, shapeSize.y);
+            shapeDrawer.rectangle(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, shapeSize.x, shapeSize.y);
         } else if(shapeType == TYPE_ELLIPSE) {
-            shapeRenderer.ellipse(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f, shapeSize.x, shapeSize.y);
+            shapeDrawer.ellipse(tmp.x + getWidth()/2f + shapePos.x, tmp.y + getHeight()/2f + shapePos.y, shapeSize.x / 2, shapeSize.y / 2);
         } else if(shapeType == TYPE_LINE) {
-            shapeRenderer.line(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f,
+            shapeDrawer.line(tmp.x + getWidth()/2f + shapePos.x - shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y - shapeSize.y/2f,
                                    tmp.x + getWidth()/2f + shapePos.x + shapeSize.x/2f, tmp.y + getHeight()/2f + shapePos.y + shapeSize.y/2f);
         }
     }
 
-    private void drawGrid(Batch batch, float parentAlpha) {
-        shapeRenderer.setColor(1f, 1f, 1f, 0.2f);
-        shapeRenderer.rectLine(tmp.x + getWidth()/2f, tmp.y, tmp.x + getWidth()/2f, tmp.y + getHeight(), 1f);
-        shapeRenderer.rectLine(tmp.x, tmp.y + getHeight()/2f, tmp.x + getWidth(), tmp.y + getHeight()/2f, 1f);
+    private void drawGrid(ShapeDrawer shapeDrawer, float parentAlpha) {
+        shapeDrawer.setColor(1f, 1f, 1f, 0.2f);
+        shapeDrawer.line(tmp.x + getWidth()/2f, tmp.y, tmp.x + getWidth()/2f, tmp.y + getHeight(), 1f);
+        shapeDrawer.line(tmp.x, tmp.y + getHeight()/2f, tmp.x + getWidth(), tmp.y + getHeight()/2f, 1f);
     }
 
     private void drawBg(Batch batch, float parentAlpha) {

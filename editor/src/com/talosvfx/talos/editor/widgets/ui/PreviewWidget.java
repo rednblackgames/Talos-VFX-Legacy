@@ -22,7 +22,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.FloatCounter;
 import com.badlogic.gdx.math.Vector2;
@@ -37,11 +36,13 @@ import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class PreviewWidget extends ViewportWidget {
 
@@ -52,8 +53,6 @@ public class PreviewWidget extends ViewportWidget {
     private ParticleRenderer particleRenderer;
 
     private SpriteBatchParticleRenderer spriteBatchParticleRenderer;
-
-    private ShapeRenderer shapeRenderer;
 
     private Color tmpColor = new Color();
 
@@ -98,7 +97,6 @@ public class PreviewWidget extends ViewportWidget {
 
         spriteBatchParticleRenderer = new SpriteBatchParticleRenderer(null);
         particleRenderer = spriteBatchParticleRenderer;
-        shapeRenderer = new ShapeRenderer();
         previewController = new PreviewImageControllerWidget(TalosMain.Instance().getSkin()) {
             @Override
             public void removeImage () {
@@ -301,14 +299,12 @@ public class PreviewWidget extends ViewportWidget {
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
-
+        ShapeDrawer shapeDrawer = SharedShaperRenderer.getInstance().getShapeDrawer(batch);
         if (previewController.isGridVisible()) {
-            batch.end();
             gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
             ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
             gridPropertyProvider.update(camera, parentAlpha);
-            gridRenderer.drawGrid(batch, shapeRenderer);
-            batch.begin();
+            gridRenderer.drawGrid(batch, shapeDrawer);
         }
 
         mid.set(0, 0);
@@ -349,22 +345,13 @@ public class PreviewWidget extends ViewportWidget {
 
         // now for the drag points
         if(dragPoints.size > 0) {
-            batch.end();
             tmpColor.set(Color.ORANGE);
             tmpColor.a = 0.8f;
-            Gdx.gl.glLineWidth(1f);
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(tmpColor);
+            shapeDrawer.setColor(tmpColor);
 
             for (DragPoint point : dragPoints) {
-                shapeRenderer.circle(point.position.x, point.position.y, 0.1f * camera.zoom, 15);
+                shapeDrawer.filledCircle(point.position.x, point.position.y, 0.1f * camera.zoom);
             }
-
-            shapeRenderer.end();
-            batch.begin();
         }
     }
 

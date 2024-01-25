@@ -29,6 +29,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.metadata.SpriteMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
@@ -61,7 +62,7 @@ public class MainRenderer implements Notifications.Observer {
     //private TalosSkeletonRenderer spineRenderer;
 
     private TalosMapRenderer mapRenderer;
-    private ShapeRenderer shapeRenderer;
+    //private ShapeRenderer shapeRenderer;
 
     private TextureRegion textureRegion = new TextureRegion();
     private OrthographicCamera camera;
@@ -87,7 +88,7 @@ public class MainRenderer implements Notifications.Observer {
         talosRenderer = new SpriteBatchParticleRenderer();
         //spineRenderer = new TalosSkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
-        shapeRenderer = new ShapeRenderer();
+        //shapeRenderer = SharedShaperRenderer.getInstance().getShapeRenderer();
 
         layerAndDrawOrderComparator = new Comparator<GameObject>() {
             @Override
@@ -193,9 +194,9 @@ public class MainRenderer implements Notifications.Observer {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Color color = Color.valueOf("459534");
             color.a = 0.5f;
-            shapeRenderer.setColor(color);
+            /*shapeRenderer.setColor(color);
             shapeRenderer.setProjectionMatrix(camera.combined);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);*/
 
 
             for (int i = 0; i < state.list.size; i++) {
@@ -224,7 +225,7 @@ public class MainRenderer implements Notifications.Observer {
                             posX -= transformSettings.offsetX;
                             posY -= transformSettings.offsetY;
 
-                            shapeRenderer.rect(posX, posY, 1,1);
+                            //shapeRenderer.rect(posX, posY, 1,1);
 
                         } else {
                             float posY = parentTile.getIntY();
@@ -239,7 +240,7 @@ public class MainRenderer implements Notifications.Observer {
                             posX -= bottomLeftParentTile.getIntX();
                             posY -= bottomLeftParentTile.getIntY();
 
-                            shapeRenderer.rect(posX, posY, 1,1);
+                           // shapeRenderer.rect(posX, posY, 1,1);
 
                         }
 
@@ -249,7 +250,7 @@ public class MainRenderer implements Notifications.Observer {
                 }
 
             }
-            shapeRenderer.end();
+            //shapeRenderer.end();
             Gdx.gl.glDisable(GL20.GL_BLEND);
         }
         batch.begin();

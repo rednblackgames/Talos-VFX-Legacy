@@ -26,14 +26,15 @@ import com.talosvfx.talos.editor.notifications.events.NodeConnectionCreatedEvent
 import com.talosvfx.talos.editor.notifications.events.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.NodeRemovedEvent;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
 import com.talosvfx.talos.runtime.Slot;
 import com.talosvfx.talos.runtime.modules.AbstractModule;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
     private Skin skin;
 
-    ShapeRenderer shapeRenderer;
     private Curve activeCurve;
     private Bezier<Vector2> bezier = new Bezier<>();
     private Vector2[] curvePoints = new Vector2[4];
@@ -124,7 +125,6 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
     public NodeBoard(Skin skin, DynamicNodeStage nodeStage) {
         this.skin = skin;
-        shapeRenderer = new ShapeRenderer();
 
         this.nodeStage = nodeStage;
 
@@ -153,28 +153,23 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
-        batch.end();
-        shapeRenderer.setProjectionMatrix(getStage().getCamera().combined);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        drawCurves();
-        shapeRenderer.end();
-        batch.begin();
+        ShapeDrawer shapeDrawer = SharedShaperRenderer.getInstance().getShapeDrawer(batch);
+        drawCurves(shapeDrawer);
 
         super.draw(batch, parentAlpha);
     }
 
-    private void drawCurves() {
+    private void drawCurves(ShapeDrawer shapeDrawer) {
         // draw active curve
         if(activeCurve != null) {
-            shapeRenderer.setColor(0, 203/255f, 124/255f, 1f);
-            drawCurve(activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y, null, null);
+            shapeDrawer.setColor(0, 203/255f, 124/255f, 1f);
+            drawCurve(shapeDrawer, activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y, null, null);
         }
 
         NodeConnection hoveredConnectionRef = hoveredConnection;
         hoveredConnection = null;
 
-        shapeRenderer.setColor(1, 1, 1, 0.4f);
+        shapeDrawer.setColor(1, 1, 1, 0.4f);
         // draw nodes
         for(NodeConnection connection: nodeConnections) {
             connection.fromNode.getOutputSlotPos(connection.fromId, tmp);
@@ -184,12 +179,12 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
             float toX = tmp.x;
             float toY = tmp.y;
 
-            drawCurve(x, y, toX, toY, connection, hoveredConnectionRef);
+            drawCurve(shapeDrawer, x, y, toX, toY, connection, hoveredConnectionRef);
         }
     }
 
 
-    private void drawCurve(float x, float y, float toX, float toY, NodeConnection nodeConnection, NodeConnection hoveredConnectionRef) {
+    private void drawCurve(ShapeDrawer shapeDrawer, float x, float y, float toX, float toY, NodeConnection nodeConnection, NodeConnection hoveredConnectionRef) {
 
         float highlight = -1;
         Color highlightColor = NodeBoard.curveColor;
@@ -247,14 +242,14 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
                     thickness = 2f;
                 }
 
-                shapeRenderer.setColor(tmpColor);
+                shapeDrawer.setColor(tmpColor);
             } else {
-                shapeRenderer.setColor(mainColor);
+                shapeDrawer.setColor(mainColor);
             }
 
             bezier.valueAt(tmp, i);
             if(i > 0) {
-                shapeRenderer.rectLine(prev.x, prev.y, tmp.x, tmp.y, thickness);
+                shapeDrawer.line(prev.x, prev.y, tmp.x, tmp.y, thickness);
             }
             prev.set(tmp);
 

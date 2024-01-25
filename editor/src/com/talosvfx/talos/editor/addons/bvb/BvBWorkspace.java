@@ -23,6 +23,7 @@ import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.project.FileTracker;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
@@ -292,13 +293,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     @Override
     public void drawContent(Batch batch, float parentAlpha) {
-        batch.end();
-
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         ((DynamicGridPropertyProvider) gridPropertyProvider).distanceThatLinesShouldBe = pixelToWorld(150);
         gridPropertyProvider.update(camera, parentAlpha);
-        gridRenderer.drawGrid(batch, shapeRenderer);
-        batch.begin();
+        gridRenderer.drawGrid(batch, SharedShaperRenderer.getInstance().getShapeDrawer(batch));
 
         if (backgroundImage.getDrawable() != null) {
             renderBackgroundImage(batch, parentAlpha);
@@ -339,16 +337,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if (skeleton == null) return;
 
         if (showingTools) {
-            batch.end();
-            Gdx.gl.glLineWidth(1f);
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-            drawShapeRendererTools();
-
-            shapeRenderer.end();
-            batch.begin();
+            drawShapeRendererTools(batch);
 
             if (showingTools) {
                 drawSpriteTools(batch, parentAlpha);
@@ -389,7 +378,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             }
 
             // now iterate through other non static attachments
-            shapeRenderer.setColor(Color.GREEN);
+            SharedShaperRenderer.getInstance().getShapeDrawer(batch).setColor(Color.GREEN);
             for (AttachmentPoint point : effect.getAttachments()) {
                 if (!point.isStatic()) {
                     Vector2 pos = getAttachmentPosition(point);
@@ -403,7 +392,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
 
-    private void drawShapeRendererTools() {
+    private void drawShapeRendererTools(Batch batch) {
         /**
          * If attachment point of an effect is currently being moved, then draw line to it's origin or nearest bone
          */
@@ -414,14 +403,14 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 Bone bone = skeletonContainer.getBoneByName(movingPoint.getBoneName());
                 tmp3.set(bone.getWorldX(), bone.getWorldY());
 
-                shapeRenderer.setColor(Color.PURPLE);
-                shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
+                SharedShaperRenderer.getInstance().getShapeDrawer(batch).setColor(Color.PURPLE);
+                SharedShaperRenderer.getInstance().getShapeDrawer(batch).line(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
             } else {
                 Bone bone = skeletonContainer.findClosestBone(tmp2);
                 tmp3.set(bone.getWorldX(), bone.getWorldY());
 
-                shapeRenderer.setColor(Color.WHITE);
-                shapeRenderer.rectLine(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
+                SharedShaperRenderer.getInstance().getShapeDrawer(batch).setColor(Color.WHITE);
+                SharedShaperRenderer.getInstance().getShapeDrawer(batch).line(tmp2.x, tmp2.y, tmp3.x, tmp3.y, pixelToWorld(2f));
             }
 
         }

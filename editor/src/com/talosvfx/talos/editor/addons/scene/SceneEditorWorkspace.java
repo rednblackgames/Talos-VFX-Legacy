@@ -1068,17 +1068,17 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			staticGridPropertyProvider.update(camera, parentAlpha);
 			gridRenderer.setGridPropertyProvider(staticGridPropertyProvider);
 			rulerRenderer.setGridPropertyProvider(staticGridPropertyProvider);
-			gridRenderer.drawGrid(batch, shapeRenderer);
+			//gridRenderer.drawGrid(batch, shapeRenderer);
 			renderer.setRenderParentTiles(false);
 
 			if (mapEditorState.isSpraying()) {
 				// show the spray radius
 				GL20.glLineWidth(5.0f);
-				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+				//shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 				Vector2 vec = getMouseCordsOnScene();
-				shapeRenderer.circle(vec.x, vec.y, sprayInnerRadius, 20);
-				shapeRenderer.circle(vec.x, vec.y, sprayOuterRadius, 20);
-				shapeRenderer.end();
+				//shapeRenderer.circle(vec.x, vec.y, sprayInnerRadius, 20);
+				//shapeRenderer.circle(vec.x, vec.y, sprayOuterRadius, 20);
+				//shapeRenderer.end();
 				GL20.glLineWidth(1.0f);
 			}
 		} else {
@@ -1086,7 +1086,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			gridPropertyProvider.update(camera, parentAlpha);
 			gridRenderer.setGridPropertyProvider(gridPropertyProvider);
 			rulerRenderer.setGridPropertyProvider(gridPropertyProvider);
-			gridRenderer.drawGrid(batch, shapeRenderer);
+			//gridRenderer.drawGrid(batch, shapeRenderer);
 			renderer.setRenderParentTiles(false);
 		}
 

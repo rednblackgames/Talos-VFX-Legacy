@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -17,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class GridRenderer {
 
@@ -33,15 +33,9 @@ public class GridRenderer {
 		this.gridPropertyProvider = gridPropertyProvider;
 	}
 
-	public void drawGrid (Batch batch, ShapeRenderer shapeRenderer) {
+	public void drawGrid (Batch batch, ShapeDrawer shapeRenderer) {
 		Color backgroundColor = gridPropertyProvider.getBackgroundColor();
 		Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1f);
-		Gdx.gl.glLineWidth(1f);
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-		Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
-
-		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
 		for (GridLine gridLine : gridPropertyProvider.getGridLines()) {
 			shapeRenderer.setColor(gridLine.color);
@@ -59,7 +53,7 @@ public class GridRenderer {
 			int projX = getMouseCellX();
 			int projY = getMouseCellY();
 
-			shapeRenderer.rect(projX, projY, gridSizeX, gridSizeY);
+			shapeRenderer.filledRectangle(projX, projY, gridSizeX, gridSizeY);
 		}
 
 		if (gridPropertyProvider.shouldHighlightCursorSelect()) {
@@ -67,16 +61,13 @@ public class GridRenderer {
 				int projX = getMouseCellX();
 				int projY = getMouseCellY();
 
-				shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-				shapeRenderer.rect(projX, projY, gridSizeX, gridSizeY);
+				shapeRenderer.filledRectangle(projX, projY, gridSizeX, gridSizeY);
 			}
 		}
-
-		shapeRenderer.end();
 	}
 
-	private void drawLine (ShapeRenderer shapeRenderer, float x1, float y1, float x2, float y2, float thickness) {
-		shapeRenderer.rectLine(x1, y1, x2, y2, thickness);
+	private void drawLine (ShapeDrawer shapeRenderer, float x1, float y1, float x2, float y2, float thickness) {
+		shapeRenderer.line(x1, y1, x2, y2, thickness);
 	}
 
 	public int getMouseCellX () {

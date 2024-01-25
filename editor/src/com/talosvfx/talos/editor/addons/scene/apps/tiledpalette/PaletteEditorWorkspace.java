@@ -577,7 +577,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         batch.end();
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         gridPropertyProvider.update(camera, parentAlpha);
-        gridRenderer.drawGrid(batch, shapeRenderer);
+        //gridRenderer.drawGrid(batch, shapeRenderer);
 
         OrderedMap<GameAsset<?>, GameObject> gameObjects = paletteData.getResource().gameObjects;
 
@@ -586,7 +586,7 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         gameObjects.orderedKeys().sort(gameObjectRenderOrderComparator);
 
 
-        shapeRenderer.setProjectionMatrix(camera.combined);
+        //shapeRenderer.setProjectionMatrix(camera.combined);
 
         // render parent tiles
         for (ObjectMap.Entry<GameAsset<?>, GameObject> entry : gameObjects) {
@@ -632,31 +632,31 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
             boolean shouldAppend = !parentTiles.contains(dummyCell);
             if (shouldAppend) {
-                shapeRenderer.setColor(parentTilesColorBlue);
+               // shapeRenderer.setColor(parentTilesColorBlue);
             } else {
-                shapeRenderer.setColor(parentTilesColorRed);
+                //shapeRenderer.setColor(parentTilesColorRed);
             }
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            //shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
             for (int i = lowestX; i <= highestX; i++) {
                 for (int j = lowestY; j <= highestY; j++) {
-                    shapeRenderer.rect(i, j, 1, 1);
+                    //shapeRenderer.rect(i, j, 1, 1);
                 }
             }
 
-            shapeRenderer.end();
+           // shapeRenderer.end();
             if (shouldAppend) {
-                shapeRenderer.setColor(parentTilesBorderColorBlue);
+               // shapeRenderer.setColor(parentTilesBorderColorBlue);
             } else {
-                shapeRenderer.setColor(parentTilesBorderColorRed);
+               // shapeRenderer.setColor(parentTilesBorderColorRed);
             }
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+           // shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             for (int i = lowestX; i <= highestX; i++) {
                 for (int j = lowestY; j <= highestY; j++) {
-                    shapeRenderer.rect(i, j, 1, 1);
+                    //shapeRenderer.rect(i, j, 1, 1);
                 }
             }
-            shapeRenderer.end();
+            //shapeRenderer.end();
 
             batch.begin();
             Skin skin = TalosMain.Instance().getSkin();
@@ -707,8 +707,8 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         batch.end();
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(ColorLibrary.BORDER_BLUE);
+        //shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+       // shapeRenderer.setColor(ColorLibrary.BORDER_BLUE);
 
 
 //        for (ObjectMap.Entry<GameAsset<?>, StaticTile> entry : staticTiles) {
@@ -748,12 +748,12 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                     width = spriteRendererComponent.size.x + 1f;
                 }
 
-                shapeRenderer.line(
+                /*shapeRenderer.line(
                         xPos - width / 2f, tmpHeightOffset,
                         xPos + width / 2f, tmpHeightOffset
-                );
+                );*/
 
-                shapeRenderer.end();
+                //shapeRenderer.end();
                 batch.begin();
                 Skin skin = TalosMain.Instance().getSkin();
                 Drawable lineAdjustIcon = skin.getDrawable("adjust-line-icon");
@@ -765,11 +765,11 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
                 lineAdjustIcon.draw(batch, xPos - width / 2f, tmpHeightOffset - icHeight / 2f, icWidth, icHeight);
                 lineAdjustIcon.draw(batch, xPos + width / 2f - icWidth / 2f, tmpHeightOffset - icHeight / 2f, icWidth, icHeight);
                 batch.end();
-                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                //shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             }
         }
 
-        shapeRenderer.end();
+        //shapeRenderer.end();
 
 
         beginEntitySelectionBuffer();
@@ -800,26 +800,26 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
         }
 
 
-        shapeRenderer.setColor(renderColor);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        //shapeRenderer.setColor(renderColor);
+       // shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         for (GridPosition parentTile : tileDataComponent.getParentTiles()) {
-            shapeRenderer.rect(parentTile.x, parentTile.y, gridSizeX, gridSizeY);
+            //shapeRenderer.rect(parentTile.x, parentTile.y, gridSizeX, gridSizeY);
         }
-        shapeRenderer.end();
+       // shapeRenderer.end();
 
         Gdx.gl.glLineWidth(2f);
         if (selection.contains(gameObject)) {
             Color renderBorderColor = gameObject instanceof TileGameObjectProxy ? parentTilesProxyColor : parentTilesBorderColorBlue;
 
-            shapeRenderer.setColor(renderBorderColor);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+          //  shapeRenderer.setColor(renderBorderColor);
+          //  shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
             for (GridPosition parentTile : tileDataComponent.getParentTiles()) {
-                shapeRenderer.rect(parentTile.x, parentTile.y, gridSizeX, gridSizeY);
+             //   shapeRenderer.rect(parentTile.x, parentTile.y, gridSizeX, gridSizeY);
             }
 
-            shapeRenderer.end();
+         //   shapeRenderer.end();
         }
         Gdx.gl.glLineWidth(1f);
         Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -856,10 +856,10 @@ public class PaletteEditorWorkspace extends ViewportWidget implements Notificati
 
         // render highlight
         Gdx.gl.glLineWidth(4f);
-        shapeRenderer.setColor(1f, 1f, 1f, 1f);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.rect(lowestX, lowestY, gridSizeX * (highestX - lowestX) + 1, gridSizeY * (highestY - lowestY) + 1);
-        shapeRenderer.end();
+        //shapeRenderer.setColor(1f, 1f, 1f, 1f);
+       // shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+      //  shapeRenderer.rect(lowestX, lowestY, gridSizeX * (highestX - lowestX) + 1, gridSizeY * (highestY - lowestY) + 1);
+      //  shapeRenderer.end();
         Gdx.gl.glLineWidth(1f);
     }
 

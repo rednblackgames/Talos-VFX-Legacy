@@ -38,6 +38,7 @@ import com.talosvfx.talos.editor.project.ProjectController;
 import com.talosvfx.talos.editor.utils.CameraController;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.utils.ScreenshotService;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
 import com.talosvfx.talos.runtime.ScopePayload;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
@@ -318,6 +319,7 @@ public class TalosMain extends ApplicationAdapter {
 			currentWorkplaceStage.getStage().dispose();
 		}
 		uiStage.getStage().dispose();
+		SharedShaperRenderer.getInstance().dispose();
 	}
 
 	public Skin getSkin() {

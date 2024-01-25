@@ -3,10 +3,10 @@ package com.talosvfx.talos.editor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.talosvfx.talos.editor.utils.SharedShaperRenderer;
 import com.talosvfx.talos.editor.utils.grid.GridRenderer;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 
@@ -14,8 +14,6 @@ public class GridRendererWrapper extends Actor {
 
     private final Stage stage;
     private final OrthographicCamera camera;
-
-    private ShapeRenderer shapeRenderer;
 
     GridRenderer gridRenderer;
 
@@ -26,7 +24,6 @@ public class GridRendererWrapper extends Actor {
     public GridRendererWrapper (Stage stage) {
         this.stage = stage;
         camera = (OrthographicCamera)this.stage.getViewport().getCamera();
-        shapeRenderer = new ShapeRenderer();
         gridPropertyProvider = new DynamicGridPropertyProvider();
         gridPropertyProvider.setLineThickness(pixelToWorld(1.2f));
         gridPropertyProvider.distanceThatLinesShouldBe = pixelToWorld(150f);
@@ -46,9 +43,7 @@ public class GridRendererWrapper extends Actor {
     public void draw (Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
         gridPropertyProvider.update(camera, parentAlpha);
-        batch.end();
-        gridRenderer.drawGrid(batch, shapeRenderer);
-        batch.begin();
+        gridRenderer.drawGrid(batch, SharedShaperRenderer.getInstance().getShapeDrawer(batch));
     }
 
     protected float pixelToWorld (float pixelSize) {
