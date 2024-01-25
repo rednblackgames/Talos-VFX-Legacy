@@ -33,9 +33,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
 
@@ -52,19 +50,11 @@ import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
 
 public class BVBSkeletonRenderer {
-	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
+    static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
     private boolean pmaColors, pmaBlendModes;
     private final FloatArray vertices = new FloatArray(32);
     private final SkeletonClipping clipper = new SkeletonClipping();
-
-    private @Null TalosSkeletonRenderer.VertexEffect vertexEffect;
-    private final Vector2 temp = new Vector2();
-    private final Vector2 temp2 = new Vector2();
-    private final Color temp3 = new Color();
-    private final Color temp4 = new Color();
-    private final Color temp5 = new Color();
-    private final Color temp6 = new Color();
 
     /**
      * Renders the specified skeleton. If the batch is a PolygonSpriteBatch, {@link #draw(SpriteBatchParticleRenderer, PolygonSpriteBatch, SkeletonContainer, Skeleton)} is
@@ -86,10 +76,7 @@ public class BVBSkeletonRenderer {
         }
         if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
         if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
-        if (skeletonContainer == null) throw new IllegalArgumentException("skeleton cannot be null.");
-
-        TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
-        if (vertexEffect != null) vertexEffect.begin(skeleton);
+        if (skeletonContainer == null) throw new IllegalArgumentException("skeleton container cannot be null.");
 
         boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
         BlendMode blendMode = null;
@@ -100,6 +87,14 @@ public class BVBSkeletonRenderer {
         for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
             Slot slot = (Slot) drawOrder[i];
             if (!slot.bone.active) continue;
+
+            BoundEffect boundEffect = skeletonContainer.findEffect(skeleton, slot);
+            if (boundEffect != null && boundEffect.isNested() && boundEffect.isBehind()) {
+                for (ParticleEffectInstance particleEffectInstance : boundEffect.getParticleEffects()) {
+                    particleRenderer.render(particleEffectInstance);
+                }
+            }
+
             Attachment attachment = slot.attachment;
             if (attachment instanceof RegionAttachment) {
                 RegionAttachment region = (RegionAttachment) attachment;
@@ -141,7 +136,14 @@ public class BVBSkeletonRenderer {
 
             } else if (attachment instanceof SkeletonAttachment) {
                 Skeleton attachmentSkeleton = ((SkeletonAttachment) attachment).getSkeleton();
-                if (attachmentSkeleton != null) draw(particleRenderer, batch, skeletonContainer, attachmentSkeleton);//TODO This is messed up
+                if (attachmentSkeleton != null)
+                    draw(particleRenderer, batch, skeletonContainer, attachmentSkeleton); //TODO This is messed up
+            }
+
+            if (boundEffect != null && boundEffect.isNested() && !boundEffect.isBehind()) {
+                for (ParticleEffectInstance particleEffectInstance : boundEffect.getParticleEffects()) {
+                    particleRenderer.render(particleEffectInstance);
+                }
             }
         }
     }
@@ -156,12 +158,7 @@ public class BVBSkeletonRenderer {
     public void draw(SpriteBatchParticleRenderer particleRenderer, PolygonSpriteBatch batch, SkeletonContainer skeletonContainer, Skeleton skeleton) {
         if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
         if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
-
-        Vector2 tempPosition = this.temp, tempUV = this.temp2;
-        Color tempLight1 = this.temp3, tempDark1 = this.temp4;
-        Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-        TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
-        if (vertexEffect != null) vertexEffect.begin(skeleton);
+        if (skeletonContainer == null) throw new IllegalArgumentException("skeleton container cannot be null.");
 
         boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
         BlendMode blendMode = null;
@@ -179,7 +176,6 @@ public class BVBSkeletonRenderer {
             }
 
             BoundEffect boundEffect = skeletonContainer.findEffect(skeleton, slot);
-
             if (boundEffect != null && boundEffect.isNested() && boundEffect.isBehind()) {
                 for (ParticleEffectInstance particleEffectInstance : boundEffect.getParticleEffects()) {
                     particleRenderer.render(particleEffectInstance);
@@ -244,35 +240,14 @@ public class BVBSkeletonRenderer {
                     clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, c, 0, false);
                     FloatArray clippedVertices = clipper.getClippedVertices();
                     ShortArray clippedTriangles = clipper.getClippedTriangles();
-                    if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 5, c, 0);
                     batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
                             clippedTriangles.size);
                 } else {
-                    if (vertexEffect != null) {
-                        tempLight1.set(NumberUtils.floatToIntColor(c));
-                        tempDark1.set(0);
-                        for (int v = 0, u = 0; v < verticesLength; v += 5, u += 2) {
-                            tempPosition.x = vertices[v];
-                            tempPosition.y = vertices[v + 1];
-                            tempLight2.set(tempLight1);
-                            tempDark2.set(tempDark1);
-                            tempUV.x = uvs[u];
-                            tempUV.y = uvs[u + 1];
-                            vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
-                            vertices[v] = tempPosition.x;
-                            vertices[v + 1] = tempPosition.y;
-                            vertices[v + 2] = tempLight2.toFloatBits();
-                            vertices[v + 3] = tempUV.x;
-                            vertices[v + 4] = tempUV.y;
-                        }
-                    } else {
-                        for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
-                            vertices[v] = c;
-                            vertices[v + 1] = uvs[u];
-                            vertices[v + 2] = uvs[u + 1];
-                        }
+                    for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
+                        vertices[v] = c;
+                        vertices[v + 1] = uvs[u];
+                        vertices[v + 2] = uvs[u + 1];
                     }
-
                     batch.draw(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
                 }
             }
@@ -286,7 +261,6 @@ public class BVBSkeletonRenderer {
             }
         }
         clipper.clipEnd();
-        if (vertexEffect != null) vertexEffect.end();
     }
 
     /**
@@ -299,12 +273,7 @@ public class BVBSkeletonRenderer {
     public void draw(SpriteBatchParticleRenderer particleRenderer, TwoColorPolygonBatch batch, SkeletonContainer skeletonContainer, Skeleton skeleton) {
         if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
         if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
-
-        Vector2 tempPosition = this.temp, tempUV = this.temp2;
-        Color tempLight1 = this.temp3, tempDark1 = this.temp4;
-        Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-        TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
-        if (vertexEffect != null) vertexEffect.begin(skeleton);
+        if (skeletonContainer == null) throw new IllegalArgumentException("skeleton container cannot be null.");
 
         boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
         batch.setPremultipliedAlpha(pmaColors);
@@ -321,6 +290,14 @@ public class BVBSkeletonRenderer {
                 clipper.clipEnd(slot);
                 continue;
             }
+
+            BoundEffect boundEffect = skeletonContainer.findEffect(skeleton, slot);
+            if (boundEffect != null && boundEffect.isNested() && boundEffect.isBehind()) {
+                for (ParticleEffectInstance particleEffectInstance : boundEffect.getParticleEffects()) {
+                    particleRenderer.render(particleEffectInstance);
+                }
+            }
+
             Texture texture = null;
             int vertexSize = clipper.isClipping() ? 2 : 6;
             Attachment attachment = slot.attachment;
@@ -387,86 +364,29 @@ public class BVBSkeletonRenderer {
                     clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);
                     FloatArray clippedVertices = clipper.getClippedVertices();
                     ShortArray clippedTriangles = clipper.getClippedTriangles();
-                    if (vertexEffect != null)
-                        applyVertexEffect(clippedVertices.items, clippedVertices.size, 6, light, dark);
+
                     batch.drawTwoColor(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
                             clippedTriangles.size);
                 } else {
-                    if (vertexEffect != null) {
-                        tempLight1.set(NumberUtils.floatToIntColor(light));
-                        tempDark1.set(NumberUtils.floatToIntColor(dark));
-                        for (int v = 0, u = 0; v < verticesLength; v += 6, u += 2) {
-                            tempPosition.x = vertices[v];
-                            tempPosition.y = vertices[v + 1];
-                            tempLight2.set(tempLight1);
-                            tempDark2.set(tempDark1);
-                            tempUV.x = uvs[u];
-                            tempUV.y = uvs[u + 1];
-                            vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
-                            vertices[v] = tempPosition.x;
-                            vertices[v + 1] = tempPosition.y;
-                            vertices[v + 2] = tempLight2.toFloatBits();
-                            vertices[v + 3] = tempDark2.toFloatBits();
-                            vertices[v + 4] = tempUV.x;
-                            vertices[v + 5] = tempUV.y;
-                        }
-                    } else {
-                        for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
-                            vertices[v] = light;
-                            vertices[v + 1] = dark;
-                            vertices[v + 2] = uvs[u];
-                            vertices[v + 3] = uvs[u + 1];
-                        }
+                    for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
+                        vertices[v] = light;
+                        vertices[v + 1] = dark;
+                        vertices[v + 2] = uvs[u];
+                        vertices[v + 3] = uvs[u + 1];
                     }
                     batch.drawTwoColor(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
                 }
             }
 
             clipper.clipEnd(slot);
+
+            if (boundEffect != null && boundEffect.isNested() && !boundEffect.isBehind()) {
+                for (ParticleEffectInstance particleEffectInstance : boundEffect.getParticleEffects()) {
+                    particleRenderer.render(particleEffectInstance);
+                }
+            }
         }
         clipper.clipEnd();
-        if (vertexEffect != null) vertexEffect.end();
-    }
-
-    private void applyVertexEffect(float[] vertices, int verticesLength, int stride, float light, float dark) {
-        Vector2 tempPosition = this.temp, tempUV = this.temp2;
-        Color tempLight1 = this.temp3, tempDark1 = this.temp4;
-        Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-        TalosSkeletonRenderer.VertexEffect vertexEffect = this.vertexEffect;
-        tempLight1.set(NumberUtils.floatToIntColor(light));
-        tempDark1.set(NumberUtils.floatToIntColor(dark));
-        if (stride == 5) {
-            for (int v = 0; v < verticesLength; v += stride) {
-                tempPosition.x = vertices[v];
-                tempPosition.y = vertices[v + 1];
-                tempUV.x = vertices[v + 3];
-                tempUV.y = vertices[v + 4];
-                tempLight2.set(tempLight1);
-                tempDark2.set(tempDark1);
-                vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
-                vertices[v] = tempPosition.x;
-                vertices[v + 1] = tempPosition.y;
-                vertices[v + 2] = tempLight2.toFloatBits();
-                vertices[v + 3] = tempUV.x;
-                vertices[v + 4] = tempUV.y;
-            }
-        } else {
-            for (int v = 0; v < verticesLength; v += stride) {
-                tempPosition.x = vertices[v];
-                tempPosition.y = vertices[v + 1];
-                tempUV.x = vertices[v + 4];
-                tempUV.y = vertices[v + 5];
-                tempLight2.set(tempLight1);
-                tempDark2.set(tempDark1);
-                vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
-                vertices[v] = tempPosition.x;
-                vertices[v + 1] = tempPosition.y;
-                vertices[v + 2] = tempLight2.toFloatBits();
-                vertices[v + 3] = tempDark2.toFloatBits();
-                vertices[v + 4] = tempUV.x;
-                vertices[v + 5] = tempUV.y;
-            }
-        }
     }
 
     public boolean getPremultipliedAlphaColors() {
@@ -499,13 +419,5 @@ public class BVBSkeletonRenderer {
     public void setPremultipliedAlpha(boolean pmaColorsAndBlendModes) {
         pmaColors = pmaColorsAndBlendModes;
         pmaBlendModes = pmaColorsAndBlendModes;
-    }
-
-    public @Null TalosSkeletonRenderer.VertexEffect getVertexEffect() {
-        return vertexEffect;
-    }
-
-    public void setVertexEffect(@Null TalosSkeletonRenderer.VertexEffect vertexEffect) {
-        this.vertexEffect = vertexEffect;
     }
 }

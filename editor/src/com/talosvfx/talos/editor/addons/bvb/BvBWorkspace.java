@@ -237,7 +237,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                     camera.position.set(0, 0, 0);
                     setWorldSize(getWorldWidth());
                 }
-                if (keycode == Input.Keys.SPACE) {
+                if (keycode == Input.Keys.R) {
                     paused = !paused;
                     bvb.getTimeline().setPaused(paused);
                 }

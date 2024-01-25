@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.esotericsoftware.spine.TalosSkeletonRenderer;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.assets.GameAssetType;
@@ -33,7 +32,6 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.runtime.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.render.SpriteBatchParticleRenderer;
-import org.w3c.dom.Text;
 
 import java.util.Comparator;
 
@@ -60,7 +58,7 @@ public class MainRenderer implements Notifications.Observer {
     private ObjectMap<ParticleComponent, ParticleEffectInstance> particleCache = new ObjectMap<>();
 
     private SpriteBatchParticleRenderer talosRenderer;
-    private TalosSkeletonRenderer spineRenderer;
+    //private TalosSkeletonRenderer spineRenderer;
 
     private TalosMapRenderer mapRenderer;
     private ShapeRenderer shapeRenderer;
@@ -87,7 +85,7 @@ public class MainRenderer implements Notifications.Observer {
         Notifications.registerObserver(this);
 
         talosRenderer = new SpriteBatchParticleRenderer();
-        spineRenderer = new TalosSkeletonRenderer();
+        //spineRenderer = new TalosSkeletonRenderer();
         mapRenderer = new TalosMapRenderer();
         shapeRenderer = new ShapeRenderer();
 
@@ -347,7 +345,7 @@ public class MainRenderer implements Notifications.Observer {
         }
         spineRendererComponent.skeleton.updateWorldTransform();
 
-        spineRenderer.draw(batch, spineRendererComponent.skeleton);
+        //spineRenderer.draw(batch, spineRendererComponent.skeleton);
 
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }

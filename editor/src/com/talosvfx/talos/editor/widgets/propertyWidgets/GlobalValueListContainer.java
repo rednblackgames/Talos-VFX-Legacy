@@ -64,7 +64,7 @@ public class GlobalValueListContainer extends Table {
     }
 
     public void setData(Array<AttachmentPoint> attachmentPoints) {
-        list.clearItems(false);
+        list.clearItems(attachmentPoints.size == 0);
         for(AttachmentPoint attachmentPoint: attachmentPoints) {
             AttachmentPointBox attachmentPointBox = createBoxWidget(attachmentPoint, true);
             list.addItem(attachmentPointBox);
