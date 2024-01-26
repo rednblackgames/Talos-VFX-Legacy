@@ -55,6 +55,12 @@ public class ShaderAddon implements IAddon {
 
     @Override
     public boolean projectFileDrop (FileHandle handle) {
+        if(handle.extension().equals("tsh")) {
+            TalosMain.Instance().ProjectController().setProject(getProjectType());
+            TalosMain.Instance().ProjectController().loadProject(handle);
+
+            return true;
+        }
         // a shader project should be loaded, but any other files go straight to modules
 
         IProject currProjectType = TalosMain.Instance().ProjectController().getProject();
@@ -71,7 +77,7 @@ public class ShaderAddon implements IAddon {
 
     @Override
     public IProject getProjectType () {
-        return null;
+        return SHADER_PROJECT;
     }
 
     @Override

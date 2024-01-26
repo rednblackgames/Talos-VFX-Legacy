@@ -277,7 +277,7 @@ public class MainMenu extends Table {
 
         for(String path: list) {
             final FileHandle handle = Gdx.files.absolute(path);
-            if(!handle.exists()) continue;;
+            if(!handle.exists()) continue;
             String name = handle.name();
             MenuItem item = new MenuItem(name);
             item.addListener(new ClickListener() {
