@@ -22,7 +22,7 @@ public class MainMenu extends Table {
     private MenuItem export;
     private MenuItem exportAs;
     private MenuItem saveAsProject;
-    private Menu modulesMenu;
+    private Menu partcileMenu;
     private MenuItem removeSelectedModules;
     private MenuItem createModule;
     private MenuItem groupSelectedModules;
@@ -42,8 +42,8 @@ public class MainMenu extends Table {
         MenuBar menuBar = new MenuBar();
         Menu projectMenu = new Menu("File");
         menuBar.addMenu(projectMenu);
-        modulesMenu = new Menu("Modules");
-        menuBar.addMenu(modulesMenu);
+        partcileMenu = new Menu("Particle");
+        menuBar.addMenu(partcileMenu);
 
         TalosMain.Instance().Addons().buildMenu(menuBar);
 
@@ -66,12 +66,14 @@ public class MainMenu extends Table {
         removeSelectedModules = new MenuItem("Remove Selected").setShortcut(Input.Keys.DEL);
         groupSelectedModules = new MenuItem("Group Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.G);
         ungroupSelectedModules = new MenuItem("Ungroup Selected").setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.U);
-        modulesMenu.addItem(createModule);
-        modulesMenu.addItem(removeSelectedModules);
-        modulesMenu.addItem(groupSelectedModules);
+        final MenuItem newProject = new MenuItem("New Particle", icon("ic-file-new"));
+        final MenuItem openProject = new MenuItem("Open Particle", icon("ic-folder"));
+        partcileMenu.addItem(newProject);
+        partcileMenu.addItem(openProject);
+        partcileMenu.addItem(createModule);
+        partcileMenu.addItem(removeSelectedModules);
+        partcileMenu.addItem(groupSelectedModules);
 
-        final MenuItem newProject = new MenuItem("New TalosProject", icon("ic-file-new"));
-        final MenuItem openProject = new MenuItem("Open TalosProject", icon("ic-folder"));
         MenuItem openRecent = new MenuItem("Open Recent", icon("ic-folder-recent"));
         saveProject = new MenuItem("Save", icon("ic-save"));
         export = new MenuItem("Export" , icon("ic-download"));
@@ -81,13 +83,15 @@ public class MainMenu extends Table {
         openRecentPopup = new PopupMenu();
         openRecent.setSubMenu(openRecentPopup);
 
-        MenuItem legacy = new MenuItem("Legacy");
+        MenuItem legacy = new MenuItem("libGDX Particles");
         PopupMenu legacyPopup = new PopupMenu();
         MenuItem legacyImportItem = new MenuItem("Import");
         MenuItem legacyBatchImportItem = new MenuItem("Batch Convert");
         legacyPopup.addItem(legacyImportItem);
         legacyPopup.addItem(legacyBatchImportItem);
         legacy.setSubMenu(legacyPopup);
+        partcileMenu.addSeparator();
+        partcileMenu.addItem(legacy);
 
         MenuItem settings = new MenuItem("Preferences");
 
@@ -97,8 +101,6 @@ public class MainMenu extends Table {
         saveAsProject = new MenuItem("Save As", icon("ic-save-aster"));
         MenuItem exitApp = new MenuItem("Exit");
 
-        projectMenu.addItem(newProject);
-        projectMenu.addItem(openProject);
         projectMenu.addItem(openRecent);
         projectMenu.addItem(saveProject);
         projectMenu.addItem(saveAsProject);
@@ -106,7 +108,6 @@ public class MainMenu extends Table {
         projectMenu.addItem(exportAs);
         projectMenu.addSeparator();
         projectMenu.addItem(examples);
-        projectMenu.addItem(legacy);
         projectMenu.addSeparator();
         projectMenu.addItem(settings);
         projectMenu.addSeparator();

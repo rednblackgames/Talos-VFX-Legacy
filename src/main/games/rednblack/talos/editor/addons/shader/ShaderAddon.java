@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
@@ -89,9 +90,9 @@ public class ShaderAddon implements IAddon {
     public void buildMenu (MenuBar menuBar) {
         Menu menu = new Menu("Shader Graph");
 
-        MenuItem newFile = new MenuItem("New Shader");
+        MenuItem newFile = new MenuItem("New Shader", icon("ic-file-new"));
         menu.addItem(newFile);
-        MenuItem openFile = new MenuItem("Open Shader");
+        MenuItem openFile = new MenuItem("Open Shader", icon("ic-folder"));
         menu.addItem(openFile);
         MenuItem exportRaw = new MenuItem("Export RAW");
         menu.addItem(exportRaw);
@@ -169,5 +170,9 @@ public class ShaderAddon implements IAddon {
     @Override
     public void dispose () {
 
+    }
+
+    private Image icon(String name) {
+        return new Image(TalosMain.Instance().UIStage().getSkin().getDrawable(name));
     }
 }

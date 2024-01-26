@@ -2,6 +2,7 @@ package games.rednblack.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.widget.Menu;
 import com.kotcrab.vis.ui.widget.MenuBar;
@@ -40,11 +41,11 @@ public class BvBAddon implements IAddon {
 
     @Override
     public void buildMenu(MenuBar menuBar) {
-        Menu bvbMenu = new Menu("Animations");
+        Menu bvbMenu = new Menu("Animation");
 
-        MenuItem newBvbProject = new MenuItem("New Project");
+        MenuItem newBvbProject = new MenuItem("New BVB", icon("ic-file-new"));
         bvbMenu.addItem(newBvbProject);
-        MenuItem openBvbProject = new MenuItem("Open Project");
+        MenuItem openBvbProject = new MenuItem("Open BVB", icon("ic-folder"));
         bvbMenu.addItem(openBvbProject);
         // TODO: add other menu items here
 
@@ -147,5 +148,9 @@ public class BvBAddon implements IAddon {
 
     public ParticleList getTimeline () {
         return particleList;
+    }
+
+    private Image icon(String name) {
+        return new Image(TalosMain.Instance().UIStage().getSkin().getDrawable(name));
     }
 }
