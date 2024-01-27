@@ -19,10 +19,7 @@ package games.rednblack.talos.editor.project;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.*;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.ParticleEmitterWrapper;
 import games.rednblack.talos.editor.LegacyImporter;
@@ -36,9 +33,7 @@ import games.rednblack.talos.editor.wrappers.ModuleWrapper;
 import games.rednblack.talos.runtime.ParticleEmitterDescriptor;
 import games.rednblack.talos.runtime.ParticleEffectInstance;
 import games.rednblack.talos.runtime.ParticleEffectDescriptor;
-import games.rednblack.talos.runtime.modules.PolylineModule;
-import games.rednblack.talos.runtime.modules.TextureModule;
-import games.rednblack.talos.runtime.modules.VectorFieldModule;
+import games.rednblack.talos.runtime.modules.*;
 import games.rednblack.talos.runtime.serialization.ConnectionData;
 import games.rednblack.talos.runtime.serialization.ExportData;
 
@@ -225,64 +220,6 @@ public class TalosProject implements IProject {
 		handle.writeString(projectSerializer.writeTalosPExport(exportData), false);
 	}
 
-	public static ExportData exportTLSDataToP (FileHandle tlsFile) {
-		ProjectData projectDataToConvert = readTalosTLSProject(tlsFile.readString());
-
-		Array<EmitterData> emitters = projectDataToConvert.getEmitters();
-
-		ExportData data = new ExportData();
-
-		for (EmitterData emitter : emitters) {
-			ExportData.EmitterExportData emitterData = new ExportData.EmitterExportData();
-			emitterData.name = emitter.name;
-			for (ModuleWrapper wrapper : emitter.modules) {
-				emitterData.modules.add(wrapper.getModule());
-
-				if (wrapper.getModule() instanceof TextureModule) {
-					TextureModule textureModule = (TextureModule)wrapper.getModule();
-					String name = textureModule.regionName;
-					if (name == null)
-						name = "fire";
-
-					if (!data.metadata.resources.contains(name, false)) {
-						data.metadata.resources.add(name);
-					}
-				}
-				if (wrapper.getModule() instanceof PolylineModule) {
-					PolylineModule module = (PolylineModule)wrapper.getModule();
-					String name = module.regionName;
-					if (name == null)
-						name = "fire";
-
-					if (!data.metadata.resources.contains(name, false)) {
-						data.metadata.resources.add(name);
-					}
-				}
-				if (wrapper.getModule() instanceof VectorFieldModule) {
-					VectorFieldModule vectorFieldModule = (VectorFieldModule) wrapper.getModule();
-					String fgaFileName = vectorFieldModule.fgaFileName;
-
-					if (fgaFileName == null) {
-						continue;
-					}
-					fgaFileName = fgaFileName + ".fga";
-					if (!data.metadata.resources.contains(fgaFileName, false)) {
-						data.metadata.resources.add(fgaFileName);
-					}
-				}
-			}
-
-			Array<ConnectionData> connections = emitter.connections;
-			for (ConnectionData connection : connections) {
-				emitterData.connections.add(connection);
-			}
-
-			data.emitters.add(emitterData);
-		}
-
-		return data;
-	}
-
 	@Override
 	public String exportProject() {
 		ExportData exportData = new ExportData();
@@ -440,6 +377,18 @@ public class TalosProject implements IProject {
 					fgaFileName = fgaFileName + ".fga";
 					if (!data.metadata.resources.contains(fgaFileName, false)) {
 						data.metadata.resources.add(fgaFileName);
+					}
+				}
+				if (wrapper.getModule() instanceof ShadedSpriteModule) {
+					ShadedSpriteModule shadedSpriteModule = (ShadedSpriteModule) wrapper.getModule();
+					String shaderName = shadedSpriteModule.shdrFileName;
+
+					if (shaderName == null) {
+						continue;
+					}
+
+					if (!data.metadata.resources.contains(shaderName, false)) {
+						data.metadata.resources.add(shaderName);
 					}
 				}
 			}
