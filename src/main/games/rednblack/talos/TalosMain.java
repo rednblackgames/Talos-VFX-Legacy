@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.Tooltip;
 import games.rednblack.talos.editor.NodeStage;
 import games.rednblack.talos.editor.TalosInputProcessor;
 import games.rednblack.talos.editor.UIStage;
@@ -130,6 +131,7 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+		Tooltip.DEFAULT_APPEAR_DELAY_TIME = 1;
 
 		//Check for properties
 		loadFromProperties();

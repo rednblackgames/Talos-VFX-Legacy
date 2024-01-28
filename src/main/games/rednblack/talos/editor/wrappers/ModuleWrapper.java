@@ -32,6 +32,7 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.*;
+import com.kotcrab.vis.ui.widget.Tooltip;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.widgets.ui.DynamicTable;
 import games.rednblack.talos.editor.widgets.ui.EditableLabel;
@@ -183,6 +184,8 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
             }
         });
 
+        String moduleName = TalosMain.Instance().moduleNames.get(getClass());
+        new Tooltip.Builder(moduleName).target(this).build();
     }
 
     protected abstract void configureSlots();
