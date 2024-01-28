@@ -1,11 +1,12 @@
 package games.rednblack.talos.editor.utils.grid;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.widgets.ui.ViewportWidget;
 
@@ -43,6 +44,37 @@ public class RulerRenderer extends Group {
         addActor(yRulerTable);
     }
 
+    private final ObjectMap<String, Array<Label>> labelCache = new ObjectMap<>();
+    private final Array<Table> tableCache = new Array<>();
+
+    private Label getOrCreateLabel(String text) {
+        if (labelCache.containsKey(text)) {
+            Array<Label> cache = labelCache.get(text);
+            for (int i = 0; i < cache.size; i++) {
+                if (!cache.get(i).hasParent()) return cache.get(i);
+            }
+            cache.add(new Label(text, getSkin()));
+            return cache.get(cache.size -1);
+        }
+        Array<Label> cache = new Array<>();
+        cache.add(new Label(text, getSkin()));
+        labelCache.put(text, cache);
+        return cache.get(0);
+    }
+
+    private Table getTable() {
+        for (int i = 0; i < tableCache.size; i++) {
+            if (!tableCache.get(i).hasParent()) {
+                Table table = tableCache.get(i);
+                table.clearChildren(true);
+                return table;
+            }
+        }
+        Table table = new Table();
+        tableCache.add(table);
+        return table;
+    }
+
     public void configureRulers () {
         xRulerTable.clearChildren();
         xRulerTable.setWidth(viewportWidget.getWidth());
@@ -67,7 +99,7 @@ public class RulerRenderer extends Group {
             int testInt = (int)xStart;
             float tmp = xStart - testInt;
             coordText = tmp > 0 ? "" + xStart : "" + testInt;
-            Label coordinateLabel = new Label(coordText, getSkin());
+            Label coordinateLabel = getOrCreateLabel(coordText);
             float x = viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f;
             coordinateLabel.setX(x);
             xRulerTable.addActor(coordinateLabel);
@@ -80,7 +112,7 @@ public class RulerRenderer extends Group {
             int testInt = (int)xStart;
             float tmp = xStart - testInt;
             coordText = tmp < 0 ? "" + xStart : "" + testInt;
-            Label coordinateLabel = new Label(coordText, getSkin());
+            Label coordinateLabel = getOrCreateLabel(coordText);
             float x = viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f;
             coordinateLabel.setX(x);
             xRulerTable.addActor(coordinateLabel);
@@ -111,10 +143,10 @@ public class RulerRenderer extends Group {
             float tmp = yStart - testInt;
             coordText = tmp > 0 ? "" + yStart : "" + testInt;
 
-            Table wrapperTable = new Table();
+            Table wrapperTable = getTable();
             wrapperTable.setTransform(true);
             wrapperTable.setRotation(90);
-            Label coordinateLabel = new Label(coordText, getSkin());
+            Label coordinateLabel = getOrCreateLabel(coordText);
             float height = coordinateLabel.getHeight();
             float y = viewportWidget.getLocalFromWorld(0, yStart).y - height / 2f;
             wrapperTable.setY(y);
@@ -140,10 +172,10 @@ public class RulerRenderer extends Group {
             float tmp = yStart - testInt;
             coordText = tmp < 0 ? "" + yStart : "" + testInt;
 
-            Table wrapperTable = new Table();
+            Table wrapperTable = getTable();
             wrapperTable.setTransform(true);
             wrapperTable.setRotation(90);
-            Label coordinateLabel = new Label(coordText, getSkin());
+            Label coordinateLabel = getOrCreateLabel(coordText);
             float height = coordinateLabel.getHeight();
             float y = viewportWidget.getLocalFromWorld(0, yStart).y - height / 2f;
             wrapperTable.setY(y);
@@ -154,7 +186,6 @@ public class RulerRenderer extends Group {
             wrapperTable.setSize(width, height);
             wrapperTable.setX((RULER_SIZE - width) / 2f);
             wrapperTable.setOrigin(width / 2f, height / 2f);
-
 
             wrapperTable.addActor(coordinateLabel);
 

@@ -29,6 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Pools;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.utils.CameraController;
 import games.rednblack.talos.editor.utils.CursorUtil;
@@ -331,9 +332,10 @@ public abstract class ViewportWidget extends Table {
 		getViewportBounds(Rectangle.tmp);
 		camera.project(tmp.set(x, y, 0), Rectangle.tmp.x, Rectangle.tmp.y, Rectangle.tmp.width, Rectangle.tmp.height);
 		tmp.y = Gdx.graphics.getHeight() - tmp.y;
-		Vector2 vector2 = screenToLocalCoordinates(new Vector2(tmp.x, tmp.y));
+		Vector2 v = Pools.obtain(Vector2.class).set(tmp.x, tmp.y);
+		Vector2 vector2 = screenToLocalCoordinates(v);
 		vec2.set(vector2);
-
+		Pools.free(v);
 		return vec2;
 	}
 

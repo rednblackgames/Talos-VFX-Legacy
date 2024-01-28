@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
 import games.rednblack.talos.editor.utils.grid.GridLine;
 import games.rednblack.talos.editor.utils.grid.GridPropertyProvider;
 
@@ -103,8 +104,14 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
         return highlightZero;
     }
 
+    Color gridMainLineColor = new Color();
+    Color comingLinesColor = new Color();
+    Color smallLinesColor = new Color();
+    Color zeroColor = new Color();
+
     @Override
     public void update (OrthographicCamera camera, float parentAlpha) {
+        Pools.freeAll(gridLines);
         gridLines.clear();
 
         float zeroAlpha = 0.2f;
@@ -132,24 +139,20 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
         float visibleEndY = cameraY + visibleHeight / 2;
 
         // configure colors
-        Color gridMainLineColor = new Color();
         gridMainLineColor.set(Color.GRAY);
         gridMainLineColor.a =  mainLinesAlpha * parentAlpha;
 
-        Color comingLinesColor = new Color();
         comingLinesColor.set(Color.GRAY);
         comingLinesColor.a =  linesToAppearAlpha * parentAlpha;
 
-        Color smallLinesColor = new Color();
         smallLinesColor.set(Color.GRAY);
         smallLinesColor.a =  smallLinesAlpha * parentAlpha;
 
-        Color zeroColor = new Color();
         zeroColor.set(Color.CYAN);
         zeroColor.a = zeroAlpha;
 
-        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness));
-        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness));
+        gridLines.add(Pools.obtain(GridLine.class).set(Pools.obtain(Vector2.class).set(visibleStartX, 0), Pools.obtain(Vector2.class).set(visibleEndX, 0), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness));
+        gridLines.add(Pools.obtain(GridLine.class).set(Pools.obtain(Vector2.class).set(0, visibleStartY), Pools.obtain(Vector2.class).set(0, visibleEndY), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness));
 
         gridXStart = gridUnit * MathUtils.floor(visibleStartX / gridUnit) ;
 
@@ -162,18 +165,18 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
 
                 for (int k = 0; k < baseLineDivisor; k++) {
                     float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
-                    gridLines.add(new GridLine(new Vector2(x1 + k * nextUnitSize, cameraY - visibleHeight / 2),
-                            new Vector2(x1 + k * nextUnitSize, cameraY + visibleHeight / 2), comingLinesColor, thickness));
+                    gridLines.add(Pools.obtain(GridLine.class).set(Pools.obtain(Vector2.class).set(x1 + k * nextUnitSize, cameraY - visibleHeight / 2),
+                            Pools.obtain(Vector2.class).set(x1 + k * nextUnitSize, cameraY + visibleHeight / 2), comingLinesColor, thickness));
                 }
 
-                gridLines.add(new GridLine(new Vector2(x1, cameraY - visibleHeight / 2),
-                        new Vector2(x1, cameraY + visibleHeight / 2), smallLinesColor, thickness));
+                gridLines.add(Pools.obtain(GridLine.class).set(Pools.obtain(Vector2.class).set(x1, cameraY - visibleHeight / 2),
+                        Pools.obtain(Vector2.class).set(x1, cameraY + visibleHeight / 2), smallLinesColor, thickness));
             }
 
             gridXEnd = i;
             if (i == 0) continue;
-            gridLines.add(new GridLine(new Vector2(i, cameraY - visibleHeight / 2),
-                    new Vector2(i, cameraY + visibleHeight / 2), gridMainLineColor, thickness));
+            gridLines.add(Pools.obtain(GridLine.class).set(Pools.obtain(Vector2.class).set(i, cameraY - visibleHeight / 2),
+                    Pools.obtain(Vector2.class).set(i, cameraY + visibleHeight / 2), gridMainLineColor, thickness));
         }
 
         gridYStart = gridUnit * MathUtils.floor(visibleStartY / gridUnit);
@@ -185,18 +188,18 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
 
                 for (int k = 0; k < baseLineDivisor; k++) {
                     float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
-                    gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, y1 + k * nextUnitSize),
-                            new Vector2(cameraX + visibleWidth / 2, y1 + k * nextUnitSize), comingLinesColor, thickness));
+                    gridLines.add(Pools.obtain(GridLine.class).set(Pools.obtain(Vector2.class).set(cameraX - visibleWidth / 2, y1 + k * nextUnitSize),
+                            Pools.obtain(Vector2.class).set(cameraX + visibleWidth / 2, y1 + k * nextUnitSize), comingLinesColor, thickness));
                 }
 
-                gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, y1),
-                        new Vector2(cameraX + visibleWidth / 2, y1), smallLinesColor, thickness));
+                gridLines.add(Pools.obtain(GridLine.class).set(Pools.obtain(Vector2.class).set(cameraX - visibleWidth / 2, y1),
+                        Pools.obtain(Vector2.class).set(cameraX + visibleWidth / 2, y1), smallLinesColor, thickness));
             }
 
             gridYEnd = i;
             if (i == 0) continue;
-            gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, i),
-                    new Vector2(cameraX + visibleWidth / 2, i), gridMainLineColor, thickness));
+            gridLines.add(Pools.obtain(GridLine.class).set(Pools.obtain(Vector2.class).set(cameraX - visibleWidth / 2, i),
+                    Pools.obtain(Vector2.class).set(cameraX + visibleWidth / 2, i), gridMainLineColor, thickness));
         }
     }
 

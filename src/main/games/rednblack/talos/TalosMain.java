@@ -21,8 +21,10 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Pools;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.Tooltip;
 import games.rednblack.talos.editor.NodeStage;
@@ -39,6 +41,7 @@ import games.rednblack.talos.editor.utils.CameraController;
 import games.rednblack.talos.editor.utils.CursorUtil;
 import games.rednblack.talos.editor.utils.ScreenshotService;
 import games.rednblack.talos.editor.utils.SharedShapeDrawer;
+import games.rednblack.talos.editor.utils.grid.GridLine;
 import games.rednblack.talos.runtime.ScopePayload;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
@@ -131,6 +134,8 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+		Pools.get(Vector2.class, 10_000);
+		Pools.get(GridLine.class, 10_000);
 		Tooltip.DEFAULT_APPEAR_DELAY_TIME = 1;
 
 		//Check for properties
