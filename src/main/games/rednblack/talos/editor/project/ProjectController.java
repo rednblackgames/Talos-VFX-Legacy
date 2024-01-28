@@ -112,6 +112,7 @@ public class ProjectController {
             TalosMain.Instance().reportException(e);
         } finally {
             loading = false;
+            TalosMain.Instance().ProjectController().setDirty();
         }
     }
 
