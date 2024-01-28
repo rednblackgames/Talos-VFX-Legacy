@@ -18,6 +18,7 @@ package games.rednblack.talos.editor.project;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -188,9 +189,79 @@ public class TalosProject implements IProject {
 
 			emitterData.connections.addAll(emitterExportData.connections);
 			projectData.getEmitters().add(emitterData);
+
+			formatNode(emitterData.modules, emitterData.connections, 100);
 		}
 
 		loadFromProjectData(projectData);
+	}
+
+	// Constants for the algorithm
+	static final float REPULSION_FORCE = 200.0f;
+	static final float ATTRACTION_FORCE = 0.1f;
+	static final float ITERATION_STEP = 0.1f;
+
+	public void formatNode(Array<ModuleWrapper> nodes, Array<ConnectionData> connections, int iterations) {
+		// Initialize nodes in a grid-like pattern with random perturbations
+		int gridSize = (int) Math.ceil(Math.sqrt(nodes.size));
+		int nodeIndex = 0;
+
+		for (int i = 0; i < gridSize; i++) {
+			for (int j = 0; j < gridSize; j++) {
+				if (nodeIndex < nodes.size) {
+					nodes.get(nodeIndex).setX(i * 50 + MathUtils.random() * 10);
+					nodes.get(nodeIndex).setY(j * 50 + MathUtils.random() * 10);
+					nodeIndex++;
+				}
+			}
+		}
+
+		for (int iter = 0; iter < iterations; iter++) {
+			// Calculate forces and update positions
+			for (ModuleWrapper node : new Array.ArrayIterator<>(nodes)) {
+				// Repulsive forces
+				for (ModuleWrapper other : new Array.ArrayIterator<>(nodes)) {
+					if (node != other) {
+						float dx = other.getX() - node.getX();
+						float dy = other.getY() - node.getY();
+						float distance = (float) Math.sqrt(dx * dx + dy * dy);
+						float force = REPULSION_FORCE / distance;
+
+						if (distance > 0) {
+							node.setX(node.getX() - (dx / distance) * force * ITERATION_STEP);
+							node.setY(node.getY() - (dy / distance) * force * ITERATION_STEP);
+						}
+					}
+				}
+
+				// Attractive forces
+				for (ConnectionData connection : new Array.ArrayIterator<>(connections)) {
+					if (connection.moduleFrom == node.getId()) {
+						ModuleWrapper connectedNode = getNodeById(nodes, connection.moduleTo);
+						if (connectedNode != null) {
+							float dx = connectedNode.getX() - node.getX();
+							float dy = connectedNode.getY() - node.getY();
+							float distance = (float) Math.sqrt(dx * dx + dy * dy);
+							float force = ATTRACTION_FORCE * distance;
+
+							if (distance > 0) {
+								node.setX(node.getX() - (dx / distance) * force * ITERATION_STEP);
+								node.setY(node.getY() - (dy / distance) * force * ITERATION_STEP);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public static ModuleWrapper getNodeById(Array<ModuleWrapper> nodes, int id) {
+		for (ModuleWrapper node : new Array.ArrayIterator<>(nodes)) {
+			if (node.getId() == id) {
+				return node;
+			}
+		}
+		return null;
 	}
 
 	public void sortEmitters() {
