@@ -44,6 +44,16 @@ public class ShapeModuleWrapper extends ModuleWrapper<ShapeModule> {
         });
     }
 
+    @Override
+    public void setModule(ShapeModule module) {
+        super.setModule(module);
+        shape.setShape(module.getShape());
+        module.getPos(pos);
+        shape.setPos(pos);
+        module.getSize(size);
+        shape.setShapeSize(size);
+    }
+
     private void updateModuleDataFromWidgets() {
         if(!lockUpdate) {
             shape.getShapePos(pos);

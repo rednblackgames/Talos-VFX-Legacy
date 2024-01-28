@@ -20,6 +20,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.ParticleEmitterWrapper;
 import games.rednblack.talos.editor.LegacyImporter;
@@ -30,6 +32,7 @@ import games.rednblack.talos.editor.serialization.*;
 import games.rednblack.talos.editor.utils.FileUtils;
 import games.rednblack.talos.editor.widgets.ui.ModuleBoardWidget;
 import games.rednblack.talos.editor.wrappers.ModuleWrapper;
+import games.rednblack.talos.editor.wrappers.WrapperRegistry;
 import games.rednblack.talos.runtime.ParticleEmitterDescriptor;
 import games.rednblack.talos.runtime.ParticleEffectInstance;
 import games.rednblack.talos.runtime.ParticleEffectDescriptor;
@@ -83,12 +86,16 @@ public class TalosProject implements IProject {
 
 
 	public void loadProject (FileHandle projectFileHandle, String data, boolean fromMemory) {
+		projectSerializer.prereadhack(data);
+		loadFromProjectData(readTalosTLSProject(data));
+	}
+
+	private void loadFromProjectData(ProjectData projectData) {
 		TalosMain.Instance().UIStage().PreviewWidget().getGLProfiler().reset();
 
 		cleanData();
 
-		projectSerializer.prereadhack(data);
-		projectData = readTalosTLSProject(data);
+		this.projectData = projectData;
 		readMetaData = projectData.metaData;
 
 		ParticleEmitterWrapper firstEmitter = null;
@@ -142,6 +149,48 @@ public class TalosProject implements IProject {
 
 		TalosMain.Instance().UIStage().setEmitters(activeWrappers);
 		TalosMain.Instance().NodeStage().getStage().setKeyboardFocus(null);
+	}
+
+	public void loadFromExportP(FileHandle handle) {
+		Json json = new Json();
+		ParticleEmitterDescriptor.registerModules();
+		for (Class clazz: WrapperRegistry.map.values()) {
+			json.addClassTag(clazz.getSimpleName(), clazz);
+		}
+		for (Class clazz: ParticleEmitterDescriptor.registeredModules) {
+			json.addClassTag(clazz.getSimpleName(), clazz);
+		}
+
+		json.setOutputType(JsonWriter.OutputType.json);
+		ExportData exportData = json.fromJson(ExportData.class, handle);
+		ProjectData projectData = new ProjectData();
+
+		projectData.metaData.getResourcePathStrings().addAll(exportData.metadata.resources);
+
+		for (ExportData.EmitterExportData emitterExportData : exportData.emitters) {
+			EmitterData emitterData = new EmitterData();
+			emitterData.name = emitterExportData.name;
+
+			for (AbstractModule module : emitterExportData.modules) {
+				String wrapperName = module.getClass().getSimpleName() + "Wrapper";
+                ModuleWrapper wrapper = null;
+                try {
+                    wrapper = (ModuleWrapper) ClassReflection.newInstance(json.getClass(wrapperName));
+					wrapper.setId(module.getIndex());
+					wrapper.setModule(module);
+                } catch (ReflectionException e) {
+                    throw new RuntimeException(e);
+                }
+
+				if (wrapper != null)
+                	emitterData.modules.add(wrapper);
+			}
+
+			emitterData.connections.addAll(emitterExportData.connections);
+			projectData.getEmitters().add(emitterData);
+		}
+
+		loadFromProjectData(projectData);
 	}
 
 	public void sortEmitters() {

@@ -158,10 +158,14 @@ public class UIStage {
 				} else {
 					// notify talos first
 					if(TalosMain.Instance().ProjectController().getProject() == ProjectController.TLS) {
-						AssetFileDroppedEvent event = Notifications.obtainEvent(AssetFileDroppedEvent.class);
-						event.setFileHandle(handle);
-						event.setScreenPos(Gdx.input.getX(), Gdx.input.getY());
-						Notifications.fireEvent(event);
+						if (handle.extension().equals("p")) {
+							TalosMain.Instance().ProjectController().loadFromExportedP(handle);
+						} else {
+							AssetFileDroppedEvent event = Notifications.obtainEvent(AssetFileDroppedEvent.class);
+							event.setFileHandle(handle);
+							event.setScreenPos(Gdx.input.getX(), Gdx.input.getY());
+							Notifications.fireEvent(event);
+						}
 					}
 					// ask addons if they are interested
 					IAddon addon = TalosMain.Instance().Addons().projectFileDrop(handle);

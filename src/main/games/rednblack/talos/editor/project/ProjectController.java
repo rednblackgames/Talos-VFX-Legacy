@@ -103,6 +103,18 @@ public class ProjectController {
         }
     }
 
+    public void loadFromExportedP(FileHandle fileHandle) {
+        try {
+            loading = true;
+            currentProjectPath = fileHandle.path().replace(".p", ".tls");
+            ((TalosProject)currentProject).loadFromExportP(fileHandle);
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
+        } finally {
+            loading = false;
+        }
+    }
+
     public void saveProject (FileHandle destination) {
         try {
             String data = currentProject.getProjectString(false);

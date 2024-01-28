@@ -128,6 +128,13 @@ public class DynamicRangeModuleWrapper extends ModuleWrapper<DynamicRangeModule>
 		updateValues();
 	}
 
+    @Override
+    public void setModule(DynamicRangeModule module) {
+        super.setModule(module);
+
+        lowInput.setValue(module.getLowMin(), module.getLowMax());
+        highInput.setValue(module.getHightMin(), module.getHightMax());
+    }
 
     @Override
     protected float reportPrefWidth() {

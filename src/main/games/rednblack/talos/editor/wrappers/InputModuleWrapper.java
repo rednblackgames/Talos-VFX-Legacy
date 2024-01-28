@@ -38,7 +38,7 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
     @Override
     public void setModule(InputModule module) {
         super.setModule(module);
-        //module.setInput(ScopePayload.EMITTER_ALPHA);
+        setKey(module.getInput());
     }
 
     @Override

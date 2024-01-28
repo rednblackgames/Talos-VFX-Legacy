@@ -14,6 +14,13 @@ public class RibbonModuleWrapper extends ModuleWrapper<RibbonModule> {
     private IntegerInputWidget detailCount;
 
     @Override
+    public void setModule(RibbonModule module) {
+        super.setModule(module);
+        detailCount.setValue(module.getDetailCount());
+        memoryDuration.setValue(module.getMemoryDuration());
+    }
+
+    @Override
     protected void configureSlots() {
         addInputSlot("main texture",  RibbonModule.MAIN_REGION);
         addInputSlot("ribbon texture",  RibbonModule.RIBBON_REGION);

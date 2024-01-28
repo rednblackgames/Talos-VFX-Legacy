@@ -42,7 +42,7 @@
     </category>
     <category name = "Curves and Math">
         <module name = "Curve" wrapper = "CurveModuleWrapper">CurveModule</module>
-        <module name = "Interpolation" wrapper = "InterpolationWrapper">InterpolationModule</module>
+        <module name = "Interpolation" wrapper = "InterpolationModuleWrapper">InterpolationModule</module>
         <module name = "Math Operations" wrapper = "MathModuleWrapper">MathModule</module>
         <module name = "Target Movement" wrapper = "TargetModuleWrapper">TargetModule</module>
     </category>

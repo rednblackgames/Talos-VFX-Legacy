@@ -142,6 +142,17 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
         return 230;
     }
 
+    @Override
+    public void setModule(ColorModule module) {
+        super.setModule(module);
+
+        final Color color = module.getColor();
+        tmpClr.set(color);
+        colorBtn.setColor(tmpClr);
+        rField.setText(""+(int)(color.r * 255f));
+        gField.setText(""+(int)(color.g * 255f));
+        bField.setText(""+(int)(color.b * 255f));
+    }
 
     @Override
     public void read (Json json, JsonValue jsonData) {

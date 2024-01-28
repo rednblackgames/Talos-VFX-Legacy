@@ -51,6 +51,12 @@ public class NinePatchModuleWrapper extends ModuleWrapper<NinePatchModule> {
         rightWrapper.addListener(changeListener);
     }
 
+    @Override
+    public void setModule(NinePatchModule module) {
+        super.setModule(module);
+        setData(module.getSplits());
+    }
+
     private void updateValues() {
         module.setSplits(leftSplit.getValue(), rightSplit.getValue(), topSplit.getValue(), bottomSplit.getValue());
         module.resetPatch();

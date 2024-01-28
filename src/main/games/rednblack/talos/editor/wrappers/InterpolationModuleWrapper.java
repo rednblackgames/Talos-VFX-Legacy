@@ -27,12 +27,12 @@ import games.rednblack.talos.runtime.Slot;
 import games.rednblack.talos.runtime.modules.*;
 import games.rednblack.talos.runtime.utils.InterpolationMappings;
 
-public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
+public class InterpolationModuleWrapper extends ModuleWrapper<InterpolationModule> {
 
 
     VisSelectBox<String> selectBox;
 
-    public InterpolationWrapper() {
+    public InterpolationModuleWrapper() {
         super();
     }
 
@@ -65,6 +65,11 @@ public class InterpolationWrapper extends ModuleWrapper<InterpolationModule> {
         });
     }
 
+    @Override
+    public void setModule(InterpolationModule module) {
+        super.setModule(module);
+        selectBox.setSelected(InterpolationMappings.getNameForInterpolation(module.getInterpolation()));
+    }
 
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {

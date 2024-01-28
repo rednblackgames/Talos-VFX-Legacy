@@ -52,6 +52,13 @@ public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule
     }
 
     @Override
+    public void setModule(TextureModule module) {
+        super.setModule(module);
+        assetNameLabel.setText(module.regionName);
+        setTexture(module.regionName + ".png");
+    }
+
+    @Override
     protected void configureSlots() {
 
         defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));

@@ -55,6 +55,7 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         super.setModule(module);
         NumericalValue value = TalosMain.Instance().globalScope.getDynamicValue(module.getKey());
         dragPoint.set(value.get(0), value.get(1));
+        selectBox.setSelected(String.valueOf(module.getKey()));
     }
 
     @Override

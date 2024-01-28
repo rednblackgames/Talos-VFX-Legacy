@@ -43,6 +43,13 @@ public class ShadedSpriteModuleWrapper extends ModuleWrapper<ShadedSpriteModule>
         });
     }
 
+    @Override
+    public void setModule(ShadedSpriteModule module) {
+        super.setModule(module);
+        shaderFileName = module.shdrFileName;
+        setShaderLabel(shaderFileName);
+    }
+
     private void setShaderLabel(String shaderFileName) {
         dropLabel.setText("SHDR File: " + shaderFileName);
     }

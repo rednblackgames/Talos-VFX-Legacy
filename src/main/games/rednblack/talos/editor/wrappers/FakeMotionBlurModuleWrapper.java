@@ -63,4 +63,12 @@ public class FakeMotionBlurModuleWrapper extends ModuleWrapper<FakeMotionBlurMod
         velocityMinMax.setValue(module.getVelocityMin(), module.getVelocityMax());
         sizeMinMax.setValue(module.getSizeMin(), module.getSizeMax());
     }
+
+    @Override
+    public void setModule(FakeMotionBlurModule module) {
+        super.setModule(module);
+
+        velocityMinMax.setValue(module.getVelocityMin(), module.getVelocityMax());
+        sizeMinMax.setValue(module.getSizeMin(), module.getSizeMax());
+    }
 }

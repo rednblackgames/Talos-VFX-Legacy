@@ -91,6 +91,15 @@ public class FlipbookModuleWrapper extends TextureDropModuleWrapper<FlipbookModu
     }
 
     @Override
+    public void setModule(FlipbookModule module) {
+        super.setModule(module);
+        rows.setValue(module.getRows());
+        cols.setValue(module.getCols());
+        duration.setValue(module.duration);
+        setTexture(module.regionName + ".png");
+    }
+
+    @Override
     protected float reportPrefWidth() {
         return 200;
     }

@@ -52,7 +52,7 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
     @Override
     public void setModule(OffsetModule module) {
         super.setModule(module);
-        updateModuleDataFromWidgets();
+        updateWidgetsFromModuleData();
     }
 
     @Override

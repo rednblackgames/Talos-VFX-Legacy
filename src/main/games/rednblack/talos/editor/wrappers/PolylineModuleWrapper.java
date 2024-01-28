@@ -50,6 +50,13 @@ public class PolylineModuleWrapper extends TextureDropModuleWrapper<PolylineModu
     }
 
     @Override
+    public void setModule(PolylineModule module) {
+        super.setModule(module);
+        interpolationPoints.setValue(module.pointCount);
+        setTexture(module.regionName + ".png");
+    }
+
+    @Override
     protected void configureSlots() {
         defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
 

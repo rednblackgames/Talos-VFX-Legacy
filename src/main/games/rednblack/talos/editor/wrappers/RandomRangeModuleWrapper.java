@@ -49,6 +49,13 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
     }
 
     @Override
+    public void setModule(RandomRangeModule module) {
+        super.setModule(module);
+        inputRange.setValue(module.getMin(), module.getMax());
+        distribution.setChecked(module.isDistributed());
+    }
+
+    @Override
     protected float reportPrefWidth() {
         return 190;
     }
