@@ -47,8 +47,14 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 				DefaultShaders.BLEND_ADD_FRAGMENT_SHADER);
 	}
 
+	@Override
 	public void setBatch (Batch batch) {
 		this.batch = batch;
+	}
+
+	@Override
+	public Batch getBatch() {
+		return batch;
 	}
 
 	@Override

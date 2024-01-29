@@ -16,10 +16,13 @@
 
 package games.rednblack.talos.runtime.render;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import games.rednblack.talos.runtime.ParticleEffectInstance;
 
 public interface ParticleRenderer {
 
     void render (ParticleEffectInstance particleEffectInstance);
 
+    void setBatch(Batch batch);
+    Batch getBatch();
 }
