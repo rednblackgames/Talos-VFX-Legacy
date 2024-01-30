@@ -70,6 +70,7 @@ task dist(type: Jar) {
 
 dependencies {
     implementation project(":runtimes:talos-libgdx")
+    implementation project(":runtimes:bvb-libgdx")
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"

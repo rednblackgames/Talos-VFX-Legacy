@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+}
+
+apply from : 'publish.gradle'
+
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
+
+sourceSets.main.java.srcDirs = [ "src/main" ]
+
+dependencies {
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.esotericsoftware.spine:spine-libgdx:$spineVersion"
+    implementation project(":runtimes:talos-libgdx")
+
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+}
+
+task dist(type: Jar) {
+    from files(sourceSets.main.output.classesDirs)
+    from files(sourceSets.main.output.resourcesDir)
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ["--release", "7"]
+}

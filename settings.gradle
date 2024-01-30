@@ -1,2 +1,3 @@
 include 'editor'
 include 'runtimes:talos-libgdx'
+include 'runtimes:bvb-libgdx'

@@ -2,7 +2,6 @@ package games.rednblack.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.utils.Array;
@@ -10,7 +9,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.EventData;
 import com.esotericsoftware.spine.Slot;
-import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import games.rednblack.talos.editor.utils.NumberUtils;
 import games.rednblack.talos.editor.widgets.propertyWidgets.*;
 import com.badlogic.gdx.utils.Json;
@@ -21,6 +19,7 @@ import games.rednblack.talos.runtime.ParticleEffectDescriptor;
 import games.rednblack.talos.runtime.ParticleEffectInstance;
 import games.rednblack.talos.runtime.ParticleEmitterDescriptor;
 import games.rednblack.talos.runtime.ScopePayload;
+import games.rednblack.talos.runtime.bvb.AttachmentPoint;
 import games.rednblack.talos.runtime.values.NumericalValue;
 
 import java.util.function.Supplier;

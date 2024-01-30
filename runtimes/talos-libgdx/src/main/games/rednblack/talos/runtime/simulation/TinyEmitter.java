@@ -257,6 +257,11 @@ public class TinyEmitter implements IEmitter {
     }
 
     @Override
+    public boolean isStopped() {
+        return isStopped;
+    }
+
+    @Override
     public float getDelayRemaining () {
         return delayTimer;
     }

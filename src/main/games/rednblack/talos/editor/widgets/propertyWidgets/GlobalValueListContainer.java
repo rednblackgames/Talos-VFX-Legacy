@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
-import games.rednblack.talos.editor.addons.bvb.AttachmentPoint;
+import games.rednblack.talos.runtime.bvb.AttachmentPoint;
 
 public class GlobalValueListContainer extends Table {
 

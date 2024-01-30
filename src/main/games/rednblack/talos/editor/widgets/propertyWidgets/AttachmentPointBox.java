@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
 import games.rednblack.talos.TalosMain;
-import games.rednblack.talos.editor.addons.bvb.AttachmentPoint;
+import games.rednblack.talos.runtime.bvb.AttachmentPoint;
 import games.rednblack.talos.editor.addons.bvb.AttachmentTypeToggle;
 import games.rednblack.talos.editor.addons.bvb.BvBAddon;
 import games.rednblack.talos.editor.widgets.ui.BackgroundButton;

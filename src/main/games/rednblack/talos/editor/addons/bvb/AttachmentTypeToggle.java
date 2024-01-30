@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.OrderedMap;
+import games.rednblack.talos.runtime.bvb.AttachmentPoint;
 
 public class AttachmentTypeToggle extends Table {
 

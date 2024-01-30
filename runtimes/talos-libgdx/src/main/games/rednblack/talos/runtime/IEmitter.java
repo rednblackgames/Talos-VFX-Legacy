@@ -20,12 +20,13 @@ public interface IEmitter {
 
     void setScope(ScopePayload scope);
     int getActiveParticleCount();
-    boolean isContinuous();;
+    boolean isContinuous();
     boolean isComplete();
+    boolean isStopped();
     void stop();
     void pause();
     void resume();
-    void restart();;
+    void restart();
     float getDelayRemaining();
     void update(float delta);
     ParticleEmitterDescriptor getEmitterGraph();

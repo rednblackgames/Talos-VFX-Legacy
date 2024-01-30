@@ -11,8 +11,8 @@ import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.widgets.propertyWidgets.*;
 import games.rednblack.talos.runtime.ParticleEffectDescriptor;
+import games.rednblack.talos.runtime.bvb.AttachmentPoint;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.function.Supplier;
 

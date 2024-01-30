@@ -279,12 +279,17 @@ public class ParticleEmitterInstance implements IEmitter {
 
 	@Override
 	public boolean isContinuous () {
-		return isContinuous;
+		return isContinuous && !isStopped;
 	}
 
 	@Override
 	public boolean isComplete () {
 		return isComplete;
+	}
+
+	@Override
+	public boolean isStopped() {
+		return false;
 	}
 
 	@Override

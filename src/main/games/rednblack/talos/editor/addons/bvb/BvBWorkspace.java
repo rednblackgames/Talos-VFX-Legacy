@@ -26,6 +26,7 @@ import games.rednblack.talos.editor.widgets.propertyWidgets.*;
 import games.rednblack.talos.editor.widgets.ui.ViewportWidget;
 import games.rednblack.talos.runtime.ParticleEffectDescriptor;
 import games.rednblack.talos.runtime.ParticleEffectInstance;
+import games.rednblack.talos.runtime.bvb.AttachmentPoint;
 import games.rednblack.talos.runtime.render.SpriteBatchParticleRenderer;
 
 import java.io.File;
