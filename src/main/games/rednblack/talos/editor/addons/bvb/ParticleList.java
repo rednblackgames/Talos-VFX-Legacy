@@ -2,11 +2,10 @@ package games.rednblack.talos.editor.addons.bvb;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import games.rednblack.talos.editor.ParticleEmitterWrapper;
 import games.rednblack.talos.editor.widgets.ui.timeline.TimelineListener;
 import games.rednblack.talos.editor.widgets.ui.timeline.TimelineWidget;
 
-public class ParticleList extends TimelineWidget<BoundEffect> {
+public class ParticleList extends TimelineWidget<BvBBoundEffect> {
 
     BvBWorkspace workspace;
 
@@ -27,15 +26,15 @@ public class ParticleList extends TimelineWidget<BoundEffect> {
 
             @Override
             protected void onDeleteClicked () {
-                Array<BoundEffect> selector = getSelector();
-                BoundEffect selectedItem = getSelectedItem();
+                Array<BvBBoundEffect> selector = getSelector();
+                BvBBoundEffect selectedItem = getSelectedItem();
                 if(selectedItem != null) {
                     if (!selector.contains(selectedItem, true)) {
                         selector.add(selectedItem);
                     }
                 }
 
-                for(BoundEffect effect: selector) {
+                for(BvBBoundEffect effect: selector) {
                     if(effect != null) {
                         workspace.getSkeletonContainer().removeEffect(effect);
                         workspace.effectUnselected(effect);
@@ -47,7 +46,7 @@ public class ParticleList extends TimelineWidget<BoundEffect> {
 
             @Override
             protected void onItemSelect (Object identifier) {
-                BoundEffect selectedItem = (BoundEffect) identifier;
+                BvBBoundEffect selectedItem = (BvBBoundEffect) identifier;
                 workspace.effectSelected(selectedItem);
             }
         });
@@ -58,7 +57,7 @@ public class ParticleList extends TimelineWidget<BoundEffect> {
         return "Effects";
     }
 
-    public void updateEffectList(Array<BoundEffect> list) {
+    public void updateEffectList(Array<BvBBoundEffect> list) {
         setData(list);
     }
 

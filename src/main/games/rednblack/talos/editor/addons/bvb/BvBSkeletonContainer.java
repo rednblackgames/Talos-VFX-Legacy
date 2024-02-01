@@ -12,12 +12,12 @@ import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.widgets.propertyWidgets.*;
 import games.rednblack.talos.runtime.ParticleEffectDescriptor;
 import games.rednblack.talos.runtime.bvb.AttachmentPoint;
+import games.rednblack.talos.runtime.bvb.SkeletonContainer;
 
 import java.util.Comparator;
 import java.util.function.Supplier;
 
-
-public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
+public class BvBSkeletonContainer extends SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     private final BvBWorkspace workspace;
 
@@ -27,7 +27,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     private Animation currentAnimation;
     private Skin currentSkin;
 
-    private ObjectMap<String, ObjectMap<String, Array<BoundEffect>>> boundEffects = new ObjectMap<>();
+    private ObjectMap<String, ObjectMap<String, Array<BvBBoundEffect>>> boundEffects = new ObjectMap<>();
 
     private Vector2 tmp = new Vector2();
 
@@ -37,7 +37,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
     private Comparator<String> alphabeticalComparator;
 
-    public SkeletonContainer(BvBWorkspace workspace) {
+    public BvBSkeletonContainer(BvBWorkspace workspace) {
         this.workspace = workspace;
 
         alphabeticalComparator = new Comparator<String>() {
@@ -87,7 +87,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
     public boolean checkForGoners(final SkeletonData skeletonData) {
         final ObjectSet<String> skinsToRemove = new ObjectSet<>();
         final ObjectSet<String> animationsToRemove = new ObjectSet<>();
-        final Array<BoundEffect> effectsToRemove = new Array<>();
+        final Array<BvBBoundEffect> effectsToRemove = new Array<>();
 
         for(String skinName: boundEffects.keys()) {
             if(skeletonData.findSkin(skinName) == null) {
@@ -97,7 +97,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 if(skeletonData.findAnimation(animationName) == null) {
                     animationsToRemove.add(animationName);
                 }
-                for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
+                for(BvBBoundEffect effect: boundEffects.get(skinName).get(animationName)) {
                     if(!effect.getPositionAttachment().isStatic() && skeletonData.findBone(effect.getPositionAttachment().getBoneName()) == null) {
                         effectsToRemove.add(effect);
                     }
@@ -133,7 +133,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                         }
                     }
 
-                    for(BoundEffect effect: effectsToRemove) {
+                    for(BvBBoundEffect effect: effectsToRemove) {
                         if(workspace.selectedEffect == effect) {
                             workspace.effectUnselected(effect);
                         }
@@ -146,7 +146,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                     }
 
                     configureSkeleton(skeletonData);
-                    workspace.bvb.properties.showPanel(SkeletonContainer.this);
+                    workspace.bvb.properties.showPanel(BvBSkeletonContainer.this);
 
                     TalosMain.Instance().ProjectController().setDirty();
                 }
@@ -211,7 +211,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
                 getWorkspace().flyLabel(event.getData().getName());
 
-                for(BoundEffect boundEffect: getBoundEffects()) {
+                for(BvBBoundEffect boundEffect: getBoundEffects()) {
                     String startEvent = boundEffect.getStartEvent();
                     String completeEvent = boundEffect.getCompleteEvent();
                     if(startEvent.equals(event.getData().getName())) {
@@ -234,7 +234,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
                 /**
                  * A loop has been done, so stopping and starting
                  */
-                for(BoundEffect boundEffect: getBoundEffects()) {
+                for(BvBBoundEffect boundEffect: getBoundEffects()) {
                     String completeEventName = boundEffect.getCompleteEvent();
                     if(completeEventName.equals("")) {
                         boundEffect.completeInstance();
@@ -260,7 +260,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             animationState.apply(skeleton);
         }
 
-        for(BoundEffect effect: getBoundEffects()) {
+        for(BvBBoundEffect effect: getBoundEffects()) {
             float animTime = getAnimationState().getTracks().first().getTrackTime();
             float duration = getCurrentAnimation().getDuration();
             float innerTime = animTime % duration;
@@ -314,31 +314,31 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         return 0;
     }
 
-    public Array<BoundEffect> getBoundEffects(String skinName, String animationName) {
+    public Array<BvBBoundEffect> getBoundEffects(String skinName, String animationName) {
         if(boundEffects.get(skinName) == null) {
-            boundEffects.put(skinName, new ObjectMap<String, Array<BoundEffect>>());
+            boundEffects.put(skinName, new ObjectMap<String, Array<BvBBoundEffect>>());
         }
-        ObjectMap<String, Array<BoundEffect>> animations = boundEffects.get(skinName);
+        ObjectMap<String, Array<BvBBoundEffect>> animations = boundEffects.get(skinName);
         if(animations.get(animationName) == null) {
-            animations.put(animationName, new Array<BoundEffect>());
+            animations.put(animationName, new Array<BvBBoundEffect>());
         }
 
         return animations.get(animationName);
     }
 
-    public Array<BoundEffect> getBoundEffects() {
+    public Array<BvBBoundEffect> getBoundEffects() {
         if(boundEffects.get(currentSkin.getName()) == null) {
-            boundEffects.put(currentSkin.getName(), new ObjectMap<String, Array<BoundEffect>>());
+            boundEffects.put(currentSkin.getName(), new ObjectMap<String, Array<BvBBoundEffect>>());
         }
-        ObjectMap<String, Array<BoundEffect>> animations = boundEffects.get(currentSkin.getName());
+        ObjectMap<String, Array<BvBBoundEffect>> animations = boundEffects.get(currentSkin.getName());
         if(animations.get(currentAnimation.getName()) == null) {
-            animations.put(currentAnimation.getName(), new Array<BoundEffect>());
+            animations.put(currentAnimation.getName(), new Array<BvBBoundEffect>());
         }
 
         return animations.get(currentAnimation.getName());
     }
 
-    public BoundEffect addEffect(String skinName, String animationName, BoundEffect effect) {
+    public BvBBoundEffect addEffect(String skinName, String animationName, BvBBoundEffect effect) {
         getBoundEffects(skinName, animationName).add(effect);
 
         effect.setDrawOrder(getBoundEffects().size-1); // todo this is not going to work well and is not tested
@@ -346,8 +346,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         return effect;
     }
 
-    public BoundEffect addEffect(String name, ParticleEffectDescriptor descriptor) {
-        BoundEffect boundEffect = new BoundEffect(name, descriptor, this);
+    public BvBBoundEffect addEffect(String name, ParticleEffectDescriptor descriptor) {
+        BvBBoundEffect boundEffect = new BvBBoundEffect(name, descriptor, this);
         //boundEffect.setForever(true);
 
         getBoundEffects().add(boundEffect);
@@ -379,11 +379,11 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         return skeleton.findBone(boneName);
     }
 
-    public BoundEffect updateEffect(String name, ParticleEffectDescriptor descriptor) {
-        for(ObjectMap<String, Array<BoundEffect>> skins: boundEffects.values()) {
-            for(Array<BoundEffect> animations: skins.values()) {
-                for(BoundEffect effect: animations) {
-                    if(effect.name.equals(name)) {
+    public BvBBoundEffect updateEffect(String name, ParticleEffectDescriptor descriptor) {
+        for(ObjectMap<String, Array<BvBBoundEffect>> skins: boundEffects.values()) {
+            for(Array<BvBBoundEffect> animations: skins.values()) {
+                for(BvBBoundEffect effect: animations) {
+                    if(effect.getEffectName().equals(name)) {
                         // found it
                         effect.updateEffect(descriptor);
                         return effect;
@@ -404,8 +404,8 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
 
         for(String skinName: boundEffects.keys()) {
             for(String animationName: boundEffects.get(skinName).keys()) {
-                for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
-                   result.add(effect.name);
+                for(BvBBoundEffect effect: boundEffects.get(skinName).get(animationName)) {
+                   result.add(effect.getEffectName());
                 }
             }
         }
@@ -421,7 +421,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         json.writeArrayStart("boundEffects");
         for(String skinName: boundEffects.keys()) {
             for(String animationName: boundEffects.get(skinName).keys()) {
-                for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
+                for(BvBBoundEffect effect: boundEffects.get(skinName).get(animationName)) {
                     json.writeObjectStart();
                     json.writeValue("skin", skinName);
                     json.writeValue("animation", animationName);
@@ -443,7 +443,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         json.writeArrayStart("boundEffects");
         for(String skinName: boundEffects.keys()) {
             for(String animationName: boundEffects.get(skinName).keys()) {
-                for(BoundEffect effect: boundEffects.get(skinName).get(animationName)) {
+                for(BvBBoundEffect effect: boundEffects.get(skinName).get(animationName)) {
                     json.writeObjectStart();
                     json.writeValue("skin", skinName);
                     json.writeValue("animation", animationName);
@@ -476,7 +476,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
             String skin = boundEffect.getString("skin");
             String animation = boundEffect.getString("animation");
             JsonValue data = boundEffect.get("data");
-            BoundEffect effect = new BoundEffect();
+            BvBBoundEffect effect = new BvBBoundEffect();
             effect.setParent(this);
             try {
                 effect.read(json, data);
@@ -618,10 +618,10 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         return this.getClass();
     }
 
-    public BoundEffect getEffectByName(String selectedEffect) {
+    public BvBBoundEffect getEffectByName(String selectedEffect) {
         if(selectedEffect == null) return null;
-        for(BoundEffect effect: getBoundEffects()) {
-            if(effect.name.equals(selectedEffect)) {
+        for(BvBBoundEffect effect: getBoundEffects()) {
+            if(effect.getEffectName().equals(selectedEffect)) {
                 return effect;
             }
         }
@@ -629,7 +629,7 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         return null;
     }
 
-    public void removeEffect(BoundEffect effect) {
+    public void removeEffect(BvBBoundEffect effect) {
         getBoundEffects().removeValue(effect, true);
     }
 
@@ -648,15 +648,16 @@ public class SkeletonContainer implements Json.Serializable, IPropertyProvider {
         return events;
     }
 
-    public BoundEffect findEffect (Skeleton skeleton, Slot slot) {
+    @Override
+    public BvBBoundEffect findEffect (Slot slot) {
         final String boneName = slot.getBone().getData().getName();
 
-        final Skin skin = skeleton.getSkin();
-        final ObjectMap<String, Array<BoundEffect>> entries = boundEffects.get(skin.getName());
+        final Skin skin = slot.getSkeleton().getSkin();
+        final ObjectMap<String, Array<BvBBoundEffect>> entries = boundEffects.get(skin.getName());
 
-        for (Array<BoundEffect> value : entries.values()) {
+        for (Array<BvBBoundEffect> value : entries.values()) {
             for (int i = 0; i < value.size; i++) {
-                final BoundEffect boundEffect = value.get(i);
+                final BvBBoundEffect boundEffect = value.get(i);
                 if (boundEffect.getPositionAttachment().getBoneName().equals(boneName)) {
                     return boundEffect;
                 }

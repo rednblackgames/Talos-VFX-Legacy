@@ -13,29 +13,29 @@ import games.rednblack.talos.runtime.values.NumericalValue;
 public class BoundEffect {
     public String skin, animation;
     public BoundEffectData data;
-    private final boolean forever = false;
+    protected final boolean forever = false;
 
-    private transient SkeletonContainer parent;
+    protected transient SkeletonContainer parent;
 
-    private transient ParticleEffectInstancePool particleEffectInstancePool;
+    protected transient ParticleEffectInstancePool particleEffectInstancePool;
 
     /**
      * even though this is one effect, many instances of it can be rendered at the same time
      * in cases when it starts more often then finishes
      */
-    private final Array<ParticleEffectInstance> particleEffects = new Array<>();
-    private final Array<ParticleEffectInstance> removeList = new Array<>();
+    protected final Array<ParticleEffectInstance> particleEffects = new Array<>();
+    protected final Array<ParticleEffectInstance> removeList = new Array<>();
 
     /**
      * each effect hsa it's own instance of scope payload, we want this global values local to effect type
      */
-    private final ScopePayload scopePayload = new ScopePayload();
+    protected final ScopePayload scopePayload = new ScopePayload();
 
     /**
      * System vars
      */
-    Vector2 tmpVec = new Vector2();
-    NumericalValue val = new NumericalValue();
+    protected final Vector2 tmpVec = new Vector2();
+    protected final NumericalValue val = new NumericalValue();
 
     public static class BoundEffectData {
         public String effectName, startEvent = "", completeEvent = "";
@@ -70,6 +70,10 @@ public class BoundEffect {
 
     public String getCompleteEvent() {
         return data.completeEvent;
+    }
+
+    public String getEffectName() {
+        return data.effectName;
     }
 
     public Array<ParticleEffectInstance> getParticleEffects() {

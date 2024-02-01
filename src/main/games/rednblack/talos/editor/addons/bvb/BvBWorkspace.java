@@ -27,6 +27,7 @@ import games.rednblack.talos.editor.widgets.ui.ViewportWidget;
 import games.rednblack.talos.runtime.ParticleEffectDescriptor;
 import games.rednblack.talos.runtime.ParticleEffectInstance;
 import games.rednblack.talos.runtime.bvb.AttachmentPoint;
+import games.rednblack.talos.runtime.bvb.BVBSkeletonRenderer;
 import games.rednblack.talos.runtime.render.SpriteBatchParticleRenderer;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     private static BvBWorkspace instance;
     public BvBAddon bvb;
-    private SkeletonContainer skeletonContainer;
+    private BvBSkeletonContainer skeletonContainer;
     private SpriteBatchParticleRenderer talosRenderer;
     private BVBSkeletonRenderer renderer;
     private BackgroundImageController backgroundImageController;
@@ -54,7 +55,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     private ObjectMap<String, ParticleEffectDescriptor> vfxLibrary = new ObjectMap<>();
     private ObjectMap<String, String> pathMap = new ObjectMap<>();
 
-    public BoundEffect selectedEffect = null;
+    public BvBBoundEffect selectedEffect = null;
 
     private Label hintLabel;
 
@@ -90,7 +91,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         topUI.setTransform(false);
 
-        skeletonContainer = new SkeletonContainer(this);
+        skeletonContainer = new BvBSkeletonContainer(this);
         backgroundImageController = new BackgroundImageController();
 
         talosRenderer = new SpriteBatchParticleRenderer(null);
@@ -131,10 +132,10 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
                 if (skeletonContainer.getSkeleton() == null) return false;
 
                 Array<AttachmentPoint> possiblePoints = new Array<>();
-                ObjectMap<AttachmentPoint, BoundEffect> pointEffectMap = new ObjectMap<>();
+                ObjectMap<AttachmentPoint, BvBBoundEffect> pointEffectMap = new ObjectMap<>();
 
                 // check for all attachment points
-                for (BoundEffect effect : skeletonContainer.getBoundEffects()) {
+                for (BvBBoundEffect effect : skeletonContainer.getBoundEffects()) {
                     AttachmentPoint position = effect.getPositionAttachment();
                     Array<AttachmentPoint> attachments = effect.getAttachments();
 
@@ -155,7 +156,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
                 if (possiblePoints.size > 0) {
                     AttachmentPoint point = possiblePoints.get(selectIndex % possiblePoints.size);
-                    BoundEffect effect = pointEffectMap.get(point);
+                    BvBBoundEffect effect = pointEffectMap.get(point);
                     movingPoint = point;
                     event.handle();
                     effectSelected(effect);
@@ -261,12 +262,12 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         addListener(inputListener);
     }
 
-    public void effectSelected(BoundEffect effect) {
+    public void effectSelected(BvBBoundEffect effect) {
         selectedEffect = effect;
         bvb.properties.showPanel(effect);
     }
 
-    public void effectUnselected(BoundEffect effect) {
+    public void effectUnselected(BvBBoundEffect effect) {
         selectedEffect = null;
         bvb.properties.hidePanel(effect);
     }
@@ -364,7 +365,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         /**
          * Draw bound effects and their attachment points
          */
-        for (BoundEffect effect : skeletonContainer.getBoundEffects()) {
+        for (BvBBoundEffect effect : skeletonContainer.getBoundEffects()) {
             // position attachment first
             AttachmentPoint positionAttachment = effect.getPositionAttachment();
             if (positionAttachment != null && !positionAttachment.isStatic()) {
@@ -439,7 +440,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         int a3 = batch.getBlendSrcFuncAlpha();
         int a4 = batch.getBlendDstFuncAlpha();
         renderer.setPremultipliedAlpha(preMultipliedAlpha);
-        renderer.draw(talosRenderer, batch, skeletonContainer, skeleton); // Draw the skeleton images.
+        renderer.draw(talosRenderer, skeletonContainer, skeleton); // Draw the skeleton images.
 
         // fixing back the blending because PMA is shit
         batch.setBlendFunctionSeparate(a1, a2, a3, a4);
@@ -450,7 +451,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if (skeleton == null) return;
 
         talosRenderer.setBatch(batch);
-        for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+        for(BvBBoundEffect effect: skeletonContainer.getBoundEffects()) {
             if(effect.isNested() || !effect.isBehind()) continue;
             for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
                 talosRenderer.render(particleEffectInstance);
@@ -463,7 +464,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if (skeleton == null) return;
 
         talosRenderer.setBatch(batch);
-        for(BoundEffect effect: skeletonContainer.getBoundEffects()) {
+        for(BvBBoundEffect effect: skeletonContainer.getBoundEffects()) {
             if(effect.isNested() || effect.isBehind()) continue;
             for(ParticleEffectInstance particleEffectInstance: effect.getParticleEffects()) {
                 talosRenderer.render(particleEffectInstance);
@@ -479,7 +480,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         bvb.properties.updateValues();
     }
 
-    public BoundEffect addParticle(FileHandle handle) {
+    public BvBBoundEffect addParticle(FileHandle handle) {
         if (skeletonContainer.getSkeleton() == null) return null;
         pathMap.put(handle.name(), handle.path());
 
@@ -491,7 +492,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         descriptor.load(handle);
         vfxLibrary.put(name, descriptor);
 
-        BoundEffect effect = skeletonContainer.addEffect(name, descriptor);
+        BvBBoundEffect effect = skeletonContainer.addEffect(name, descriptor);
         effect.setPositionAttachment(skeletonContainer.getSkeleton().getRootBone().toString());
 
         bvb.getTimeline().updateEffectList(skeletonContainer.getBoundEffects());
@@ -596,7 +597,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         json.writeValue("cameraPosX", camera.position.x);
         json.writeValue("cameraPosY", camera.position.y);
         if (selectedEffect != null) {
-            json.writeValue("selectedEffect", selectedEffect.name);
+            json.writeValue("selectedEffect", selectedEffect.getEffectName());
         }
     }
 
@@ -609,7 +610,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
             pathMap.put(path.name(), path.asString());
         }
 
-        skeletonContainer = new SkeletonContainer(this);
+        skeletonContainer = new BvBSkeletonContainer(this);
         skeletonContainer.read(json, jsonData.get("skeleton"));
 
         preMultipliedAlpha = jsonData.getBoolean("pma", false);
@@ -628,7 +629,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         bvb.properties.showPanel(backgroundImageController);
 
         String selectedEffect = jsonData.getString("selectedEffect", null);
-        BoundEffect effect = skeletonContainer.getEffectByName(selectedEffect);
+        BvBBoundEffect effect = skeletonContainer.getEffectByName(selectedEffect);
         if (effect != null) effectSelected(effect);
     }
 
@@ -711,7 +712,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         return getClass();
     }
 
-    public SkeletonContainer getSkeletonContainer() {
+    public BvBSkeletonContainer getSkeletonContainer() {
         return skeletonContainer;
     }
 

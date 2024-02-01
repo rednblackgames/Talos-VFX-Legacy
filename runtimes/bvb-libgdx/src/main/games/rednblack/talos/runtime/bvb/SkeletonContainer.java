@@ -160,17 +160,11 @@ public class SkeletonContainer {
         }
     }
 
-    /**
-     * Find the bound effect, the skeleton instance is passed because particle may be bound to a SkeletonAttachment
-     *
-     * @param skeleton
-     * @param slot
-     * @return
-     */
-    public BoundEffect findEffect (Skeleton skeleton, Slot slot) {
+
+    public BoundEffect findEffect (Slot slot) {
         final String boneName = slot.getBone().getData().getName();
 
-        final Skin skin = skeleton.getSkin();
+        final Skin skin = slot.getSkeleton().getSkin();
         final ObjectMap<String, Array<BoundEffect>> entries = boundEffectsMap.get(skin.getName());
 
         if (entries == null) return null;
