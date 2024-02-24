@@ -27,6 +27,7 @@ public interface IEmitter {
     void pause();
     void resume();
     void restart();
+    void reset();
     float getDelayRemaining();
     void update(float delta);
     ParticleEmitterDescriptor getEmitterGraph();

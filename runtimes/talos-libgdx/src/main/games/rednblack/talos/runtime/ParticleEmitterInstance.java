@@ -353,4 +353,9 @@ public class ParticleEmitterInstance implements IEmitter {
 	public void setTint(Color color) {
     	tint.set(color);
 	}
+
+	public void reset() {
+		initialized = false;
+		activeParticles.clear();
+	}
 }

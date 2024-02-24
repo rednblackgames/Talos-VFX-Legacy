@@ -257,6 +257,11 @@ public class TinyEmitter implements IEmitter {
     }
 
     @Override
+    public void reset() {
+
+    }
+
+    @Override
     public boolean isStopped() {
         return isStopped;
     }

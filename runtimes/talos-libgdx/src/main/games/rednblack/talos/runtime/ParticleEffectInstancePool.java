@@ -45,7 +45,7 @@ public class ParticleEffectInstancePool extends Pool<ParticleEffectInstancePool.
     public void free(PooledParticleEffectInstance object) {
         super.free(object);
 
-        object.restart();
+        object.reset();
     }
 
     public class PooledParticleEffectInstance extends ParticleEffectInstance {
