@@ -22,7 +22,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -55,7 +54,6 @@ import games.rednblack.talos.editor.notifications.Notifications;
 import games.rednblack.talos.editor.notifications.events.AssetFileDroppedEvent;
 import games.rednblack.talos.editor.project.IProject;
 import games.rednblack.talos.editor.project.ProjectController;
-import games.rednblack.talos.editor.project.TalosProject;
 import games.rednblack.talos.editor.widgets.ui.*;
 import games.rednblack.talos.editor.wrappers.WrapperRegistry;
 import games.rednblack.talos.runtime.ParticleEmitterDescriptor;
@@ -484,6 +482,9 @@ public class UIStage {
 	}
 
 	public void swapToAddonContent(Table left, Table right, Table bottom) {
+		verticalPane.setVisible(true);
+		horizontalPane.setVisible(true);
+
 		leftTable.clearChildren();
 		rightTable.clearChildren();
 		bottomTable.clearChildren();

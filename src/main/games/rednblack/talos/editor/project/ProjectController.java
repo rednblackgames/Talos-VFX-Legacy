@@ -48,7 +48,7 @@ public class ProjectController {
                     } else {
                         IProject tmp = currentProject;
                         currentProject = currentTab.getProjectType();
-                        saveProjectToCache(projectFileName);
+                        saveProjectToCache(currentProjectPath);
                         currentProject = tmp;
                     }
                 }
@@ -85,8 +85,10 @@ public class ProjectController {
 
     private void saveProjectToCache(String projectFileName) {
         try {
-            fileCache.put(projectFileName, currentProject.getProjectString(true));
-            pathCache.put(projectFileName, currentProjectPath);
+            if (projectFileName != null) {
+                fileCache.put(projectFileName, currentProject.getProjectString(true));
+                pathCache.put(projectFileName, currentProjectPath);
+            }
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
         }
@@ -176,7 +178,7 @@ public class ProjectController {
                 removingUnworthy = true;
                 clearCache(currentTab.getFileName());
             }  else {
-                saveProjectToCache(projectFileName);
+                saveProjectToCache(currentProjectPath);
             }
         }
 
@@ -244,10 +246,11 @@ public class ProjectController {
     }
 
     public void loadFromTab(FileTab tab) {
+        loading = true;
         String fileName = tab.getFileName();
 
         if (currentTab != null && currentTab != tab) {
-            saveProjectToCache(projectFileName);
+            saveProjectToCache(currentProjectPath);
         }
 
         if (fileCache.containsKey(fileName)) {
@@ -258,6 +261,7 @@ public class ProjectController {
             currentProject.loadProject(projectFileHandle, fileData, true);
         }
 
+        currentProjectPath = tab.getProjectFileHandle().path();
         projectFileName = fileName;
         currentTab = tab;
         currentProject = currentTab.getProjectType();
@@ -267,6 +271,7 @@ public class ProjectController {
             currentProject.initUIContent();
         }
         TalosMain.Instance().resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        loading = false;
     }
 
     public void removeTab(FileTab tab) {

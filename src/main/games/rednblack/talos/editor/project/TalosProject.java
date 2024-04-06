@@ -171,9 +171,12 @@ public class TalosProject implements IProject {
 		for (ExportData.EmitterExportData emitterExportData : exportData.emitters) {
 			EmitterData emitterData = new EmitterData();
 			emitterData.name = emitterExportData.name;
+			ModuleWrapper particleModule = null;
+			ModuleWrapper emitterModule = null;
 
 			for (AbstractModule module : emitterExportData.modules) {
 				String wrapperName = module.getClass().getSimpleName() + "Wrapper";
+
                 ModuleWrapper wrapper = null;
                 try {
                     wrapper = (ModuleWrapper) ClassReflection.newInstance(json.getClass(wrapperName));
@@ -182,18 +185,46 @@ public class TalosProject implements IProject {
                 } catch (ReflectionException e) {
                     throw new RuntimeException(e);
                 }
+				if (wrapperName.equals("ParticleModuleWrapper")) particleModule = wrapper;
+				if (wrapperName.equals("EmitterModuleWrapper")) emitterModule = wrapper;
 
-				if (wrapper != null)
-                	emitterData.modules.add(wrapper);
+				emitterData.modules.add(wrapper);
 			}
 
 			emitterData.connections.addAll(emitterExportData.connections);
 			projectData.getEmitters().add(emitterData);
 
-			formatNode(emitterData.modules, emitterData.connections, 100);
+			if (particleModule != null) {
+				traverse(emitterData.modules, emitterData.connections, particleModule.getId(), new IntMap<>(), 200, 400, 0);
+			}
+
+			if (emitterModule != null) {
+				traverse(emitterData.modules, emitterData.connections, emitterModule.getId(), new IntMap<>(), 700, 600, 0);
+			}
+
+			//formatNode(emitterData.modules, emitterData.connections, 50);
 		}
 
 		loadFromProjectData(projectData);
+	}
+
+	private void traverse(Array<ModuleWrapper> nodes, Array<ConnectionData> connections, int nodeId, IntMap<Boolean> visited, float lastX, float lastY, float prevHeight) {
+		ModuleWrapper currentNode = getNodeById(nodes, nodeId);
+		if (currentNode == null) return;
+
+		visited.put(nodeId, Boolean.TRUE);
+		currentNode.setX(lastX - currentNode.getWidth());
+		currentNode.setY(lastY - prevHeight - currentNode.getHeight());
+
+		ModuleWrapper prevNode = null;
+		for (int i = connections.size - 1; i >= 0; i--) {
+			ConnectionData connectionData = connections.get(i);
+			if (connectionData.moduleTo == nodeId && visited.get(connectionData.moduleFrom, Boolean.FALSE) == Boolean.FALSE) {
+				float h = prevNode != null ? prevNode.getHeight() : 0;
+				traverse(nodes, connections, connectionData.moduleFrom, visited, currentNode.getX(), currentNode.getY(), h);
+				prevNode = getNodeById(nodes, connectionData.moduleFrom);
+			}
+		}
 	}
 
 	// Constants for the algorithm
@@ -206,7 +237,7 @@ public class TalosProject implements IProject {
 		int gridSize = (int) Math.ceil(Math.sqrt(nodes.size));
 		int nodeIndex = 0;
 
-		for (int i = 0; i < gridSize; i++) {
+		/*for (int i = 0; i < gridSize; i++) {
 			for (int j = 0; j < gridSize; j++) {
 				if (nodeIndex < nodes.size) {
 					nodes.get(nodeIndex).setX(i * 50 + MathUtils.random() * 10);
@@ -214,7 +245,7 @@ public class TalosProject implements IProject {
 					nodeIndex++;
 				}
 			}
-		}
+		}*/
 
 		for (int iter = 0; iter < iterations; iter++) {
 			// Calculate forces and update positions
@@ -256,7 +287,8 @@ public class TalosProject implements IProject {
 	}
 
 	public static ModuleWrapper getNodeById(Array<ModuleWrapper> nodes, int id) {
-		for (ModuleWrapper node : new Array.ArrayIterator<>(nodes)) {
+		for (int i = 0; i < nodes.size; i++) {
+			ModuleWrapper node = nodes.get(i);
 			if (node.getId() == id) {
 				return node;
 			}
@@ -283,6 +315,7 @@ public class TalosProject implements IProject {
 		particleEffect.sortEmitters();
 	}
 
+	@Override
 	public String getProjectString (boolean toMemory) {
 		projectData.setFrom(TalosMain.Instance().NodeStage().moduleBoardWidget);
 		String data = projectSerializer.write(projectData);
