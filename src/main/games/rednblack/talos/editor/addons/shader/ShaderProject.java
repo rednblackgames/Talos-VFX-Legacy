@@ -101,6 +101,8 @@ public class ShaderProject implements IProject {
         public void loadStage (DynamicNodeStage nodeStage) {
             Json json = new Json();
             nodeStage.read(json, nodeStageData);
+            if (nodeStageData.get("list").get(0) != null)
+                nodeStage.getStage().getCamera().position.set(nodeStageData.get("list").get(0).get("position").get("x").asFloat(), nodeStageData.get("list").get(0).get("position").get("y").asFloat(), 0);
         }
     }
 
