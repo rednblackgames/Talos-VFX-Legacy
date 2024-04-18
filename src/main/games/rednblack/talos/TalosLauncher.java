@@ -23,6 +23,8 @@ import java.awt.*;
 
 public class TalosLauncher {
 	public static void main (String[] arg) {
+		if (StartupHelper.startNewJvmIfRequired()) return;
+
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setMaximized(true);
 		config.setTitle("Talos");
