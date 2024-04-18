@@ -1,16 +1,14 @@
 [1.5.0]
-- Scene Editor addon with a whole sweet of features bellow
-- Scenes and Prefabs
-- Importer for 9patch files
-- ECS like GameObject/Component system
-- File explorer
-- Property system to edit individual components and other property holders
-- Game Object templates
-- Transform system, and useful gizmos
-- Support for nested objects
-- Support for particle effects, and linking to TLS
-- Metadata system for each asset
-- Multiple camera system, and camera previews
+- First legacy version
+- Update libGDX to 1.12.1
+- Move editor to ANGLE with many performance improvements
+- Update Spine runtime to 4.1
+- Refactor the gradle structure with new package to avoid conflicts
+- Make BVB working again with a stand alone runtime
+- Fix compatibility with web backends
+- Allow to import again exported particles
+- Support pooling particles
+- A lot of bug fixes and stability improvements
 
 [1.4.2]
 - Material Module for 2D/3D preview of shader code output
