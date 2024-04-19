@@ -432,7 +432,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         if (skeleton == null) return;
 
         skeleton.setPosition(0, 0);
-        skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
+        skeleton.updateWorldTransform(Skeleton.Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
 
         int a1 = batch.getBlendSrcFunc();
