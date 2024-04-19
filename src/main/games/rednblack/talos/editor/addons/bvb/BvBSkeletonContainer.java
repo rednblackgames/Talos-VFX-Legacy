@@ -191,6 +191,7 @@ public class BvBSkeletonContainer extends SkeletonContainer implements Json.Seri
 
         animationState.update(0.1f); // Update the animation time.
         animationState.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.\
+        skeleton.update(0.1f);
         skeleton.setPosition(0, 0);
         skeleton.updateWorldTransform(Skeleton.Physics.update); // Uses the bones' local SRT to compute their world SRT.
 
@@ -257,6 +258,7 @@ public class BvBSkeletonContainer extends SkeletonContainer implements Json.Seri
 
         if(!isSkeletonPaused) {
             animationState.update(delta);
+            skeleton.update(delta);
             animationState.apply(skeleton);
         }
 
