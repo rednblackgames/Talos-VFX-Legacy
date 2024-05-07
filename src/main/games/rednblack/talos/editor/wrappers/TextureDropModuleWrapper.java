@@ -73,15 +73,16 @@ public abstract class TextureDropModuleWrapper<T extends AbstractModule> extends
 
                 TalosMain.Instance().ProjectController().setDirty();
 
-                TalosMain.Instance().FileTracker().trackFile(fileHandle, new FileTracker.Tracker() {
-                    @Override
-                    public void updated(FileHandle handle) {
+                TalosMain.Instance().FileTracker().trackFile(fileHandle, handle -> {
 
+                    try {
                         final TalosAssetProvider projectAssetProvider = TalosMain.Instance().TalosProject().getProjectAssetProvider();
-                        Sprite region = projectAssetProvider.replaceRegion(handle);
+                        Sprite region1 = projectAssetProvider.replaceRegion(handle);
 
-                        setModuleRegion(handle.nameWithoutExtension(), region);
-                        dropWidget.setDrawable(new TextureRegionDrawable(region));
+                        setModuleRegion(handle.nameWithoutExtension(), region1);
+                        dropWidget.setDrawable(new TextureRegionDrawable(region1));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 });
             }
