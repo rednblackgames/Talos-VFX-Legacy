@@ -520,6 +520,16 @@ public class TalosProject implements IProject {
 						data.metadata.resources.add(name);
 					}
 				}
+				if (wrapper.getModule() instanceof FlipbookModule) {
+					FlipbookModule module = (FlipbookModule)wrapper.getModule();
+					String name = module.regionName;
+					if (name == null)
+						name = "fire";
+
+					if (!data.metadata.resources.contains(name, false)) {
+						data.metadata.resources.add(name);
+					}
+				}
 				if (wrapper.getModule() instanceof VectorFieldModule) {
 					VectorFieldModule vectorFieldModule = (VectorFieldModule) wrapper.getModule();
 					String fgaFileName = vectorFieldModule.fgaFileName;

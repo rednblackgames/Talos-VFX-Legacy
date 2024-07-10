@@ -67,7 +67,7 @@ public class SpriteAnimationDrawable extends ParticleDrawable {
 
     private void updateVertices(float x, float y, float width, float height, Color color, float u, float v, float u2, float v2, float rotation, float originX, float originY) {
         int idx = 0;
-        origin.set(x + width * originX, y + width * originY);
+        origin.set(x + width * originX, y + height * originY);
 
         tmp.set(x, y).rotateAround(origin, rotation);
         vertices[idx++] = tmp.x;
