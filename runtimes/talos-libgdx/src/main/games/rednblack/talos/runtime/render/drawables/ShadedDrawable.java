@@ -72,6 +72,7 @@ public class ShadedDrawable extends ParticleDrawable {
             int bind = 1;
             for (String uniformName : textureMap.keys()) {
                 TextureRegion region = textureMap.get(uniformName);
+                if (region == null) continue;
                 Texture texture = region.getTexture();
                 texture.bind(bind);
                 shaderProgram.setUniformi(uniformName, bind);

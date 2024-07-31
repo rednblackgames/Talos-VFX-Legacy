@@ -19,8 +19,6 @@ package games.rednblack.talos;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
-import java.awt.*;
-
 public class TalosLauncher {
 	public static void main (String[] arg) {
 		if (StartupHelper.startNewJvmIfRequired()) return;
