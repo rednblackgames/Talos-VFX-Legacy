@@ -66,6 +66,13 @@ public class SkeletonContainer {
             @Override
             public void start(AnimationState.TrackEntry entry) {
                 super.start(entry);
+                for(BoundEffect boundEffect: boundEffects) {
+                    //Start all effects not associated to an event
+                    String startEventName = boundEffect.getStartEvent();
+                    if(startEventName.equals("")) {
+                        boundEffect.startInstance();
+                    }
+                }
             }
 
             @Override
