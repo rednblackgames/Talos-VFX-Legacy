@@ -206,7 +206,7 @@ public class BVBSkeletonRenderer {
                         | (int) (r * slotColor.r * color.r * multiplier));
 
                 if (clipper.isClipping()) {
-                    clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, c, 0, false);
+                    clipper.clipTriangles(vertices, triangles, triangles.length, uvs, c, 0, false);
                     FloatArray clippedVertices = clipper.getClippedVertices();
                     ShortArray clippedTriangles = clipper.getClippedTriangles();
                     batch.draw(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
@@ -330,7 +330,7 @@ public class BVBSkeletonRenderer {
                         | (int) (red * darkColor.r));
 
                 if (clipper.isClipping()) {
-                    clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);
+                    clipper.clipTriangles(vertices, triangles, triangles.length, uvs, light, dark, true);
                     FloatArray clippedVertices = clipper.getClippedVertices();
                     ShortArray clippedTriangles = clipper.getClippedTriangles();
 
