@@ -1,3 +1,8 @@
+[1.5.1]
+- Update libGDX to 1.13.1, VisUI 1.5.5, Spine 4.2.7
+- Fix fipbook pivot
+- Bug fixes
+
 [1.5.0]
 - First legacy version
 - Update libGDX to 1.12.1
