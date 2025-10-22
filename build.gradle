@@ -53,6 +53,7 @@ task runTalos(dependsOn: classes, type: JavaExec) {
 }
 
 task dist(type: Jar) {
+    dependsOn classes
     archiveVersion.set(getBuildVersion())
 
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
