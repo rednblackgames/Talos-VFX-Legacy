@@ -23,7 +23,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.CharArray;
 import games.rednblack.talos.runtime.values.ColorPoint;
 
 public class GradientImage extends Actor {
@@ -36,7 +36,7 @@ public class GradientImage extends Actor {
 
     Texture white;
 
-    StringBuilder stringBuilder = new StringBuilder();
+    CharArray stringBuilder = new CharArray();
 
     private final String U_POINT_COUNT = "u_pointCount";
     private final String U_ARR_NAME = "u_gradientPoints[";

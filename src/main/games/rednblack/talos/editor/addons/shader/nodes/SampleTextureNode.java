@@ -111,7 +111,7 @@ public class SampleTextureNode extends AbstractShaderNode implements ShaderBuild
         FileHandle fileHandle = TalosMain.Instance().ProjectController().findFile(texturePath);
 
         if(fileHandle != null) {
-            FileActorBinder.FileEvent fileEvent = Pools.obtain(FileActorBinder.FileEvent.class);
+            FileActorBinder.FileEvent fileEvent = TalosMain.POOLS.obtain(FileActorBinder.FileEvent.class);
             fileEvent.setFileHandle(fileHandle);
             shaderBox.fire(fileEvent);
         }

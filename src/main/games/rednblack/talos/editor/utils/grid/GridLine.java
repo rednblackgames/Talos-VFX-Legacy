@@ -3,7 +3,7 @@ package games.rednblack.talos.editor.utils.grid;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Pools;
+import games.rednblack.talos.TalosMain;
 
 public class GridLine implements Pool.Poolable {
     public Vector2 startCoordinate;
@@ -32,8 +32,8 @@ public class GridLine implements Pool.Poolable {
 
     @Override
     public void reset() {
-        Pools.free(startCoordinate);
-        Pools.free(endCoordinate);
+        if (startCoordinate != null) TalosMain.POOLS.free(startCoordinate);
+        if (endCoordinate != null) TalosMain.POOLS.free(endCoordinate);
         color.set(0);
         thickness = 0;
     }

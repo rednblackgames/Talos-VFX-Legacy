@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.Pools;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.notifications.events.AssetFileDroppedEvent;
@@ -45,7 +44,7 @@ public class FileActorBinder implements Notifications.Observer {
                         String path = file.first().file().getAbsolutePath();
                         FileHandle handle = Gdx.files.absolute(path);
 
-                        FileEvent fileEvent = Pools.obtain(FileEvent.class);
+                        FileEvent fileEvent = TalosMain.POOLS.obtain(FileEvent.class);
                         fileEvent.setFileHandle(handle);
                         actor.fire(fileEvent);
                     }
@@ -106,7 +105,7 @@ public class FileActorBinder implements Notifications.Observer {
                 vec.set(event.getScreenPos());
                 vec = actor.screenToLocalCoordinates(vec);
                 if (actor.hit(vec.x, vec.y, false) != null) {
-                    FileEvent fileEvent = Pools.obtain(FileEvent.class);
+                    FileEvent fileEvent = TalosMain.POOLS.obtain(FileEvent.class);
                     fileEvent.setFileHandle(fileHandle);
                     actor.fire(fileEvent);
 

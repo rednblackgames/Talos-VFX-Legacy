@@ -32,8 +32,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.CharArray;
 import com.badlogic.gdx.utils.PerformanceCounter;
-import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.TimeUtils;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.utils.SharedShapeDrawer;
@@ -77,7 +77,7 @@ public class PreviewWidget extends ViewportWidget {
     private FPSLogger fpsLogger = new FPSLogger();
     private PerformanceCounter performanceCounter = new PerformanceCounter("talos");
 
-    private StringBuilder stringBuilder = new StringBuilder();
+    private CharArray stringBuilder = new CharArray();
     private int trisCount = 0;
     private FloatCounter renderTime = new FloatCounter(100);
     private FloatCounter cpuTime = new FloatCounter(100);

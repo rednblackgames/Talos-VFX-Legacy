@@ -27,7 +27,7 @@ public class ShaderAddon implements IAddon {
 
     public static ShaderProject SHADER_PROJECT;
 
-    public DynamicNodeStage nodeStage;
+    public ShaderNodeStage nodeStage;
 
     ExportSequenceDialog exportSequenceDialog;
 
@@ -42,7 +42,7 @@ public class ShaderAddon implements IAddon {
     }
 
     private void buildUI () {
-        exportSequenceDialog = new ExportSequenceDialog((ShaderNodeStage)nodeStage);
+        exportSequenceDialog = new ExportSequenceDialog(nodeStage);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class ShaderAddon implements IAddon {
                 TalosMain.Instance().UIStage().showSaveFileChooser(".frag", new FileChooserAdapter() {
                     @Override
                     public void selected (Array<FileHandle> files) {
-                        String fragShader = ((ShaderNodeStage)(nodeStage)).getFragShader();
+                        String fragShader = nodeStage.getFragShader();
 
                         FileHandle file = files.get(0);
 
@@ -146,7 +146,7 @@ public class ShaderAddon implements IAddon {
                     @Override
                     public void selected (Array<FileHandle> files) {
                         FileHandle file = files.get(0);
-                        Pixmap pixmap = ((ShaderNodeStage)(nodeStage)).exportPixmap();
+                        Pixmap pixmap = nodeStage.exportPixmap();
                         if(pixmap != null) {
                             PixmapIO.writePNG(file, pixmap);
                             pixmap.dispose();
@@ -169,7 +169,7 @@ public class ShaderAddon implements IAddon {
 
     @Override
     public void dispose () {
-
+        nodeStage.dispose();
     }
 
     private Image icon(String name) {

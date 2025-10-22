@@ -1,16 +1,11 @@
 package games.rednblack.talos.editor.widgets.ui.timeline;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pools;
 import games.rednblack.talos.TalosMain;
-import games.rednblack.talos.runtime.ParticleEmitterDescriptor;
-import games.rednblack.talos.runtime.simulation.TinyEmitter;
 
 import java.util.Comparator;
 
@@ -67,7 +62,7 @@ public abstract class TimelineWidget<U> extends Table {
     }
 
     private TimelineListener.TimelineEvent obtainEvent() {
-        return Pools.obtain(TimelineListener.TimelineEvent.class);
+        return TalosMain.POOLS.obtain(TimelineListener.TimelineEvent.class);
     }
 
     protected abstract String getItemTypeName();

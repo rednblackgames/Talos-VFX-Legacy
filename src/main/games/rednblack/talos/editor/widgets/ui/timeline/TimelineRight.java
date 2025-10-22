@@ -5,11 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.CharArray;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
 import games.rednblack.talos.editor.widgets.ui.common.DynamicSlider;
 import games.rednblack.talos.editor.widgets.ui.common.FlatButton;
@@ -30,7 +29,7 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     private Slider scroll;
     private TimeCursor timeCursorWidget;
 
-    private StringBuilder stringBuilder = new StringBuilder();
+    private CharArray stringBuilder = new CharArray();
     private final String ZERO_STRING = "0";
     private final String TIME_SEPARATOR_STRING = " : ";
     private Table timeBar;

@@ -17,7 +17,7 @@
 package games.rednblack.talos.runtime.serialization;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.CharArray;
 import games.rednblack.talos.runtime.modules.AbstractModule;
 
 public class ExportData {
@@ -37,7 +37,7 @@ public class ExportData {
 
         @Override
         public String toString () {
-            StringBuilder stringBuilder = new StringBuilder();
+            CharArray stringBuilder = new CharArray();
 
             stringBuilder.append(name);
             stringBuilder.append("\n");

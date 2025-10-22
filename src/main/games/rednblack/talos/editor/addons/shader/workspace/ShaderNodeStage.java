@@ -3,6 +3,7 @@ package games.rednblack.talos.editor.addons.shader.workspace;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector2;
@@ -25,14 +26,13 @@ import games.rednblack.talos.editor.notifications.events.NodeRemovedEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
 
 public class ShaderNodeStage extends DynamicNodeStage implements Notifications.Observer {
 
     private ColorOutput colorOutput;
 
     FrameBuffer frameBuffer;
-    SpriteBatch spriteBatch;
+    PolygonSpriteBatch spriteBatch;
     Viewport viewport;
 
     class ExportSequencePayload {
@@ -53,7 +53,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
         super(skin);
 
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 240, 240, false);
-        spriteBatch = new SpriteBatch();
+        spriteBatch = new PolygonSpriteBatch();
         viewport = new FitViewport(240, 240);
         viewport.apply(true);
 
@@ -295,5 +295,10 @@ public class ShaderNodeStage extends DynamicNodeStage implements Notifications.O
 
 
         exportSequencePayload = null;
+    }
+
+    public void dispose() {
+        spriteBatch.dispose();
+        frameBuffer.dispose();
     }
 }

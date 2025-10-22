@@ -23,8 +23,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.PoolManager;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.Tooltip;
 import games.rednblack.talos.editor.NodeStage;
@@ -33,6 +34,7 @@ import games.rednblack.talos.editor.UIStage;
 import games.rednblack.talos.editor.WorkplaceStage;
 import games.rednblack.talos.editor.addons.AddonController;
 import games.rednblack.talos.editor.dialogs.ErrorReporting;
+import games.rednblack.talos.editor.notifications.FileActorBinder;
 import games.rednblack.talos.editor.project.FileTracker;
 import games.rednblack.talos.editor.project.IProject;
 import games.rednblack.talos.editor.project.TalosProject;
@@ -42,11 +44,10 @@ import games.rednblack.talos.editor.utils.CursorUtil;
 import games.rednblack.talos.editor.utils.ScreenshotService;
 import games.rednblack.talos.editor.utils.SharedShapeDrawer;
 import games.rednblack.talos.editor.utils.grid.GridLine;
+import games.rednblack.talos.editor.widgets.ui.timeline.TimelineListener;
 import games.rednblack.talos.runtime.ScopePayload;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWDropCallback;
-import org.lwjgl.glfw.GLFWWindowFocusCallback;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -57,8 +58,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class TalosMain extends ApplicationAdapter {
-
-	private static boolean focused = true;
+    public static PoolManager POOLS = new PoolManager(FileActorBinder.FileEvent::new, Vector2::new, ChangeListener.ChangeEvent::new, GridLine::new, TimelineListener.TimelineEvent::new);
 
 	private UIStage uiStage;
 
@@ -134,8 +134,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void create () {
-		Pools.get(Vector2.class, 10_000);
-		Pools.get(GridLine.class, 10_000);
 		Tooltip.DEFAULT_APPEAR_DELAY_TIME = 1;
 
 		//Check for properties
@@ -207,21 +205,6 @@ public class TalosMain extends ApplicationAdapter {
 
 		// final init after all is done
 		TalosMain.Instance().ProjectController().newProject(ProjectController.TLS);
-
-
-		GLFWWindowFocusCallback glfwWindowFocusCallback = GLFWWindowFocusCallback.create(new GLFWWindowFocusCallback() {
-			@Override
-			public void invoke (long window, boolean focused) {
-				Gdx.app.postRunnable(new Runnable() {
-					@Override
-					public void run () {
-						TalosMain.focused = focused;
-					}
-				});
-			}
-		});
-		GLFW.glfwSetWindowFocusCallback(((Lwjgl3Graphics)Gdx.graphics).getWindow().getWindowHandle(), glfwWindowFocusCallback);
-
 	}
 
 	private void loadFromProperties () {

@@ -4,8 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.XmlReader;
+import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
 
 public abstract class AbstractWidget<T> extends Table {
@@ -72,13 +72,13 @@ public abstract class AbstractWidget<T> extends Table {
     }
 
     protected boolean fireChangedEvent() {
-        ChangeListener.ChangeEvent changeEvent = Pools.obtain(ChangeListener.ChangeEvent.class);
+        ChangeListener.ChangeEvent changeEvent = TalosMain.POOLS.obtain(ChangeListener.ChangeEvent.class);
 
         boolean var2;
         try {
             var2 = fire(changeEvent);
         } finally {
-            Pools.free(changeEvent);
+            TalosMain.POOLS.free(changeEvent);
         }
 
         return var2;
