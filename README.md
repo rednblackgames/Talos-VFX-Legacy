@@ -3,7 +3,7 @@
 ![maven-central](https://img.shields.io/maven-central/v/games.rednblack.talos/runtime-libgdx?color=blue&label=release)
 ![sonatype-nexus](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fcentral.sonatype.com%2Frepository%2Fmaven-snapshots%2Fgames%2Frednblack%2Ftalos%2Fruntime-libgdx%2Fmaven-metadata.xml)
 
-Talos VFX Legacy is a fork of latest open source Talos V1. Official development went far beyond the VFX concept, becoming difficult to integrate in already complex scenarios. This Legacy development is made to keep Talos a pure VFX toolkit and nothing else for 2D games.
+Talos VFX Legacy is a fork of latest open source [Talos VFX V1](https://talosvfx.com/). Official development went far beyond the VFX concept, becoming difficult to integrate in already complex scenarios. This Legacy development is made to keep Talos a pure VFX toolkit and nothing else for 2D games.
 
 ![alt text](https://i.imgur.com/Fxw1Unn.jpg)
 
