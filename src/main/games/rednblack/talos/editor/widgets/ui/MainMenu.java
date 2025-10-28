@@ -56,7 +56,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                VisDialog dialog = Dialogs.showOKDialog(stage.getStage(), "About Talos 1.5.0", "Talos is a an open source node based FX and Shader editor");
+                Dialogs.showOKDialog(stage.getStage(), "About Talos 1.5.2", "Talos is a an open source node based FX and Shader editor");
             }
         });
 
