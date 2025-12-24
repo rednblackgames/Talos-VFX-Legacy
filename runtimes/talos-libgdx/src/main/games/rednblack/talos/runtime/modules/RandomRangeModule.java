@@ -16,6 +16,7 @@
 
 package games.rednblack.talos.runtime.modules;
 
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.runtime.ScopePayload;
@@ -38,8 +39,8 @@ public class RandomRangeModule extends AbstractModule {
 
     private float min = 1, max = 1;
 
-    private Random random = new Random();
-    private DistributedRandom distributedRandom = new DistributedRandom();
+    private final Random random = new RandomXS128();
+    private final DistributedRandom distributedRandom = new DistributedRandom();
     private boolean distributed = false;
 
     @Override

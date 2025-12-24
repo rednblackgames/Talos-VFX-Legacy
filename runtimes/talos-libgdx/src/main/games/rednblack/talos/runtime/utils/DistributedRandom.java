@@ -1,5 +1,6 @@
 package games.rednblack.talos.runtime.utils;
 
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.utils.*;
 
 import java.util.Iterator;
@@ -55,11 +56,11 @@ public class DistributedRandom {
         return map.get(seed).nextFloat();
     }
 
-    public class Distribution implements Pool.Poolable {
+    public static class Distribution implements Pool.Poolable {
 
         private long lastAccess;
 
-        Random random = new Random();
+        private final Random random = new RandomXS128();
 
         private int segment = 0;
 

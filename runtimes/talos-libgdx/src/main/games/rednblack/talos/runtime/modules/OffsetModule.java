@@ -64,7 +64,7 @@ public class OffsetModule extends AbstractModule {
     private Vector2 randLow = new Vector2();
     private Vector2 randHigh = new Vector2();
 
-    private Random random = new Random();
+    private final Random random = new RandomXS128();
 
     private Rectangle rect = new Rectangle();
     private Vector2 tmp = new Vector2();

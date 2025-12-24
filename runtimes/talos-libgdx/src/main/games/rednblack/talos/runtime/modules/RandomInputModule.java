@@ -17,6 +17,7 @@
 package games.rednblack.talos.runtime.modules;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import games.rednblack.talos.runtime.ScopePayload;
@@ -29,7 +30,7 @@ public class RandomInputModule extends AbstractModule {
 
     Class valueType = null;
 
-    private Random random = new Random();
+    private final Random random = new RandomXS128();
 
     public int slotCount = 0;
 

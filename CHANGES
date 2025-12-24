@@ -1,5 +1,6 @@
 [1.5.3]
--
+- Update Spine 4.2.10
+- Fix Random numbers in TeaVM
 
 [1.5.2]
 - Update libGDX to 1.14.0

@@ -22,7 +22,7 @@ import java.util.Arrays;
 
 public class NumericalValue extends Value {
 
-	private float[] elements = new float[4];
+	private final float[] elements = new float[4];
 
 	private int currentElementCount;
 
