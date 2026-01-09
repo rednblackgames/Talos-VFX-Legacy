@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.runtime.ScopePayload;
 import games.rednblack.talos.runtime.utils.DistributedRandom;
+import games.rednblack.talos.runtime.utils.FastRandom;
 import games.rednblack.talos.runtime.values.NumericalValue;
 
 import java.util.Random;
@@ -39,7 +40,7 @@ public class RandomRangeModule extends AbstractModule {
 
     private float min = 1, max = 1;
 
-    private final Random random = new RandomXS128();
+    private final Random random = new FastRandom();
     private final DistributedRandom distributedRandom = new DistributedRandom();
     private boolean distributed = false;
 
@@ -53,16 +54,16 @@ public class RandomRangeModule extends AbstractModule {
 
     @Override
     public void processValues() {
-        // what's worse, keeping thousands of long values, or keeping floats but casting 1000 times to long?
-        // I'll leave the answer to the reader
-        long seed = (long) (getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * (index+1) * 1000);
+        float seedFactor = getScope().getFloat(ScopePayload.PARTICLE_SEED);
+        int seed = (int) (seedFactor * 10000 * (index + 1) * 1000);
+        random.setSeed(seed);
 
         float startPos;
         if(!distributed) {
             random.setSeed(seed);
             startPos = random.nextFloat();
         } else {
-            distributedRandom.setSeed((int) (10000 * (index+1)));
+            distributedRandom.setSeed(10000 * (index+1));
             startPos = distributedRandom.nextFloat();
         }
 

@@ -36,7 +36,7 @@ public class CurveModule extends AbstractModule {
 
     private Array<Vector2> points;
 
-    private Vector2 tmp = new Vector2();
+    private final Vector2 tmp = new Vector2();
 
     Comparator<Vector2> comparator = new Comparator<Vector2>() {
         @Override

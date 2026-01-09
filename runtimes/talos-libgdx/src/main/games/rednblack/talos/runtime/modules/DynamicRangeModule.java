@@ -17,13 +17,11 @@
 package games.rednblack.talos.runtime.modules;
 
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.runtime.ScopePayload;
+import games.rednblack.talos.runtime.utils.FastRandom;
 import games.rednblack.talos.runtime.values.NumericalValue;
-
-import java.util.Random;
 
 public class DynamicRangeModule extends CurveModule {
 
@@ -32,7 +30,7 @@ public class DynamicRangeModule extends CurveModule {
 
     public static final int OUTPUT = 0;
 
-    private final Random random = new RandomXS128();
+    private final FastRandom random = new FastRandom();
 
     @Override
     public void processValues() {
@@ -50,7 +48,9 @@ public class DynamicRangeModule extends CurveModule {
     }
 
     private float calcRandomRange(float min, float max, int randomOffset) {
-        random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * (index + randomOffset) * 1000)));
+        float seedFactor = getScope().getFloat(ScopePayload.PARTICLE_SEED);
+        int seed = (int) (seedFactor * 10000 * (index + randomOffset) * 1000);
+        random.setSeed(seed);
         float startPos = random.nextFloat();
         return min + (max - min) * startPos;
     }

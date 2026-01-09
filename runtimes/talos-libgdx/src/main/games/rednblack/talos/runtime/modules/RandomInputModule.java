@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import games.rednblack.talos.runtime.ScopePayload;
 import games.rednblack.talos.runtime.Slot;
+import games.rednblack.talos.runtime.utils.FastRandom;
 import games.rednblack.talos.runtime.values.Value;
 
 import java.util.Random;
@@ -30,7 +31,7 @@ public class RandomInputModule extends AbstractModule {
 
     Class valueType = null;
 
-    private final Random random = new RandomXS128();
+    private final Random random = new FastRandom();
 
     public int slotCount = 0;
 
@@ -77,7 +78,9 @@ public class RandomInputModule extends AbstractModule {
 
         Value output = outputSlots.get(0).getValue();
         if(output != null) {
-            random.setSeed((long) ((getScope().getFloat(ScopePayload.EMITTER_ALPHA_AT_P_INIT) * 10000 * (index+1) * 1000)));
+            float seedFactor = getScope().getFloat(ScopePayload.EMITTER_ALPHA_AT_P_INIT);
+            int seed = (int) (seedFactor * 10000 * (index + 1) * 1000);
+            random.setSeed(seed);
             int index = MathUtils.round(random.nextFloat() * (inputSlots.size - 1));
 
             Value input = inputSlots.get(index).getValue();

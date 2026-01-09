@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.runtime.ScopePayload;
+import games.rednblack.talos.runtime.utils.FastRandom;
 import games.rednblack.talos.runtime.values.NumericalValue;
 
 import java.util.Comparator;
@@ -64,7 +65,7 @@ public class OffsetModule extends AbstractModule {
     private Vector2 randLow = new Vector2();
     private Vector2 randHigh = new Vector2();
 
-    private final Random random = new RandomXS128();
+    private final Random random = new FastRandom();
 
     private Rectangle rect = new Rectangle();
     private Vector2 tmp = new Vector2();
@@ -117,7 +118,9 @@ public class OffsetModule extends AbstractModule {
     }
 
     private void getRandomPosOn(int side, boolean edge, int shape, NumericalValue pos, NumericalValue size, Vector2 result) {
-        random.setSeed((long) ((getScope().getFloat(ScopePayload.PARTICLE_SEED) * 10000 * index * 1000)));
+        float seedFactor = getScope().getFloat(ScopePayload.PARTICLE_SEED);
+        int seed = (int) (seedFactor * 10000 * (index) * 1000);
+        random.setSeed(seed);
         float angle = random.nextFloat();
 
         if(side == SIDE_TOP) angle = angle/2f;

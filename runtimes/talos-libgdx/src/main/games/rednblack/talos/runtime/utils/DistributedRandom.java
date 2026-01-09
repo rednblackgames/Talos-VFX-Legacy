@@ -60,7 +60,7 @@ public class DistributedRandom {
 
         private long lastAccess;
 
-        private final Random random = new RandomXS128();
+        private final Random random = new FastRandom();
 
         private int segment = 0;
 
