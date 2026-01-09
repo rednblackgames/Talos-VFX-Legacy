@@ -23,6 +23,7 @@ public interface IEmitter {
     boolean isContinuous();
     boolean isComplete();
     boolean isStopped();
+    boolean isPaused();
     void stop();
     void pause();
     void resume();

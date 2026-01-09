@@ -16,11 +16,9 @@
 
 package games.rednblack.talos.runtime;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import games.rednblack.talos.runtime.render.ParticleRenderer;
-import games.rednblack.talos.runtime.render.SpriteBatchParticleRenderer;
 import games.rednblack.talos.runtime.simulation.TinyEmitter;
 
 import java.util.Comparator;

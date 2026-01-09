@@ -234,6 +234,11 @@ public class TinyEmitter implements IEmitter {
         return isComplete;
     }
 
+    @Override
+    public boolean isPaused() {
+        return paused;
+    }
+
     public void stop() {
         alpha = 1f;
         isStopped = true;

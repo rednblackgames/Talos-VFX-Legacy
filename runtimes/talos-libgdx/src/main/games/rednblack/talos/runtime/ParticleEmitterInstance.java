@@ -288,6 +288,11 @@ public class ParticleEmitterInstance implements IEmitter {
 	}
 
 	@Override
+	public boolean isPaused() {
+		return paused;
+	}
+
+	@Override
 	public boolean isStopped() {
 		return false;
 	}
