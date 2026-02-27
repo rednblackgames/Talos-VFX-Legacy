@@ -83,11 +83,12 @@ public class ProjectController {
         }
     }
 
-    private void saveProjectToCache(String projectFileName) {
+    private void saveProjectToCache(String projectPath) {
         try {
-            if (projectFileName != null) {
-                fileCache.put(projectFileName, currentProject.getProjectString(true));
-                pathCache.put(projectFileName, currentProjectPath);
+            if (projectPath != null && currentTab != null) {
+                String cacheKey = currentTab.getFileName();
+                fileCache.put(cacheKey, currentProject.getProjectString(true));
+                pathCache.put(cacheKey, projectPath);
             }
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);

@@ -40,6 +40,7 @@ public class GlobalValueListContainer extends Table {
         bottomPanel.add().expandX();
 
         listContainer.add(list).grow().minHeight(90);
+        main.add(new Label("Global Values", getSkin())).left().padTop(10).row();
         main.add(stack).grow();
         add(main).growX();
 
