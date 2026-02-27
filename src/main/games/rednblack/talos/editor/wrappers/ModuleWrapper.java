@@ -34,9 +34,13 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.widget.*;
 import com.kotcrab.vis.ui.widget.Tooltip;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.nodes.widgets.AbstractWidget;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.editor.widgets.ui.DynamicTable;
 import games.rednblack.talos.editor.widgets.ui.EditableLabel;
 import games.rednblack.talos.editor.widgets.ui.ModuleBoardWidget;
+import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
+import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary.BackgroundColor;
 import games.rednblack.talos.runtime.Slot;
 import games.rednblack.talos.runtime.modules.AbstractModule;
 import games.rednblack.talos.runtime.values.NumericalValue;
@@ -46,9 +50,10 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
     protected T module;
     protected DynamicTable leftWrapper, rightWrapper, contentWrapper;
     protected Table content;
+    protected Table outputRow;
 
-    protected IntMap<Image> inputSlotMap = new IntMap<>();
-    protected IntMap<Image> outputSlotMap = new IntMap<>();
+    protected IntMap<Actor> inputSlotMap = new IntMap<>();
+    protected IntMap<Actor> outputSlotMap = new IntMap<>();
 
     private ModuleBoardWidget moduleBoardWidget;
 
@@ -70,12 +75,15 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     private EditableLabel titleLabel;
     private String titleOverride = "";
+    protected Table headerTable;
 
     public void setSelectionState(boolean selected) {
         if(isSelected != selected) {
             if(selected) {
+                headerTable.setBackground(ColorLibrary.obtainBackground(getSkin(), "node-header", BackgroundColor.LIGHT_BLUE));
                 wrapperSelected();
             } else {
+                headerTable.setBackground(ColorLibrary.obtainBackground(getSkin(), "node-header", BackgroundColor.RED));
                 wrapperDeselected();
             }
         }
@@ -114,43 +122,69 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
     public ModuleWrapper() {
         super("", "panel");
 
-        // change title label
-        Cell cell = ((Table)getTitleLabel().getParent()).getCell(getTitleLabel());
-        titleLabel = new EditableLabel(getTitleLabel().getText().toString(), getSkin());
-        cell.setActor(titleLabel);
+        // Strip VisWindow's default chrome
+        clearChildren();
+        padTop(0); padLeft(0); padRight(0); padBottom(0);
 
+        Skin skin = getSkin();
+
+        // --- NodeWidget-style visual structure ---
+        Stack mainStack = new Stack();
+        Table backgroundTable = new Table();
+        Table contentTable = new Table();
+        mainStack.add(backgroundTable);
+        mainStack.add(contentTable);
+
+        // Header (red, turns blue on selection)
+        headerTable = new Table();
+        headerTable.setBackground(ColorLibrary.obtainBackground(skin, "node-header", BackgroundColor.RED));
+
+        // Body
+        Table bodyTable = new Table();
+        bodyTable.setBackground(ColorLibrary.obtainBackground(skin, "node-body", BackgroundColor.WHITE));
+
+        // Shadow border on the whole widget
+        setBackground(ColorLibrary.obtainBackground(skin, "node-shadow-border", BackgroundColor.WHITE));
+
+        backgroundTable.add(headerTable).growX().height(32).row();
+        backgroundTable.add(bodyTable).grow().row();
+
+        // Editable title in header
+        titleLabel = new EditableLabel("Module", skin);
         titleLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
             @Override
             public void changed(String newText) {
                 titleOverride = newText;
             }
         });
+        headerTable.add(titleLabel).expandX().top().left().padLeft(12).height(15);
 
-        setModal(false);
-        setMovable(true);
-        setKeepWithinParent(false);
-        setKeepWithinStage(false);
-
-        padTop(32);
-        padLeft(16);
-
+        // Content area with slot wrappers
         content = new Table();
-        add(content).grow().fill().padRight(13).padLeft(-2).padBottom(17);
-
-
-        Stack stack = new Stack();
-
         leftWrapper = new DynamicTable();
         rightWrapper = new DynamicTable();
         contentWrapper = new DynamicTable();
+        outputRow = new Table();
 
-        stack.add(leftWrapper);
-        stack.add(rightWrapper);
-        stack.add(contentWrapper);
+        Stack slotStack = new Stack();
+        slotStack.add(leftWrapper);
+        slotStack.add(rightWrapper);
+        slotStack.add(contentWrapper);
 
         configureSlots();
 
-        content.add(stack).grow().fill().width(reportPrefWidth());
+        content.add(outputRow).padTop(8).padBottom(8).right().growX().row();
+        content.add(slotStack).grow().fill().width(reportPrefWidth()).row();
+        contentTable.add(content).padLeft(16).padRight(16).grow().top().padTop(32);
+        contentTable.row();
+        contentTable.add().height(15).row();
+
+        add(mainStack).width(reportPrefWidth() + 30).pad(15);
+
+        setModal(false);
+        setMovable(false);
+        setKeepWithinParent(false);
+        setKeepWithinStage(false);
 
         invalidateHierarchy();
         pack();
@@ -159,20 +193,27 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
             Vector2 tmp = new Vector2();
             Vector2 prev = new Vector2();
+            boolean isDraggingHeader = false;
 
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 prev.set(x, y);
                 ModuleWrapper.this.localToStageCoordinates(prev);
                 moduleBoardWidget.wrapperClicked(ModuleWrapper.this);
+                // Only allow dragging from header area (top 47px: 15px pad + 32px header)
+                isDraggingHeader = y >= getHeight() - 47;
                 return true;
             }
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                if (!isDraggingHeader) return;
                 tmp.set(x, y);
                 ModuleWrapper.this.localToStageCoordinates(tmp);
                 super.touchDragged(event, x, y, pointer);
-                moduleBoardWidget.wrapperMovedBy(ModuleWrapper.this, tmp.x - prev.x, tmp.y - prev.y);
+                float deltaX = tmp.x - prev.x;
+                float deltaY = tmp.y - prev.y;
+                ModuleWrapper.this.moveBy(deltaX, deltaY);
+                moduleBoardWidget.wrapperMovedBy(ModuleWrapper.this, deltaX, deltaY);
 
                 prev.set(tmp);
             }
@@ -181,6 +222,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
                 moduleBoardWidget.wrapperClickedUp(ModuleWrapper.this);
+                isDraggingHeader = false;
             }
         });
 
@@ -192,6 +234,15 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected float reportPrefWidth() {
         return 300;
+    }
+
+    protected Table createCircularPort() {
+        Table portBody = new Table();
+        Image portBorder = new Image(ColorLibrary.obtainBackground(getSkin(), "circle-border", BackgroundColor.BROKEN_WHITE));
+        portBody.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, BackgroundColor.BROKEN_WHITE));
+        portBody.add(portBorder).growX().pad(-1f);
+        portBody.setSize(15, 15);
+        return portBody;
     }
 
     protected void addSeparator(boolean input) {
@@ -225,32 +276,33 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected Cell addInputSlot(String title, int key) {
         Table slotRow = new Table();
-        Image icon = new Image(getSkin().getDrawable("node-connector-off"));
+        Table port = createCircularPort();
         VisLabel label = new VisLabel(title, "small");
-        slotRow.add(icon).left();
+        slotRow.add(port).left().size(15).padLeft(-24);
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
         Cell cell = leftWrapper.addRow(slotRow, true);
 
         leftSlotNames.put(key, title);
 
-        configureNodeActions(icon, key, true);
+        configureNodeActions(port, key, true);
 
         return cell;
     }
 
     protected Cell addOutputSlot(String title, int key) {
         Table slotRow = new Table();
-        Image icon = new Image(getSkin().getDrawable("node-connector-off"));
+        Table port = createCircularPort();
         VisLabel label = new VisLabel(title, "small");
         slotRow.add(label).right().padBottom(4).padLeft(10).padRight(5);
-        slotRow.add(icon).right();
+        slotRow.add(port).right().size(15).padRight(-24);
 
-        Cell cell = rightWrapper.addRow(slotRow, false);
+        Cell cell = outputRow.add(slotRow).right().expandX();
+        outputRow.row();
 
         rightSlotNames.put(key, title);
 
-        configureNodeActions(icon, key, false);
+        configureNodeActions(port, key, false);
 
         return cell;
     }
@@ -285,15 +337,15 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         return addSelectBox(values.toArray());
     }
 
-    protected void  configureNodeActions(final Image icon, final int key, final boolean isInput) {
+    protected void configureNodeActions(final Actor portActor, final int key, final boolean isInput) {
 
         if(isInput) {
-            inputSlotMap.put(key, icon);
+            inputSlotMap.put(key, portActor);
         } else {
-            outputSlotMap.put(key, icon);
+            outputSlotMap.put(key, portActor);
         }
 
-        icon.addListener(new ClickListener() {
+        portActor.addListener(new ClickListener() {
 
             private Vector2 tmp = new Vector2();
             private Vector2 tmp2 = new Vector2();
@@ -311,9 +363,9 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
                 currentIsInput = isInput;
                 currentWrapper = ModuleWrapper.this;
                 tmp.set(x, y);
-                icon.localToStageCoordinates(tmp);
-                tmp2.set(icon.getWidth()/2f, icon.getHeight()/2f);
-                icon.localToStageCoordinates(tmp2);
+                portActor.localToStageCoordinates(tmp);
+                tmp2.set(portActor.getWidth()/2f, portActor.getHeight()/2f);
+                portActor.localToStageCoordinates(tmp2);
 
                 currentSlot = key;
 
@@ -342,7 +394,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
                 tmp.set(x, y);
-                icon.localToStageCoordinates(tmp);
+                portActor.localToStageCoordinates(tmp);
                 moduleBoardWidget.updateActiveCurve(tmp.x, tmp.y);
 
                 dragged = true;
@@ -392,7 +444,6 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
                 ModuleWrapper newWrapper = moduleBoardWidget.createModule(clazz, getX(), getY());
 
                 //connecting
-                //Slot newOutSlot = newWrapper.getModule().getOutputSlot(0);
                 moduleBoardWidget.makeConnection(newWrapper, this, 0, slotId);
 
                 // now tricky positioning
@@ -491,21 +542,20 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
     }
 
     public void setSlotActive(int slotTo, boolean isInput) {
-        if(isInput) {
-            if(inputSlotMap.get(slotTo) == null) return;
-            inputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-on"));
-        } else {
-            if(outputSlotMap.get(slotTo) == null) return;
-            outputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-on"));
+        Actor slot = isInput ? inputSlotMap.get(slotTo) : outputSlotMap.get(slotTo);
+        if (slot == null) return;
+        if (slot instanceof Table) {
+            ((Table) slot).setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, BackgroundColor.LIGHT_BLUE));
         }
     }
 
     public void setSlotInactive(int slotTo, boolean isInput) {
-        if(isInput) {
-            inputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-off"));
-        } else {
-            outputSlotMap.get(slotTo).setDrawable(getSkin().getDrawable("node-connector-off"));
-
+        Actor slot = isInput ? inputSlotMap.get(slotTo) : outputSlotMap.get(slotTo);
+        if (slot == null) return;
+        if (slot instanceof Table) {
+            ((Table) slot).setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, BackgroundColor.BROKEN_WHITE));
+        }
+        if (!isInput) {
             lastAttachedWrapper = null;
             setTitleText(constructTitle());
         }
@@ -521,9 +571,9 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected VisTextArea addInputSlotWithTextArea (String title, int key) {
         Table slotRow = new Table();
-        Image icon = new Image(getSkin().getDrawable("node-connector-off"));
+        Table port = createCircularPort();
         VisLabel label = new VisLabel(title, "small");
-        slotRow.add(icon).left();
+        slotRow.add(port).left().size(15).padLeft(-24);
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
         VisTextArea textArea = new VisTextArea();
@@ -531,16 +581,16 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
         contentWrapper.add(slotRow).left().expandX().pad(3);
 
-        configureNodeActions(icon, key, true);
+        configureNodeActions(port, key, true);
 
         return textArea;
     }
 
     protected VisTextField addInputSlotWithTextField(String title, int key, float size, boolean grow) {
         Table slotRow = new Table();
-        Image icon = new Image(getSkin().getDrawable("node-connector-off"));
+        Table port = createCircularPort();
         VisLabel label = new VisLabel(title, "small");
-        slotRow.add(icon).left();
+        slotRow.add(port).left().size(15).padLeft(-24);
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
         final VisTextField textField = new VisTextField();
@@ -565,9 +615,27 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
             }
         });
 
-        configureNodeActions(icon, key, true);
+        configureNodeActions(port, key, true);
 
         return textField;
+    }
+
+    protected ValueWidget addInputSlotWithValueWidget(String label, int key) {
+        Table slotRow = new Table();
+        Table port = createCircularPort();
+
+        ValueWidget valueWidget = new ValueWidget();
+        valueWidget.init(getSkin());
+        valueWidget.setLabel(label);
+
+        slotRow.add(port).left().size(15).padLeft(-24);
+        slotRow.add(valueWidget).left().padLeft(5).growX();
+
+        leftWrapper.add(slotRow).pad(3).expandX().left().growX().row();
+
+        leftSlotNames.put(key, label);
+        configureNodeActions(port, key, true);
+        return valueWidget;
     }
 
     protected float floatFromText(String text) {
@@ -637,6 +705,25 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         return leftSlotNames.get(targetSlot);
     }
 
+    protected <W extends AbstractWidget<?>> W addWidgetWithPort(W widget, int slotKey, boolean isInput) {
+        widget.init(getSkin());
+        Table port = widget.addPort(isInput);
+        configureNodeActions(port, slotKey, isInput);
+        if (isInput) {
+            leftSlotNames.put(slotKey, "");
+        } else {
+            rightSlotNames.put(slotKey, "");
+        }
+        contentWrapper.add(widget).growX().padTop(10).padBottom(10).row();
+        return widget;
+    }
+
+    protected <W extends AbstractWidget<?>> W addContentWidget(W widget) {
+        widget.init(getSkin());
+        contentWrapper.add(widget).growX().padTop(10).padBottom(10).row();
+        return widget;
+    }
+
     @Override
     public void write (Json json) {
 		json.writeValue("id", getId());
@@ -668,5 +755,3 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         TalosMain.Instance().ProjectController().setDirty();
     }
 }
-
-

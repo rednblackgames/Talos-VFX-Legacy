@@ -18,7 +18,6 @@ package games.rednblack.talos.editor.project;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -194,95 +193,110 @@ public class TalosProject implements IProject {
 			emitterData.connections.addAll(emitterExportData.connections);
 			projectData.getEmitters().add(emitterData);
 
+			IntMap<Boolean> placed = new IntMap<>();
 			if (particleModule != null) {
-				traverse(emitterData.modules, emitterData.connections, particleModule.getId(), new IntMap<>(), 200, 400, 0);
+				layoutTree(emitterData.modules, emitterData.connections,
+						particleModule.getId(), placed, 200, 400);
 			}
-
 			if (emitterModule != null) {
-				traverse(emitterData.modules, emitterData.connections, emitterModule.getId(), new IntMap<>(), 700, 600, 0);
+				layoutTree(emitterData.modules, emitterData.connections,
+						emitterModule.getId(), placed, 700, 600);
 			}
-
-			//formatNode(emitterData.modules, emitterData.connections, 50);
 		}
 
 		loadFromProjectData(projectData);
 	}
 
-	private void traverse(Array<ModuleWrapper> nodes, Array<ConnectionData> connections, int nodeId, IntMap<Boolean> visited, float lastX, float lastY, float prevHeight) {
-		ModuleWrapper currentNode = getNodeById(nodes, nodeId);
-		if (currentNode == null) return;
+	private void layoutTree(Array<ModuleWrapper> nodes, Array<ConnectionData> connections,
+						   int rootId, IntMap<Boolean> alreadyPlaced, float anchorX, float anchorY) {
+		float H_GAP = 80, V_GAP = 40;
 
-		visited.put(nodeId, Boolean.TRUE);
-		currentNode.setX(lastX - currentNode.getWidth());
-		currentNode.setY(lastY - prevHeight - currentNode.getHeight());
-
-		ModuleWrapper prevNode = null;
-		for (int i = connections.size - 1; i >= 0; i--) {
-			ConnectionData connectionData = connections.get(i);
-			if (connectionData.moduleTo == nodeId && visited.get(connectionData.moduleFrom, Boolean.FALSE) == Boolean.FALSE) {
-				float h = prevNode != null ? prevNode.getHeight() : 0;
-				traverse(nodes, connections, connectionData.moduleFrom, visited, currentNode.getX(), currentNode.getY(), h);
-				prevNode = getNodeById(nodes, connectionData.moduleFrom);
+		// Step 1: BFS layer assignment (root = layer 0, predecessors get higher layers)
+		IntMap<Integer> layerMap = new IntMap<>();
+		Array<Integer> queue = new Array<>();
+		layerMap.put(rootId, 0);
+		queue.add(rootId);
+		int head = 0;
+		while (head < queue.size) {
+			int nodeId = queue.get(head++);
+			int currentLayer = layerMap.get(nodeId, 0);
+			for (int i = 0; i < connections.size; i++) {
+				ConnectionData c = connections.get(i);
+				if (c.moduleTo == nodeId) {
+					int newLayer = currentLayer + 1;
+					if (newLayer > layerMap.get(c.moduleFrom, -1)) {
+						layerMap.put(c.moduleFrom, newLayer);
+						if (!queue.contains(c.moduleFrom, false)) {
+							queue.add(c.moduleFrom);
+						}
+					}
+				}
 			}
 		}
-	}
 
-	// Constants for the algorithm
-	static final float REPULSION_FORCE = 200.0f;
-	static final float ATTRACTION_FORCE = 0.1f;
-	static final float ITERATION_STEP = 0.1f;
+		// Step 2: Group nodes by layer
+		int maxLayer = 0;
+		for (IntMap.Entry<Integer> e : layerMap) maxLayer = Math.max(maxLayer, e.value);
 
-	public void formatNode(Array<ModuleWrapper> nodes, Array<ConnectionData> connections, int iterations) {
-		// Initialize nodes in a grid-like pattern with random perturbations
-		int gridSize = (int) Math.ceil(Math.sqrt(nodes.size));
-		int nodeIndex = 0;
-
-		/*for (int i = 0; i < gridSize; i++) {
-			for (int j = 0; j < gridSize; j++) {
-				if (nodeIndex < nodes.size) {
-					nodes.get(nodeIndex).setX(i * 50 + MathUtils.random() * 10);
-					nodes.get(nodeIndex).setY(j * 50 + MathUtils.random() * 10);
-					nodeIndex++;
-				}
+		Array<Array<ModuleWrapper>> layers = new Array<>();
+		for (int i = 0; i <= maxLayer; i++) layers.add(new Array<>());
+		for (IntMap.Entry<Integer> e : layerMap) {
+			ModuleWrapper w = getNodeById(nodes, e.key);
+			if (w != null && !alreadyPlaced.containsKey(e.key)) {
+				layers.get(e.value).add(w);
 			}
-		}*/
+		}
 
-		for (int iter = 0; iter < iterations; iter++) {
-			// Calculate forces and update positions
-			for (ModuleWrapper node : new Array.ArrayIterator<>(nodes)) {
-				// Repulsive forces
-				for (ModuleWrapper other : new Array.ArrayIterator<>(nodes)) {
-					if (node != other) {
-						float dx = other.getX() - node.getX();
-						float dy = other.getY() - node.getY();
-						float distance = (float) Math.sqrt(dx * dx + dy * dy);
-						float force = REPULSION_FORCE / distance;
-
-						if (distance > 0) {
-							node.setX(node.getX() - (dx / distance) * force * ITERATION_STEP);
-							node.setY(node.getY() - (dy / distance) * force * ITERATION_STEP);
+		// Step 3: Barycenter ordering to minimize edge crossings
+		final IntMap<Float> yIndices = new IntMap<>();
+		for (int li = 0; li < layers.size; li++) {
+			Array<ModuleWrapper> layer = layers.get(li);
+			if (li > 0) {
+				for (int ni = 0; ni < layer.size; ni++) {
+					ModuleWrapper w = layer.get(ni);
+					float sum = 0;
+					int count = 0;
+					for (int ci = 0; ci < connections.size; ci++) {
+						ConnectionData c = connections.get(ci);
+						if (c.moduleFrom == w.getId() && yIndices.containsKey(c.moduleTo)) {
+							sum += yIndices.get(c.moduleTo, 0f);
+							count++;
 						}
 					}
+					yIndices.put(w.getId(), count > 0 ? sum / count : ni);
 				}
-
-				// Attractive forces
-				for (ConnectionData connection : new Array.ArrayIterator<>(connections)) {
-					if (connection.moduleFrom == node.getId()) {
-						ModuleWrapper connectedNode = getNodeById(nodes, connection.moduleTo);
-						if (connectedNode != null) {
-							float dx = connectedNode.getX() - node.getX();
-							float dy = connectedNode.getY() - node.getY();
-							float distance = (float) Math.sqrt(dx * dx + dy * dy);
-							float force = ATTRACTION_FORCE * distance;
-
-							if (distance > 0) {
-								node.setX(node.getX() - (dx / distance) * force * ITERATION_STEP);
-								node.setY(node.getY() - (dy / distance) * force * ITERATION_STEP);
-							}
-						}
+				layer.sort(new Comparator<ModuleWrapper>() {
+					public int compare(ModuleWrapper a, ModuleWrapper b) {
+						return Float.compare(yIndices.get(a.getId(), 0f), yIndices.get(b.getId(), 0f));
 					}
-				}
+				});
 			}
+			for (int i = 0; i < layer.size; i++) {
+				yIndices.put(layer.get(i).getId(), (float) i);
+			}
+		}
+
+		// Step 4: Position calculation
+		float x = anchorX;
+		for (int li = 0; li < layers.size; li++) {
+			Array<ModuleWrapper> layer = layers.get(li);
+			if (layer.size == 0) continue;
+			float maxWidth = 0, totalHeight = 0;
+			for (int i = 0; i < layer.size; i++) {
+				ModuleWrapper w = layer.get(i);
+				maxWidth = Math.max(maxWidth, w.getWidth());
+				totalHeight += w.getHeight();
+			}
+			totalHeight += (layer.size - 1) * V_GAP;
+			float y = anchorY + totalHeight / 2f;
+			for (int i = 0; i < layer.size; i++) {
+				ModuleWrapper w = layer.get(i);
+				w.setX(x - w.getWidth());
+				w.setY(y - w.getHeight());
+				y -= w.getHeight() + V_GAP;
+				alreadyPlaced.put(w.getId(), Boolean.TRUE);
+			}
+			x -= maxWidth + H_GAP;
 		}
 	}
 

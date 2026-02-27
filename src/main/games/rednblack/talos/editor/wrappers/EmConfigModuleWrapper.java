@@ -21,17 +21,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisCheckBox;
+import games.rednblack.talos.editor.nodes.widgets.CheckBoxWidget;
 import games.rednblack.talos.runtime.modules.EmConfigModule;
 
 public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
 
-    VisCheckBox additiveBox;
-    VisCheckBox blendAddBox;
-    VisCheckBox attachedBox;
-    VisCheckBox continuousBox;
-    VisCheckBox alignedBox;
-    VisCheckBox immortalBox;
+    CheckBoxWidget additiveBox;
+    CheckBoxWidget blendAddBox;
+    CheckBoxWidget attachedBox;
+    CheckBoxWidget continuousBox;
+    CheckBoxWidget alignedBox;
+    CheckBoxWidget immortalBox;
 
     boolean lockListeners = false;
 
@@ -39,68 +39,56 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     protected void configureSlots() {
         addOutputSlot("config", EmConfigModule.OUTPUT);
 
-        additiveBox = new VisCheckBox("additive");
-        blendAddBox = new VisCheckBox("blendadd");
-        attachedBox = new VisCheckBox("attached");
-        continuousBox = new VisCheckBox("continuous");
-        alignedBox = new VisCheckBox("aligned");
-        immortalBox = new VisCheckBox("immortal");
+        additiveBox = new CheckBoxWidget();
+        additiveBox.init(getSkin());
+        additiveBox.setText("additive");
+
+        blendAddBox = new CheckBoxWidget();
+        blendAddBox.init(getSkin());
+        blendAddBox.setText("blendadd");
+
+        attachedBox = new CheckBoxWidget();
+        attachedBox.init(getSkin());
+        attachedBox.setText("attached");
+
+        continuousBox = new CheckBoxWidget();
+        continuousBox.init(getSkin());
+        continuousBox.setText("continuous");
+
+        alignedBox = new CheckBoxWidget();
+        alignedBox.init(getSkin());
+        alignedBox.setText("aligned");
+
+        immortalBox = new CheckBoxWidget();
+        immortalBox.init(getSkin());
+        immortalBox.setText("immortal");
 
         Table form = new Table();
+        form.add(additiveBox).left().growX().row();
+        form.add(blendAddBox).left().growX().row();
+        form.add(attachedBox).left().growX().row();
+        form.add(continuousBox).left().growX().row();
+        form.add(alignedBox).left().growX().row();
+        form.add(immortalBox).left().growX().row();
 
-        form.add(additiveBox).left().padLeft(3);
-        form.row();
-        form.add(blendAddBox).left().padLeft(3);
-        form.row();
-        form.add(attachedBox).left().padLeft(3);
-        form.row();
-        form.add(continuousBox).left().padLeft(3);
-        form.row();
-        form.add(alignedBox).left().padLeft(3);
-        form.row();
-        form.add(immortalBox).left().padLeft(3);
-
-        contentWrapper.add(form).left();
+        contentWrapper.add(form).left().growX();
         contentWrapper.add().expandX();
 
         rightWrapper.add().expandY();
 
-        additiveBox.addListener(new ChangeListener() {
+        ChangeListener listener = new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 fromUIToData();
             }
-        });
-        blendAddBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                fromUIToData();
-            }
-        });
-        attachedBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                fromUIToData();
-            }
-        });
-        continuousBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                fromUIToData();
-            }
-        });
-        alignedBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                fromUIToData();
-            }
-        });
-        immortalBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                fromUIToData();
-            }
-        });
+        };
+
+        additiveBox.addListener(listener);
+        blendAddBox.addListener(listener);
+        attachedBox.addListener(listener);
+        continuousBox.addListener(listener);
+        alignedBox.addListener(listener);
+        immortalBox.addListener(listener);
     }
 
     @Override
@@ -111,12 +99,12 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
 
     public void fromUIToData() {
         if(!lockListeners) {
-            module.getUserValue().additive = additiveBox.isChecked();
-            module.getUserValue().isBlendAdd = blendAddBox.isChecked();
-            module.getUserValue().attached = attachedBox.isChecked();
-            module.getUserValue().continuous = continuousBox.isChecked();
-            module.getUserValue().aligned = alignedBox.isChecked();
-            module.getUserValue().immortal = immortalBox.isChecked();
+            module.getUserValue().additive = additiveBox.getValue();
+            module.getUserValue().isBlendAdd = blendAddBox.getValue();
+            module.getUserValue().attached = attachedBox.getValue();
+            module.getUserValue().continuous = continuousBox.getValue();
+            module.getUserValue().aligned = alignedBox.getValue();
+            module.getUserValue().immortal = immortalBox.getValue();
         }
     }
 

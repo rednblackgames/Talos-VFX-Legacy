@@ -15,9 +15,13 @@
 	"previewCamPos": {},
 	"previewCamZoom": 1.4285715,
 	"bgImagePath": "",
+	"isGridVisible": true,
 	"bgImageIsInBack": true,
 	"bgImageSize": 10,
-	"gridSize": 1
+	"gridSize": 1,
+	"particlePositionX": 0,
+	"particlePositionY": 0,
+	"resourcePaths": []
 },
 "emitters": [
 	{
@@ -26,8 +30,8 @@
 			{
 				"class": "ParticleModuleWrapper",
 				"id": 0,
-				"x": -39,
-				"y": -130,
+				"x": 167.14502,
+				"y": -226.63055,
 				"module": {
 					"data": {
 						"class": "ParticleModule",
@@ -38,8 +42,8 @@
 			{
 				"class": "EmitterModuleWrapper",
 				"id": 1,
-				"x": -58,
-				"y": 170,
+				"x": 11.252197,
+				"y": 311.72485,
 				"module": {
 					"data": {
 						"class": "EmitterModule",
@@ -54,23 +58,24 @@
 				"class": "PolylineModuleWrapper",
 				"id": 2,
 				"titleOverride": "Beam Renderer",
-				"x": -449,
-				"y": 163,
+				"x": -445.77893,
+				"y": 150.11597,
 				"module": {
 					"data": {
 						"class": "PolylineModule",
 						"index": 2,
-						"points": 50,
+						"points": 54,
 						"regionName": "fire"
 					}
 				},
-				"fileName": fire,
+				"filePath": "fire.png",
+				"regionName": "fire"
 			},
 			{
 				"class": "FromToModuleWrapper",
 				"id": 3,
-				"x": -206,
-				"y": -130,
+				"x": -122.25342,
+				"y": -331.31375,
 				"module": {
 					"data": {
 						"class": "FromToModule",
@@ -86,8 +91,8 @@
 				"class": "NoiseModuleWrapper",
 				"id": 4,
 				"titleOverride": "Simplex Noise",
-				"x": -1049,
-				"y": 501,
+				"x": -1148.8513,
+				"y": 781.2289,
 				"module": {
 					"data": {
 						"class": "NoiseModule",
@@ -99,8 +104,8 @@
 			{
 				"class": "CurveModuleWrapper",
 				"id": 5,
-				"x": -897,
-				"y": 76,
+				"x": -932.4313,
+				"y": 9.969116,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -134,8 +139,8 @@
 				"class": "InputModuleWrapper",
 				"id": 6,
 				"titleOverride": "System Input",
-				"x": -1560,
-				"y": 645,
+				"x": -1780.6398,
+				"y": 912.3446,
 				"module": {
 					"data": {
 						"class": "InputModule",
@@ -148,8 +153,8 @@
 				"class": "InputModuleWrapper",
 				"id": 7,
 				"titleOverride": "Tells Module Point Index",
-				"x": -1435,
-				"y": 225,
+				"x": -1501.0309,
+				"y": 249.1576,
 				"module": {
 					"data": {
 						"class": "InputModule",
@@ -161,24 +166,26 @@
 			{
 				"class": "EmConfigModuleWrapper",
 				"id": 8,
-				"x": 141,
-				"y": 171,
+				"x": 256.9569,
+				"y": 227.36792,
 				"module": {
 					"data": {
 						"class": "EmConfigModule",
 						"index": 8,
 						"additive": true,
+						"isBlendAdd": false,
 						"attached": false,
 						"continuous": true,
-						"aligned": false
+						"aligned": false,
+						"immortal": false
 					}
 				}
 			},
 			{
 				"class": "StaticValueModuleWrapper",
 				"id": 9,
-				"x": -223,
-				"y": 171,
+				"x": -142.47412,
+				"y": 40.548706,
 				"module": {
 					"data": {
 						"class": "StaticValueModule",
@@ -190,8 +197,8 @@
 			{
 				"class": "MathModuleWrapper",
 				"id": 10,
-				"x": -569,
-				"y": 575,
+				"x": -559.337,
+				"y": 840.734,
 				"module": {
 					"data": {
 						"class": "MathModule",
@@ -206,8 +213,8 @@
 				"class": "CurveModuleWrapper",
 				"id": 11,
 				"titleOverride": "Noise Scale",
-				"x": -852,
-				"y": 544,
+				"x": -889.04193,
+				"y": 817.7866,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -232,8 +239,8 @@
 			{
 				"class": "GradientColorModuleWrapper",
 				"id": 12,
-				"x": -944,
-				"y": 250,
+				"x": -976.2102,
+				"y": 304.75732,
 				"module": {
 					"data": {
 						"class": "GradientColorModule",
@@ -264,8 +271,8 @@
 			{
 				"class": "MathModuleWrapper",
 				"id": 13,
-				"x": -1254,
-				"y": 578,
+				"x": -1408.609,
+				"y": 861.4497,
 				"module": {
 					"data": {
 						"class": "MathModule",
@@ -279,8 +286,8 @@
 			{
 				"class": "CurveModuleWrapper",
 				"id": 14,
-				"x": -483,
-				"y": -142,
+				"x": -449.17944,
+				"y": -177.43127,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -313,8 +320,8 @@
 			{
 				"class": "Vector2ModuleWrapper",
 				"id": 15,
-				"x": -495,
-				"y": 418,
+				"x": -503.0525,
+				"y": 542.0093,
 				"module": {
 					"data": {
 						"class": "Vector2Module",
@@ -414,7 +421,7 @@
 		"groups": [
 			{
 				"text": "BEAM NOISE",
-				"modules": [ 10, 13, 11, 6, 4 ],
+				"modules": [ 11, 10, 4, 6, 13 ],
 				"color": -1.3926823E38
 			}
 		]

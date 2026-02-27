@@ -63,17 +63,15 @@ public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule
 
         defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
 
-        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
+        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin(), 100);
 
         addOutputSlot("output", TextureModule.OUTPUT);
 
         assetNameLabel = new Label("fire", getSkin());
 
-        contentWrapper.add(assetNameLabel).padLeft(10).colspan(2).expand().fill().row();
+        leftWrapper.add(assetNameLabel).padLeft(10).expand().fill().row();
 
-        contentWrapper.add(dropWidget).size(50).left().padLeft(10);
-        contentWrapper.add().expandX();
-
+        leftWrapper.add(dropWidget).growX().left().padBottom(3).row();
     }
 
 

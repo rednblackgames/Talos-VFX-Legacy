@@ -4,14 +4,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import games.rednblack.talos.editor.widgets.FloatInputWidget;
-import games.rednblack.talos.editor.widgets.IntegerInputWidget;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.runtime.modules.RibbonModule;
 
 public class RibbonModuleWrapper extends ModuleWrapper<RibbonModule> {
 
-    private FloatInputWidget memoryDuration;
-    private IntegerInputWidget detailCount;
+    private ValueWidget memoryDuration;
+    private ValueWidget detailCount;
 
     @Override
     public void setModule(RibbonModule module) {
@@ -31,24 +30,30 @@ public class RibbonModuleWrapper extends ModuleWrapper<RibbonModule> {
 
         addOutputSlot("output", RibbonModule.OUTPUT);
 
-
-
-        detailCount = new IntegerInputWidget("detail count:", getSkin());
+        detailCount = new ValueWidget();
+        detailCount.init(getSkin());
+        detailCount.setLabel("detail count:");
+        detailCount.setRange(1, 200);
+        detailCount.setStep(1);
         detailCount.setValue(20);
-        leftWrapper.add(detailCount).left().expandX().row();
+        leftWrapper.add(detailCount).pad(3).left().expandX().growX().row();
 
-        detailCount.setListener(new ChangeListener() {
+        detailCount.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                module.setDetailCount(detailCount.getValue());
+                module.setDetailCount(Math.round(detailCount.getValue()));
             }
         });
 
-        memoryDuration = new FloatInputWidget("memory:", getSkin());
+        memoryDuration = new ValueWidget();
+        memoryDuration.init(getSkin());
+        memoryDuration.setLabel("memory:");
+        memoryDuration.setRange(0, 100);
+        memoryDuration.setStep(0.01f);
         memoryDuration.setValue(1);
-        leftWrapper.add(memoryDuration).left().expandX().padLeft(3);
+        leftWrapper.add(memoryDuration).left().expandX().growX().pad(3);
 
-        memoryDuration.setListener(new ChangeListener() {
+        memoryDuration.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 module.setMemoryDuration(memoryDuration.getValue());

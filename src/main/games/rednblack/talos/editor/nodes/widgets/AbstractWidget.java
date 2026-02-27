@@ -32,7 +32,7 @@ public abstract class AbstractWidget<T> extends Table {
         setSkin(skin);
     }
 
-    public abstract void loadFromXML(XmlReader.Element element);
+    public void loadFromXML(XmlReader.Element element) { /* no-op by default */ }
 
     public Table addPort(boolean isInput) {
         portContainer.clearChildren();

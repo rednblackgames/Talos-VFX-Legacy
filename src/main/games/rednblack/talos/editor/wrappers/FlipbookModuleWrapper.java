@@ -21,18 +21,16 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import games.rednblack.talos.editor.widgets.FloatInputWidget;
-import games.rednblack.talos.editor.widgets.IntegerInputWidget;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.editor.widgets.TextureDropWidget;
 import games.rednblack.talos.runtime.modules.FlipbookModule;
 import games.rednblack.talos.runtime.modules.AbstractModule;
 
 public class FlipbookModuleWrapper extends TextureDropModuleWrapper<FlipbookModule> {
 
-    IntegerInputWidget rows;
-    IntegerInputWidget cols;
-
-    FloatInputWidget duration;
+    ValueWidget rows;
+    ValueWidget cols;
+    ValueWidget duration;
 
     @Override
     public void setModuleToDefaults () {
@@ -43,44 +41,56 @@ public class FlipbookModuleWrapper extends TextureDropModuleWrapper<FlipbookModu
     protected void configureSlots() {
         super.configureSlots();
         dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin(), 100f);
+        leftWrapper.add(dropWidget).growX().left().padBottom(3).row();
 
         addInputSlot("phase",  FlipbookModule.PHASE);
 
-        rows =  new IntegerInputWidget("Rows", getSkin());
-        cols =  new IntegerInputWidget("Cols", getSkin());
-        duration =  new FloatInputWidget("Duration", getSkin());
+        rows = new ValueWidget();
+        rows.init(getSkin());
+        rows.setLabel("Rows");
+        rows.setRange(1, 100);
+        rows.setStep(1);
         rows.setValue(1);
+
+        cols = new ValueWidget();
+        cols.init(getSkin());
+        cols.setLabel("Cols");
+        cols.setRange(1, 100);
+        cols.setStep(1);
         cols.setValue(1);
+
+        duration = new ValueWidget();
+        duration.init(getSkin());
+        duration.setLabel("Duration");
+        duration.setRange(0, 9999);
+        duration.setStep(0.01f);
         duration.setValue(1f);
 
-        leftWrapper.add(rows).padTop(5f).left().expandX().row();
-        leftWrapper.add(cols).left().expandX().row();
-        leftWrapper.add(duration).padLeft(5).left().expandX().row();
-
-        rightWrapper.add(dropWidget).size(100).right().row();
+        leftWrapper.add(rows).pad(3).left().expandX().growX().row();
+        leftWrapper.add(cols).pad(3).left().expandX().growX().row();
+        leftWrapper.add(duration).pad(3).left().expandX().growX().row();
 
         rightWrapper.add().growY().row();
         addOutputSlot("output", FlipbookModule.OUTPUT);
 
-        rows.setListener(new ChangeListener() {
+        rows.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                module.setRows(rows.getValue());
+                module.setRows(Math.round(rows.getValue()));
             }
         });
 
-
-        duration.setListener(new ChangeListener() {
+        duration.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 module.duration = duration.getValue();
             }
         });
 
-        cols.setListener(new ChangeListener() {
+        cols.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                module.setCols(cols.getValue());
+                module.setCols(Math.round(cols.getValue()));
             }
         });
     }

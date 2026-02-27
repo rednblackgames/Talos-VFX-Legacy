@@ -55,6 +55,23 @@ public class SelectWidget extends AbstractWidget<String> {
         selectBox.setItems(items);
     }
 
+    public void setItems(Array<String> displayNames, Array<String> values) {
+        titleMap.clear();
+        keyMap.clear();
+        for (int i = 0; i < displayNames.size; i++) {
+            titleMap.put(displayNames.get(i), values.get(i));
+            keyMap.put(values.get(i), displayNames.get(i));
+        }
+        selectBox.setItems(displayNames);
+    }
+
+    public void setSelected(String value) {
+        String displayName = keyMap.get(value);
+        if (displayName != null) {
+            selectBox.setSelected(displayName);
+        }
+    }
+
     @Override
     public String getValue () {
         String title = selectBox.getSelected();

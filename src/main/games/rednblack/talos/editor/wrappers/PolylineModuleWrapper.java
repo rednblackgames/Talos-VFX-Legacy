@@ -28,7 +28,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.dialogs.SettingsDialog;
-import games.rednblack.talos.editor.widgets.IntegerInputWidget;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.editor.widgets.TextureDropWidget;
 import games.rednblack.talos.runtime.Slot;
 import games.rednblack.talos.runtime.modules.*;
@@ -37,7 +37,7 @@ import java.io.File;
 
 public class PolylineModuleWrapper extends TextureDropModuleWrapper<PolylineModule> {
 
-    private IntegerInputWidget interpolationPoints;
+    private ValueWidget interpolationPoints;
 
     @Override
     public void setModuleToDefaults () {
@@ -60,6 +60,9 @@ public class PolylineModuleWrapper extends TextureDropModuleWrapper<PolylineModu
     protected void configureSlots() {
         defaultRegion = new TextureRegion(new Texture(Gdx.files.internal("fire.png")));
 
+        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin(), 100);
+        leftWrapper.add(dropWidget).growX().left().padBottom(3).row();
+
         addInputSlot("offset",  PolylineModule.OFFSET);
         addInputSlot("thickness",  PolylineModule.THICKNESS);
         addInputSlot("color",  PolylineModule.COLOR);
@@ -68,27 +71,27 @@ public class PolylineModuleWrapper extends TextureDropModuleWrapper<PolylineModu
         addInputSlot("left tangent",  PolylineModule.LEFT_TANGENT);
         addInputSlot("right tangent",  PolylineModule.RIGHT_TANGENT);
 
-        interpolationPoints = new IntegerInputWidget("interpolation points", getSkin());
+        interpolationPoints = new ValueWidget();
+        interpolationPoints.init(getSkin());
+        interpolationPoints.setLabel("interpolation points");
+        interpolationPoints.setRange(0, 100);
+        interpolationPoints.setStep(1);
         interpolationPoints.setValue(0);
-        leftWrapper.add(interpolationPoints).left().expandX();
+        leftWrapper.add(interpolationPoints).left().expandX().growX().pad(3);
 
-        interpolationPoints.setListener(new ChangeListener() {
+        interpolationPoints.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                module.setInterpolationPoints(interpolationPoints.getValue());
+                module.setInterpolationPoints(Math.round(interpolationPoints.getValue()));
             }
         });
 
-        dropWidget = new TextureDropWidget<AbstractModule>(defaultRegion, getSkin());
-        rightWrapper.add(dropWidget).size(50).right().row();
-
-        rightWrapper.add().growY().row();
         addOutputSlot("output", PolylineModule.OUTPUT);
     }
 
     @Override
     protected float reportPrefWidth() {
-        return 180;
+        return 220;
     }
 
     @Override

@@ -23,6 +23,14 @@ public class CheckBoxWidget extends AbstractWidget<Boolean> {
         checkBox.setText(element.getText());
     }
 
+    public void setText(String text) {
+        checkBox.setText(text);
+    }
+
+    public void setChecked(boolean checked) {
+        checkBox.setChecked(checked);
+    }
+
     @Override
     public Boolean getValue () {
         return checkBox.isChecked();

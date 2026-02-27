@@ -21,8 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTextField;
+import games.rednblack.talos.editor.nodes.widgets.SelectWidget;
 import games.rednblack.talos.runtime.Expression;
 import games.rednblack.talos.runtime.modules.MathModule;
 import games.rednblack.talos.runtime.utils.MathExpressionMappings;
@@ -33,7 +33,7 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
     private VisTextField aField;
     private VisTextField bField;
 
-    VisSelectBox<String> selectBox;
+    private SelectWidget selectWidget;
 
     public MathModuleWrapper() {
         super();
@@ -73,11 +73,12 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
         Array<String> mathsExpressions = new Array<>();
         MathExpressionMappings.getAvailableMathExpressions(mathsExpressions);
 
-        selectBox = new VisSelectBox();
-        selectBox.setItems(mathsExpressions);
+        selectWidget = new SelectWidget();
+        selectWidget.init(getSkin());
+        selectWidget.setItems(mathsExpressions, mathsExpressions);
 
         aField = addInputSlotWithTextField("A: ", MathModule.A);
-        leftWrapper.add(selectBox).left().expandX().pad(5).padLeft(17).row();
+        leftWrapper.add(selectWidget).left().expandX().pad(5).padLeft(17).growX().row();
         bField = addInputSlotWithTextField("B: ", MathModule.B);
 
         aField.addListener(new ChangeListener() {
@@ -99,11 +100,11 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 
         addOutputSlot("result", 0);
 
-        selectBox.addListener(new ChangeListener() {
+        selectWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String selectedString = selectBox.getSelected();
-                Expression expression = MathExpressionMappings.getMathExpressionForName(selectedString);
+                String selectedValue = selectWidget.getValue();
+                Expression expression = MathExpressionMappings.getMathExpressionForName(selectedValue);
 
                 module.setExpression(expression);
             }
@@ -113,7 +114,7 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        selectBox.setSelected(MathExpressionMappings.getNameForMathExpression(module.getExpression()));
+        selectWidget.setSelected(MathExpressionMappings.getNameForMathExpression(module.getExpression()));
 
         aField.setText(module.getDefaultA() + "");
         bField.setText(module.getDefaultB() + "");

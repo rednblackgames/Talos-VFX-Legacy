@@ -20,13 +20,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import games.rednblack.talos.editor.widgets.FloatInputWidget;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.runtime.modules.StaticValueModule;
-import games.rednblack.talos.runtime.values.NumericalValue;
 
 public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
 
-    private FloatInputWidget floatInput;
+    private ValueWidget valueWidget;
 
     public StaticValueModuleWrapper() {
         super();
@@ -35,23 +34,7 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
     @Override
     public void setModule(StaticValueModule module) {
         super.setModule(module);
-        floatInput.setValue(module.getStaticValue());
-    }
-
-    @Override
-    public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
-        super.attachModuleToMyOutput(moduleWrapper, mySlot, targetSlot);
-
-        floatInput.setFlavour(module.getOutputValue().getFlavour());
-    }
-
-    @Override
-    public void setSlotInactive(int slotTo, boolean isInput) {
-        super.setSlotInactive(slotTo, isInput);
-        if(!isInput) {
-            floatInput.setFlavour(NumericalValue.Flavour.REGULAR);
-            floatInput.setText("Number");
-        }
+        valueWidget.setValue(module.getStaticValue());
     }
 
     @Override
@@ -61,19 +44,18 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
 
     @Override
     protected void configureSlots() {
-        floatInput = new FloatInputWidget("Number", getSkin());
-
-        contentWrapper.add(floatInput).left().padLeft(4);
-        contentWrapper.add().expandX();
-
+        valueWidget = addContentWidget(new ValueWidget());
+        valueWidget.setLabel("Number");
+        valueWidget.setRange(-9999, 9999);
+        valueWidget.setStep(0.01f);
+        valueWidget.setValue(0);
 
         addOutputSlot("output", 0);
 
-
-        floatInput.setListener(new ChangeListener() {
+        valueWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                float value = floatInput.getValue();
+                float value = valueWidget.getValue();
                 module.setStaticValue(value);
             }
         });
@@ -82,11 +64,11 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        floatInput.setValue(module.getStaticValue());
+        valueWidget.setValue(module.getStaticValue());
     }
 
     public void setValue(int val) {
-        floatInput.setValue(val);
+        valueWidget.setValue(val);
         module.setStaticValue(val);
     }
 }

@@ -25,6 +25,10 @@ public class ButtonWidget extends AbstractWidget<Object> {
         label.setText(element.getText());
     }
 
+    public void setText(String text) {
+        label.setText(text);
+    }
+
     @Override
     public Object getValue() {
         return null;

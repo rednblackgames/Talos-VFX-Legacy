@@ -1,3 +1,6 @@
+[1.5.4]
+- Improve node UI using same style of shader graph
+
 [1.5.3]
 - Update Spine 4.2.10
 - Fix Random numbers in TeaVM

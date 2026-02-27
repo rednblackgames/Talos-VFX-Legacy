@@ -21,15 +21,15 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisTextField;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.runtime.Slot;
 import games.rednblack.talos.runtime.modules.*;
 
 public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
 
-    VisTextField delayField;
-    VisTextField durationField;
-    VisTextField emissionField;
+    ValueWidget delayWidget;
+    ValueWidget durationWidget;
+    ValueWidget emissionWidget;
 
     @Override
     protected float reportPrefWidth() {
@@ -39,28 +39,36 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
 
     @Override
     protected void configureSlots() {
-        delayField = addInputSlotWithTextField("delay: ", EmitterModule.DELAY, 60, true);
-        durationField = addInputSlotWithTextField("duration: ", EmitterModule.DURATION, 60, true);
-        emissionField = addInputSlotWithTextField("emission: ", EmitterModule.RATE, 60, true);
+        delayWidget = addInputSlotWithValueWidget("delay", EmitterModule.DELAY);
+        delayWidget.setRange(0, 9999);
+        delayWidget.setStep(0.01f);
 
-        delayField.addListener(new ChangeListener() {
+        durationWidget = addInputSlotWithValueWidget("duration", EmitterModule.DURATION);
+        durationWidget.setRange(0, 9999);
+        durationWidget.setStep(0.01f);
+
+        emissionWidget = addInputSlotWithValueWidget("emission", EmitterModule.RATE);
+        emissionWidget.setRange(0, 9999);
+        emissionWidget.setStep(0.01f);
+
+        delayWidget.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                 module.defaultDelay = floatFromText(delayField);
+                 module.defaultDelay = delayWidget.getValue();
             }
         });
 
-        durationField.addListener(new ChangeListener() {
+        durationWidget.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                module.defaultDuration = floatFromText(durationField);
+                module.defaultDuration = durationWidget.getValue();
             }
         });
 
-        emissionField.addListener(new ChangeListener() {
+        emissionWidget.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                module.defaultRate = floatFromText(emissionField);
+                module.defaultRate = emissionWidget.getValue();
             }
         });
 
@@ -88,17 +96,17 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
     @Override
     public void setModule(EmitterModule module) {
         super.setModule(module);
-        delayField.setText(module.defaultDelay + "");
-        durationField.setText(module.defaultDuration + "");
-        emissionField.setText(module.defaultRate + "");
+        delayWidget.setValue(module.defaultDelay);
+        durationWidget.setValue(module.defaultDuration);
+        emissionWidget.setValue(module.defaultRate);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        delayField.setText(module.defaultDelay + "");
-        durationField.setText(module.defaultDuration + "");
-        emissionField.setText(module.defaultRate + "");
+        delayWidget.setValue(module.defaultDelay);
+        durationWidget.setValue(module.defaultDuration);
+        emissionWidget.setValue(module.defaultRate);
     }
 
 }

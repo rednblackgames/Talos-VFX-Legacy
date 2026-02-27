@@ -17,13 +17,12 @@
 package games.rednblack.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisSelectBox;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.nodes.widgets.SelectWidget;
 import games.rednblack.talos.editor.widgets.ui.DragPoint;
 import games.rednblack.talos.editor.widgets.ui.PreviewWidget;
 import games.rednblack.talos.runtime.modules.GlobalScopeModule;
@@ -31,7 +30,7 @@ import games.rednblack.talos.runtime.values.NumericalValue;
 
 public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> implements IDragPointProvider {
 
-    VisSelectBox<String> selectBox;
+    SelectWidget selectWidget;
 
     DragPoint dragPoint;
 
@@ -40,12 +39,22 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         dragPoint = new DragPoint(0, 0);
 
         Array<String> array = new Array<>();
-
         for(int i = 0; i < 10; i++) {
             array.add(i+"");
         }
 
-        selectBox = addSelectBox(array);
+        selectWidget = new SelectWidget();
+        selectWidget.init(getSkin());
+        selectWidget.setItems(array, array);
+
+        leftWrapper.add(selectWidget).left().expandX().padBottom(4).padLeft(5).padRight(10).growX().row();
+
+        selectWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                updateFromSelectBox();
+            }
+        });
 
         addOutputSlot("output", GlobalScopeModule.OUTPUT);
     }
@@ -55,7 +64,7 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         super.setModule(module);
         NumericalValue value = TalosMain.Instance().globalScope.getDynamicValue(module.getKey());
         dragPoint.set(value.get(0), value.get(1));
-        selectBox.setSelected(String.valueOf(module.getKey()));
+        selectWidget.setSelected(String.valueOf(module.getKey()));
     }
 
     @Override
@@ -71,29 +80,8 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         previewWidget.unregisterDragPoints(this);
     }
 
-    protected VisSelectBox addSelectBox(Array<String> values) {
-        Table slotRow = new Table();
-        final VisSelectBox selectBox = new VisSelectBox();
-
-        selectBox.setItems(values);
-
-        selectBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                updateFromSelectBox();
-            }
-        });
-
-        slotRow.add(selectBox).width(50).left().padBottom(4).padLeft(5).padRight(10);
-
-        leftWrapper.add(slotRow).left().expandX();
-        leftWrapper.row();
-
-        return selectBox;
-    }
-
     private void updateFromSelectBox() {
-        String selected = selectBox.getSelected();
+        String selected = selectWidget.getValue();
         int key = Integer.parseInt(selected);
         module.setKey(key);
         NumericalValue value = TalosMain.Instance().globalScope.getDynamicValue(key);
@@ -118,6 +106,6 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
     @Override
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        selectBox.setSelected(module.getKey()+"");
+        selectWidget.setSelected(module.getKey()+"");
     }
 }

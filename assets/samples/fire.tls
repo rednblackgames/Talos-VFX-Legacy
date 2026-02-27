@@ -11,7 +11,17 @@
 		[ 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0 ],
 		[ 0, 0, 0, 0 ]
-	]
+	],
+	"previewCamPos": {},
+	"previewCamZoom": 1.4285715,
+	"bgImagePath": "",
+	"isGridVisible": true,
+	"bgImageIsInBack": true,
+	"bgImageSize": 10,
+	"gridSize": 1,
+	"particlePositionX": 0,
+	"particlePositionY": 0,
+	"resourcePaths": []
 },
 "emitters": [
 	{
@@ -20,8 +30,8 @@
 			{
 				"class": "ParticleModuleWrapper",
 				"id": 0,
-				"x": 52,
-				"y": -186,
+				"x": 203.99976,
+				"y": -260.05127,
 				"module": {
 					"data": {
 						"class": "ParticleModule",
@@ -32,8 +42,8 @@
 			{
 				"class": "EmitterModuleWrapper",
 				"id": 1,
-				"x": 24,
-				"y": 111,
+				"x": 361.1283,
+				"y": 64.230835,
 				"module": {
 					"data": {
 						"class": "EmitterModule",
@@ -47,8 +57,8 @@
 			{
 				"class": "TextureModuleWrapper",
 				"id": 3,
-				"x": -145,
-				"y": 176,
+				"x": -109.92322,
+				"y": 201.33313,
 				"module": {
 					"data": {
 						"class": "TextureModule",
@@ -56,29 +66,32 @@
 						"regionName": "fire"
 					}
 				},
-				"fileName": fire,
+				"filePath": "fire.png",
+				"regionName": "fire"
 			},
 			{
 				"class": "EmConfigModuleWrapper",
 				"id": 4,
-				"x": 221,
-				"y": 146,
+				"x": 326.23047,
+				"y": 294.10242,
 				"module": {
 					"data": {
 						"class": "EmConfigModule",
 						"index": 4,
 						"additive": true,
+						"isBlendAdd": false,
 						"attached": false,
 						"continuous": true,
-						"aligned": false
+						"aligned": false,
+						"immortal": false
 					}
 				}
 			},
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 5,
-				"x": -934,
-				"y": -218.00003,
+				"x": -1058.7181,
+				"y": -364.15384,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -115,8 +128,8 @@
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 6,
-				"x": -933,
-				"y": -420.00003,
+				"x": -1067.4615,
+				"y": -649.94885,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -145,8 +158,8 @@
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 7,
-				"x": -526,
-				"y": -418.00003,
+				"x": -559.1283,
+				"y": -651.8464,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -179,8 +192,8 @@
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 8,
-				"x": -527,
-				"y": -219.00003,
+				"x": -583.5128,
+				"y": -359.30783,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -237,8 +250,8 @@
 			{
 				"class": "CurveModuleWrapper",
 				"id": 10,
-				"x": -731,
-				"y": 199,
+				"x": -785.56396,
+				"y": 267.2052,
 				"module": {
 					"data": {
 						"class": "CurveModule",
@@ -271,8 +284,8 @@
 			{
 				"class": "DynamicRangeModuleWrapper",
 				"id": 11,
-				"x": -65,
-				"y": 279,
+				"x": -308.58972,
+				"y": 526.4873,
 				"module": {
 					"data": {
 						"class": "DynamicRangeModule",
@@ -345,7 +358,7 @@
 		"groups": [
 			{
 				"text": "MOVEMENT",
-				"modules": [ 6, 7, 5, 8 ],
+				"modules": [ 6, 5, 8, 7 ],
 				"color": -6.820341E37
 			}
 		]

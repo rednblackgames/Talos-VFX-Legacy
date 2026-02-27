@@ -22,15 +22,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisSelectBox;
+import games.rednblack.talos.editor.nodes.widgets.SelectWidget;
 import games.rednblack.talos.runtime.Slot;
 import games.rednblack.talos.runtime.modules.*;
 import games.rednblack.talos.runtime.utils.InterpolationMappings;
 
 public class InterpolationModuleWrapper extends ModuleWrapper<InterpolationModule> {
 
-
-    VisSelectBox<String> selectBox;
+    SelectWidget selectWidget;
 
     public InterpolationModuleWrapper() {
         super();
@@ -51,15 +50,17 @@ public class InterpolationModuleWrapper extends ModuleWrapper<InterpolationModul
         Array<String> interps = new Array<>();
         InterpolationMappings.getAvailableInterpolations(interps);
 
-        selectBox = addSelectBox(interps);
+        selectWidget = new SelectWidget();
+        selectWidget.init(getSkin());
+        selectWidget.setItems(interps, interps);
 
-        selectBox.addListener(new ChangeListener() {
+        leftWrapper.add(selectWidget).left().expandX().padBottom(4).padLeft(5).padRight(10).growX().row();
+
+        selectWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String selectedString = selectBox.getSelected();
-
+                String selectedString = selectWidget.getValue();
                 Interpolation interp = InterpolationMappings.getInterpolationForName(selectedString);
-
                 module.setInterpolation(interp);
             }
         });
@@ -68,7 +69,7 @@ public class InterpolationModuleWrapper extends ModuleWrapper<InterpolationModul
     @Override
     public void setModule(InterpolationModule module) {
         super.setModule(module);
-        selectBox.setSelected(InterpolationMappings.getNameForInterpolation(module.getInterpolation()));
+        selectWidget.setSelected(InterpolationMappings.getNameForInterpolation(module.getInterpolation()));
     }
 
     @Override
@@ -81,7 +82,7 @@ public class InterpolationModuleWrapper extends ModuleWrapper<InterpolationModul
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        selectBox.setSelected(InterpolationMappings.getNameForInterpolation(module.getInterpolation()));
+        selectWidget.setSelected(InterpolationMappings.getNameForInterpolation(module.getInterpolation()));
     }
 
 }

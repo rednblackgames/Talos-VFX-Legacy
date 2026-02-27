@@ -18,6 +18,7 @@ package games.rednblack.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -67,6 +68,14 @@ public class ModuleBoardWidget extends WidgetGroup {
 
 
     private NodeStage mainStage;
+
+    private NodeConnection hoveredConnection = null;
+    private static final Color curveColor = new Color(1, 1, 1, 0.4f);
+    private static final Color curveColorSelected = new Color(1, 1, 1, 0.8f);
+
+    Vector3 tmp3 = new Vector3();
+    Vector2 tmp4 = new Vector2();
+
     private ModuleWrapper ccFromWrapper = null;
     private int ccFromSlot = 0;
     private boolean ccCurrentIsInput = false;
@@ -402,6 +411,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         public ModuleWrapper toModule;
         public int fromSlot;
         public int toSlot;
+        public boolean highlighted = false;
     }
 
     public void showPopup() {
@@ -554,6 +564,13 @@ public class ModuleBoardWidget extends WidgetGroup {
         super.draw(batch, parentAlpha);
     }
 
+    private boolean segmentHit(Vector2 p1, Vector2 p2) {
+        tmp3.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        mainStage.getStage().getCamera().unproject(tmp3);
+        tmp4.set(tmp3.x, tmp3.y);
+        return Intersector.distanceSegmentPoint(p1, p2, tmp4) < 5;
+    }
+
     private void drawCurves(Batch batch) {
         if(currentEmitterWrapper == null) return;
 
@@ -561,10 +578,12 @@ public class ModuleBoardWidget extends WidgetGroup {
         // draw active curve
         if(activeCurve != null) {
             shapeDrawer.setColor(0, 203/255f, 124/255f, 1f);
-            drawCurve(shapeDrawer, activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y);
+            drawCurve(shapeDrawer, activeCurve.getFrom().x, activeCurve.getFrom().y, activeCurve.getTo().x, activeCurve.getTo().y, null);
         }
 
-        shapeDrawer.setColor(1, 1, 1, 0.4f);
+        NodeConnection hoveredConnectionRef = hoveredConnection;
+        hoveredConnection = null;
+
         // draw nodes
         for(NodeConnection connection: getCurrentConnections()) {
             connection.fromModule.getOutputSlotPos(connection.fromSlot, tmp);
@@ -573,14 +592,11 @@ public class ModuleBoardWidget extends WidgetGroup {
             connection.toModule.getInputSlotPos(connection.toSlot, tmp);
             float toX = tmp.x;
             float toY = tmp.y;
-            drawCurve(shapeDrawer, x, y, toX, toY);
+            drawCurve(shapeDrawer, x, y, toX, toY, connection);
         }
     }
 
-    private void drawCurve(ShapeDrawer shapeDrawer, float x, float y, float toX, float toY) {
-        //shapeRenderer.setColor(1, 1, 1, 1f);
-        //shapeRenderer.rectLine(x, y, toX, toY, 2f);
-
+    private void drawCurve(ShapeDrawer shapeDrawer, float x, float y, float toX, float toY, NodeConnection nodeConnection) {
         float minOffset = 10f;
         float maxOffset = 150f;
 
@@ -600,11 +616,29 @@ public class ModuleBoardWidget extends WidgetGroup {
         float resolution = 1f/20f;
 
         for(float i = 0; i < 1f; i+=resolution) {
+            float thickness = 2f;
+            Color mainColor = curveColor;
+
+            if(nodeConnection != null && nodeConnection.highlighted) {
+                thickness = 2.5f;
+                mainColor = curveColorSelected;
+            }
+
+            shapeDrawer.setColor(mainColor);
+
             bezier.valueAt(tmp, i);
             if(i > 0) {
-                shapeDrawer.line(prev.x, prev.y, tmp.x, tmp.y, 2f);
+                shapeDrawer.line(prev.x, prev.y, tmp.x, tmp.y, thickness);
+
+                if(nodeConnection != null && segmentHit(prev, tmp)) {
+                    hoveredConnection = nodeConnection;
+                }
             }
             prev.set(tmp);
+        }
+
+        if(nodeConnection != null) {
+            nodeConnection.highlighted = (hoveredConnection == nodeConnection);
         }
     }
 
@@ -773,13 +807,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     public void updateSelectionBackgrounds() {
         for(ModuleWrapper wrapper : getModuleWrappers()) {
-            if(getSelectedWrappers().contains(wrapper)) {
-                wrapper.setBackground("window-blue");
-                wrapper.setSelectionState(true);
-            } else {
-                wrapper.setBackground("window");
-                wrapper.setSelectionState(false);
-            }
+            wrapper.setSelectionState(getSelectedWrappers().contains(wrapper));
         }
     }
 

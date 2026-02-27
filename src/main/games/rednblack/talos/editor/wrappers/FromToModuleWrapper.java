@@ -69,7 +69,7 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     @Override
     public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
         super.attachModuleToMyOutput(moduleWrapper, mySlot, targetSlot);
-        getTitleLabel().setText("Beam Position");
+        setTitleText("Beam Position");
     }
 
     @Override

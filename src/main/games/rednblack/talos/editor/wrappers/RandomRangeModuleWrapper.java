@@ -22,7 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisCheckBox;
+import games.rednblack.talos.editor.nodes.widgets.CheckBoxWidget;
 import games.rednblack.talos.editor.widgets.FloatRangeInputWidget;
 import games.rednblack.talos.runtime.modules.RandomRangeModule;
 import games.rednblack.talos.runtime.values.NumericalValue;
@@ -30,7 +30,7 @@ import games.rednblack.talos.runtime.values.NumericalValue;
 public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 
     FloatRangeInputWidget inputRange;
-    private VisCheckBox distribution;
+    private CheckBoxWidget distribution;
 
     @Override
     public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
@@ -53,6 +53,7 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
         super.setModule(module);
         inputRange.setValue(module.getMin(), module.getMax());
         distribution.setChecked(module.isDistributed());
+
     }
 
     @Override
@@ -68,7 +69,9 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
 
         addOutputSlot("result", 0);
 
-        distribution = new VisCheckBox("distributed");
+        distribution = new CheckBoxWidget();
+        distribution.init(getSkin());
+        distribution.setText("distributed");
         rightWrapper.add(distribution).right().expandX().padRight(3).row();
 
         inputRange = new FloatRangeInputWidget("Min", "Max", getSkin());
@@ -88,7 +91,7 @@ public class RandomRangeModuleWrapper extends ModuleWrapper<RandomRangeModule> {
         distribution.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                module.setDistributed(distribution.isChecked());
+                module.setDistributed(distribution.getValue());
             }
         });
     }

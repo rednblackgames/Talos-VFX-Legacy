@@ -16,26 +16,19 @@
 
 package games.rednblack.talos.editor.wrappers;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Cursor;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.editor.utils.ScreenshotService;
 import games.rednblack.talos.runtime.modules.ColorModule;
 
@@ -46,9 +39,9 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
 
     private ColorPicker picker;
 
-    VisTextField rField;
-    VisTextField gField;
-    VisTextField bField;
+    ValueWidget rWidget;
+    ValueWidget gWidget;
+    ValueWidget bWidget;
 
     Color tmpClr = new Color();
     Vector2 vec = new Vector2();
@@ -59,51 +52,14 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
 
     @Override
     protected void configureSlots() {
-        rField = addInputSlotWithTextField("R: ", 0, 40);
-        gField = addInputSlotWithTextField("G: ", 1, 40);
-        bField = addInputSlotWithTextField("B: ", 2, 40);
-
-        rField.setText("255");
-        gField.setText("0");
-        bField.setText("0");
-
-        rField.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                float r = floatFromText(rField);
-                module.setR(r/255f);
-                update();
-            }
-        });
-
-        gField.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                float g = floatFromText(gField);
-                module.setG(g/255f);
-                update();
-            }
-        });
-
-        bField.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                float b = floatFromText(bField);
-                module.setB(b/255f);
-                update();
-            }
-        });
-
-        addOutputSlot("position", 0);
-
         picker = new ColorPicker(new ColorPickerAdapter() {
             @Override
             public void changed (Color newColor) {
                 if(colorBtn != null) {
                     colorBtn.setColor(newColor);
-                    rField.setText(""+(int)(newColor.r * 255f));
-                    gField.setText(""+(int)(newColor.g * 255f));
-                    bField.setText(""+(int)(newColor.b * 255f));
+                    rWidget.setValue(newColor.r * 255f);
+                    gWidget.setValue(newColor.g * 255f);
+                    bWidget.setValue(newColor.b * 255f);
 
                     module.setR(newColor.r);
                     module.setG(newColor.g);
@@ -114,7 +70,48 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
 
         // create color picker Btn
         colorBtn = new Image(getSkin().getDrawable("white"));
-        contentWrapper.add(colorBtn).width(50).height(50).right().padLeft(26);
+        leftWrapper.add(colorBtn).width(50).height(50).center().padBottom(3).row();
+
+        rWidget = addInputSlotWithValueWidget("R", 0);
+        rWidget.setRange(0, 255);
+        rWidget.setStep(1);
+        rWidget.setValue(255);
+
+        gWidget = addInputSlotWithValueWidget("G", 1);
+        gWidget.setRange(0, 255);
+        gWidget.setStep(1);
+        gWidget.setValue(0);
+
+        bWidget = addInputSlotWithValueWidget("B", 2);
+        bWidget.setRange(0, 255);
+        bWidget.setStep(1);
+        bWidget.setValue(0);
+
+        rWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                module.setR(rWidget.getValue() / 255f);
+                update();
+            }
+        });
+
+        gWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                module.setG(gWidget.getValue() / 255f);
+                update();
+            }
+        });
+
+        bWidget.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                module.setB(bWidget.getValue() / 255f);
+                update();
+            }
+        });
+
+        addOutputSlot("position", 0);
 
         colorBtn.setColor(1f, 0, 0, 1f);
 
@@ -149,9 +146,9 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
         final Color color = module.getColor();
         tmpClr.set(color);
         colorBtn.setColor(tmpClr);
-        rField.setText(""+(int)(color.r * 255f));
-        gField.setText(""+(int)(color.g * 255f));
-        bField.setText(""+(int)(color.b * 255f));
+        rWidget.setValue(color.r * 255f);
+        gWidget.setValue(color.g * 255f);
+        bWidget.setValue(color.b * 255f);
     }
 
     @Override
@@ -162,9 +159,9 @@ public class ColorModuleWrapper extends ModuleWrapper<ColorModule> {
         tmpClr.set(color);
 
         colorBtn.setColor(tmpClr);
-        rField.setText(""+(int)(color.r * 255f));
-        gField.setText(""+(int)(color.g * 255f));
-        bField.setText(""+(int)(color.b * 255f));
+        rWidget.setValue(color.r * 255f);
+        gWidget.setValue(color.g * 255f);
+        bWidget.setValue(color.b * 255f);
     }
 
     @Override

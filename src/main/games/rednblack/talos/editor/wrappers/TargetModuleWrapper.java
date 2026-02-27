@@ -6,8 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisTextField;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.editor.widgets.ui.DragPoint;
 import games.rednblack.talos.editor.widgets.ui.PreviewWidget;
 import games.rednblack.talos.runtime.Slot;
@@ -15,7 +15,7 @@ import games.rednblack.talos.runtime.modules.*;
 
 public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements IDragPointProvider {
 
-    private VisTextField velocityField;
+    private ValueWidget velocityWidget;
 
     private DragPoint dragPointFrom;
     private DragPoint dragPointTo;
@@ -28,7 +28,7 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
     @Override
     public void setModule(TargetModule module) {
         super.setModule(module);
-        velocityField.setText(module.getDefaultVelocity() + "");
+        velocityWidget.setValue(module.getDefaultVelocity());
         if(!lock) {
             module.setDefaultPositions(dragPointFrom.position, dragPointTo.position);
         }
@@ -37,17 +37,19 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
     @Override
     protected void configureSlots() {
         addInputSlot("alpha", TargetModule.ALPHA_INPUT);
-        velocityField = addInputSlotWithTextField("velocity: ", TargetModule.VELOCITY);
+        velocityWidget = addInputSlotWithValueWidget("velocity", TargetModule.VELOCITY);
+        velocityWidget.setRange(-9999, 9999);
+        velocityWidget.setStep(0.01f);
+
         Cell fromCell = addInputSlot("from", TargetModule.FROM);
         Cell toCell = addInputSlot("to", TargetModule.TO);
         fromLabel = getLabelFromCell(fromCell);
         toLabel = getLabelFromCell(toCell);
 
-        velocityField.addListener(new ChangeListener() {
+        velocityWidget.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                float velocity = floatFromText(velocityField);
-                module.setDefaultVelocity(velocity);
+                module.setDefaultVelocity(velocityWidget.getValue());
             }
         });
 
@@ -82,7 +84,7 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
         lock = true;
         super.read(json, jsonData);
         lock = false;
-        velocityField.setText(module.getDefaultVelocity() + "");
+        velocityWidget.setValue(module.getDefaultVelocity());
         dragPointFrom.position.set(module.defaultFrom);
         dragPointTo.position.set(module.defaultTo);
     }

@@ -265,12 +265,7 @@ public class NodeBoard extends WidgetGroup implements Notifications.Observer {
         tmp3.set(vec3.x, vec3.y);
 
         float dist = Intersector.distanceSegmentPoint(p1, p2, tmp3);
-
-        if(dist < 30) {
-            return true; // it's a mario!
-        }
-
-        return false;
+        return dist < 5;
     }
 
     public NodeWidget createNode (Class<? extends NodeWidget> clazz, XmlReader.Element config, float x, float y) {

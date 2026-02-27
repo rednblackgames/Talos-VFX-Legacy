@@ -18,10 +18,11 @@ package games.rednblack.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisSelectBox;
+import games.rednblack.talos.editor.nodes.widgets.SelectWidget;
 import games.rednblack.talos.runtime.modules.InputModule;
 import games.rednblack.talos.runtime.ScopePayload;
 
@@ -29,7 +30,7 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
 
     IntMap<String> map;
 
-    VisSelectBox<String> selectBox;
+    SelectWidget selectWidget;
 
     public InputModuleWrapper() {
         super();
@@ -57,17 +58,26 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
         map.put(ScopePayload.PARTICLE_POSITION, "Particle position");
         map.put(ScopePayload.TOTAL_TIME, "Global Time");
 
+        Array<String> displayNames = new Array<>();
+        Array<String> values = new Array<>();
+        for (IntMap.Entry<String> entry : map) {
+            displayNames.add(entry.value);
+            values.add(String.valueOf(entry.key));
+        }
 
-        selectBox = addSelectBox(map.values());
+        selectWidget = new SelectWidget();
+        selectWidget.init(getSkin());
+        selectWidget.setItems(displayNames, values);
+
+        leftWrapper.add(selectWidget).left().expandX().padBottom(4).padLeft(5).padRight(10).growX().row();
+
         addOutputSlot("output", 0);
 
-
-        selectBox.addListener(new ChangeListener() {
+        selectWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String selectedString = selectBox.getSelected();
-                int key = map.findKey(selectedString, false, 0);
-
+                String selectedValue = selectWidget.getValue();
+                int key = Integer.parseInt(selectedValue);
                 module.setInput(key);
             }
         });
@@ -80,7 +90,7 @@ public class InputModuleWrapper extends ModuleWrapper<InputModule> {
     }
 
     public void setKey(int key) {
-        selectBox.setSelected(map.get(key));
+        selectWidget.setSelected(String.valueOf(key));
         module.setInput(key);
     }
 }

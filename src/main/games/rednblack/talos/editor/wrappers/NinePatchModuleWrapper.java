@@ -2,23 +2,21 @@ package games.rednblack.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import games.rednblack.talos.editor.widgets.FloatInputWidget;
-import games.rednblack.talos.editor.widgets.IntegerInputWidget;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.runtime.modules.NinePatchModule;
 
 public class NinePatchModuleWrapper extends ModuleWrapper<NinePatchModule> {
 
-    IntegerInputWidget leftSplit;
-    IntegerInputWidget rightSplit;
-    IntegerInputWidget topSplit;
-    IntegerInputWidget bottomSplit;
+    ValueWidget leftSplit;
+    ValueWidget rightSplit;
+    ValueWidget topSplit;
+    ValueWidget bottomSplit;
 
     @Override
     protected float reportPrefWidth() {
-        return 150;
+        return 200;
     }
 
     @Override
@@ -26,17 +24,33 @@ public class NinePatchModuleWrapper extends ModuleWrapper<NinePatchModule> {
         addInputSlot("input",  NinePatchModule.INPUT);
         addOutputSlot("output", NinePatchModule.OUTPUT);
 
-        leftSplit = new IntegerInputWidget("left split", getSkin());
-        leftWrapper.add(leftSplit).left().expandX().padLeft(3).row();
+        leftSplit = new ValueWidget();
+        leftSplit.init(getSkin());
+        leftSplit.setLabel("left split");
+        leftSplit.setRange(0, 999);
+        leftSplit.setStep(1);
+        leftWrapper.add(leftSplit).left().expandX().growX().pad(3).row();
 
-        rightSplit = new IntegerInputWidget("right split", getSkin(), Align.right);
-        rightWrapper.add(rightSplit).right().expandX().padRight(3).row();
+        rightSplit = new ValueWidget();
+        rightSplit.init(getSkin());
+        rightSplit.setLabel("right split");
+        rightSplit.setRange(0, 999);
+        rightSplit.setStep(1);
+        leftWrapper.add(rightSplit).right().expandX().growX().pad(3).row();
 
-        topSplit = new IntegerInputWidget("top split", getSkin());
-        leftWrapper.add(topSplit).left().expandX().padLeft(3);
+        topSplit = new ValueWidget();
+        topSplit.init(getSkin());
+        topSplit.setLabel("top split");
+        topSplit.setRange(0, 999);
+        topSplit.setStep(1);
+        leftWrapper.add(topSplit).left().expandX().growX().pad(3).row();
 
-        bottomSplit = new IntegerInputWidget("bottom split", getSkin(), Align.right);
-        rightWrapper.add(bottomSplit).right().expandX().padRight(3);
+        bottomSplit = new ValueWidget();
+        bottomSplit.init(getSkin());
+        bottomSplit.setLabel("bottom split");
+        bottomSplit.setRange(0, 999);
+        bottomSplit.setStep(1);
+        leftWrapper.add(bottomSplit).right().expandX().growX().pad(3);
 
         ChangeListener changeListener = new ChangeListener() {
             @Override
@@ -48,7 +62,7 @@ public class NinePatchModuleWrapper extends ModuleWrapper<NinePatchModule> {
         leftSplit.addListener(changeListener);
         rightSplit.addListener(changeListener);
         topSplit.addListener(changeListener);
-        rightWrapper.addListener(changeListener);
+        bottomSplit.addListener(changeListener);
     }
 
     @Override
@@ -58,7 +72,8 @@ public class NinePatchModuleWrapper extends ModuleWrapper<NinePatchModule> {
     }
 
     private void updateValues() {
-        module.setSplits(leftSplit.getValue(), rightSplit.getValue(), topSplit.getValue(), bottomSplit.getValue());
+        module.setSplits(Math.round(leftSplit.getValue()), Math.round(rightSplit.getValue()),
+                Math.round(topSplit.getValue()), Math.round(bottomSplit.getValue()));
         module.resetPatch();
     }
 

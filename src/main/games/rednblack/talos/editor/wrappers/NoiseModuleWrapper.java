@@ -17,10 +17,10 @@
 package games.rednblack.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.editor.widgets.NoiseImage;
 import games.rednblack.talos.runtime.Slot;
 import games.rednblack.talos.runtime.modules.*;
@@ -28,7 +28,7 @@ import games.rednblack.talos.runtime.modules.*;
 public class NoiseModuleWrapper extends ModuleWrapper<NoiseModule> {
 
     NoiseImage noiseImage;
-    Slider slider;
+    ValueWidget frequencyWidget;
 
     @Override
     protected float reportPrefWidth() {
@@ -44,17 +44,21 @@ public class NoiseModuleWrapper extends ModuleWrapper<NoiseModule> {
 
         addOutputSlot("output", NoiseModule.OUTPUT);
 
-        slider = new Slider(0.5f, 20f, 0.1f, false, getSkin());
-        leftWrapper.add(slider).growX().padRight(2f).padBottom(5f).row();
-        slider.setValue(0.5f);
+        frequencyWidget = new ValueWidget();
+        frequencyWidget.init(getSkin());
+        frequencyWidget.setLabel("Frequency");
+        frequencyWidget.setRange(0.5f, 20f);
+        frequencyWidget.setStep(0.1f);
+        frequencyWidget.setValue(20f);
+        leftWrapper.add(frequencyWidget).growX().padRight(2f).padBottom(5f).row();
 
         noiseImage = new NoiseImage(getSkin());
         leftWrapper.add(noiseImage).expandX().fillX().growX().height(100).padRight(3).padBottom(3);
 
-        slider.addListener(new ChangeListener() {
+        frequencyWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                float frequency = 20f - slider.getValue() + 0.5f;
+                float frequency = frequencyWidget.getValue();
                 noiseImage.setFrequency(frequency);
                 module.setFrequency(frequency);
             }
@@ -67,14 +71,13 @@ public class NoiseModuleWrapper extends ModuleWrapper<NoiseModule> {
     public void setModule(NoiseModule module) {
         super.setModule(module);
         noiseImage.setFrequency(module.getFrequency());
-        slider.setValue(module.getFrequency());
+        frequencyWidget.setValue(module.getFrequency());
     }
 
     @Override
     public void read(Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        slider.setValue(20f - module.getFrequency() + 0.5f);
-
+        frequencyWidget.setValue(module.getFrequency());
     }
 
 
