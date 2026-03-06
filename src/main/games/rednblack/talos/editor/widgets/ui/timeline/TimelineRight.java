@@ -101,6 +101,29 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
         addActor(timeCursorWidget);
 
+        timeCursorWidget.addListener(new InputListener() {
+            private Vector2 vec = new Vector2();
+            private float lastScrubTime;
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                vec.set(x, y);
+                timeCursorWidget.localToStageCoordinates(vec);
+                lastScrubTime = timeline.stageToTime(vec);
+                timeline.onSeekToTime(lastScrubTime);
+            }
+
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                timeline.onScrubEnd(lastScrubTime);
+            }
+        });
+
         return content;
     }
 
@@ -157,16 +180,30 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
         timeBar.addListener(new InputListener() {
 
             private Vector2 vec = new Vector2();
+            private float lastScrubTime;
+
+            private float resolveTime(InputEvent event, float x) {
+                vec.set(x, 0);
+                event.getListenerActor().localToStageCoordinates(vec);
+                return timeline.stageToTime(vec);
+            }
 
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                vec.set(x, y);
-                event.getTarget().localToStageCoordinates(vec);
-                float time = timeline.stageToTime(vec);
+                lastScrubTime = resolveTime(event, x);
+                timeline.onSeekToTime(lastScrubTime);
+                return true;
+            }
 
-                System.out.println(time);
+            @Override
+            public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                lastScrubTime = resolveTime(event, x);
+                timeline.onSeekToTime(lastScrubTime);
+            }
 
-                return super.touchDown(event, x, y, pointer, button);
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                timeline.onScrubEnd(lastScrubTime);
             }
         });
 
@@ -234,7 +271,6 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
         return contentContainer;
     }
-
 
     @Override
     protected TimeRow<U> createNewItem() {

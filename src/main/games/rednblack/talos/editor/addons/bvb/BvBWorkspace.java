@@ -741,6 +741,15 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
         bvb.getTimeline().updateEffectList(skeletonContainer.getBoundEffects());
     }
 
+    public void seekToTime(float time) {
+        if (skeletonContainer == null) return;
+        if (skeletonContainer.getAnimationState() == null) return;
+
+        skeletonContainer.seekToTime(time);
+        paused = true;
+        bvb.getTimeline().setPaused(true);
+    }
+
     public void setPaused(boolean paused) {
         this.paused = paused;
     }

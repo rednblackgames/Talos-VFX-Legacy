@@ -64,6 +64,9 @@ public class ParticleModule extends AbstractModule {
 
     NumericalValue pivot;
 
+    public float defaultLife = 1f;
+    private float cachedLife = 1f;
+
     Color tmpColor = new Color();
     Vector2 tmpVec = new Vector2();
     private ParticleDrawable defaultDrawable;
@@ -122,8 +125,13 @@ public class ParticleModule extends AbstractModule {
 
     public float getLife() {
         fetchInputSlotValue(LIFE);
-        if(life.isEmpty()) return 1; // defaults
-        return life.getFloat();
+        if(life.isEmpty()) cachedLife = defaultLife;
+        else cachedLife = life.getFloat();
+        return cachedLife;
+    }
+
+    public float getCachedLife() {
+        return cachedLife;
     }
 
     public float getAngle() {

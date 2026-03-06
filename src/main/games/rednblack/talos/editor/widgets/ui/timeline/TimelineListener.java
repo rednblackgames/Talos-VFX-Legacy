@@ -50,6 +50,12 @@ public class TimelineListener implements EventListener {
                 case down:
                     onDown();
                     break;
+                case seekToTime:
+                    onSeekToTime((Float) timelineEvent.payload);
+                    break;
+                case scrubEnd:
+                    onScrubEnd((Float) timelineEvent.payload);
+                    break;
             }
         }
 
@@ -110,6 +116,8 @@ public class TimelineListener implements EventListener {
     protected void onUp () {}
 
     protected void onItemRename(Object identifier, String newName) {}
+    protected void onSeekToTime(float time) {}
+    protected void onScrubEnd(float time) {}
 
     static public enum Type {
         itemSelected,
@@ -124,6 +132,8 @@ public class TimelineListener implements EventListener {
         toggleLoop,
         rename,
         up,
-        down
+        down,
+        seekToTime,
+        scrubEnd
     }
 }

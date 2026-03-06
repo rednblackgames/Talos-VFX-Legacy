@@ -19,6 +19,7 @@ package games.rednblack.talos.runtime.modules;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.runtime.ParticleEmitterInstance;
+import games.rednblack.talos.runtime.Slot;
 import games.rednblack.talos.runtime.ScopePayload;
 import games.rednblack.talos.runtime.values.EmConfigValue;
 import games.rednblack.talos.runtime.values.NumericalValue;
@@ -40,6 +41,9 @@ public class EmitterModule extends AbstractModule {
     public float defaultDuration = 2f;
     public float defaultRate = 50f;
 
+    private float cachedDelay = 0;
+    private float cachedDuration = 2f;
+
     @Override
     protected void defineSlots() {
         delay = createInputSlot(DELAY);
@@ -59,17 +63,19 @@ public class EmitterModule extends AbstractModule {
     public float getDelay() {
         fetchInputSlotValue(DELAY);
 
-        if(delay.isEmpty()) return defaultDelay; // defaults
+        if(delay.isEmpty()) cachedDelay = defaultDelay;
+        else cachedDelay = delay.getFloat();
 
-        return delay.getFloat();
+        return cachedDelay;
     }
 
     public float getDuration() {
         fetchInputSlotValue(DURATION);
 
-        if(duration.isEmpty()) return defaultDuration; // defaults
+        if(duration.isEmpty()) cachedDuration = defaultDuration;
+        else cachedDuration = duration.getFloat();
 
-        return duration.getFloat();
+        return cachedDuration;
     }
 
     public float getRate() {
@@ -85,6 +91,16 @@ public class EmitterModule extends AbstractModule {
 
         if(config.isEmpty()) return false;
 
+        return config.continuous;
+    }
+
+    /**
+     * Returns the continuous state without re-evaluating the module graph.
+     * Safe to call from the UI thread for timeline display.
+     */
+    public boolean isContinuousCached() {
+        Slot configSlot = inputSlots.get(CONFIG);
+        if (configSlot == null || configSlot.getTargetSlot() == null) return false;
         return config.continuous;
     }
 
@@ -121,6 +137,14 @@ public class EmitterModule extends AbstractModule {
         return config.isBlendAdd;
     }
 
+    public float getCachedDelay() {
+        return cachedDelay;
+    }
+
+    public float getCachedDuration() {
+        return cachedDuration;
+    }
+
     public void updateScopeData(ParticleEmitterInstance particleEmitter) {
         getScope().set(ScopePayload.EMITTER_ALPHA, particleEmitter.alpha);
         getScope().set(ScopePayload.REQUESTER_ID, 1.1f); // TODO change to something more... unique when emitters are in
@@ -140,6 +164,8 @@ public class EmitterModule extends AbstractModule {
         defaultDelay = jsonData.getFloat("delay", 0);
         defaultDuration = jsonData.getFloat("duration", 2);
         defaultRate = jsonData.getFloat("rate", 50);
+        cachedDelay = defaultDelay;
+        cachedDuration = defaultDuration;
     }
 
     public boolean isImmortal() {

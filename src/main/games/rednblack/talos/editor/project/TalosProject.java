@@ -589,39 +589,27 @@ public class TalosProject implements IProject {
 	public float estimateTotalEffectDuration() {
 		Array<ParticleEmitterWrapper> activeWrappers = getActiveWrappers();
 
-		if (particleEffectDescriptor.isContinuous()) {
-			float maxWindow = 0;
-			for (ParticleEmitterWrapper wrapper : activeWrappers) {
-				if(wrapper.getEmitter().getEmitterModule() != null) {
-					float duration = wrapper.getEmitter().getEmitterModule().getDuration();
+		float furthestPoint = 0;
+		for (ParticleEmitterWrapper wrapper : activeWrappers) {
+			if(wrapper.getEmitter().getEmitterModule() != null && wrapper.getEmitter().getParticleModule() != null) {
+				float delay = wrapper.getEmitter().getEmitterModule().getCachedDelay();
+				float duration = wrapper.getEmitter().getEmitterModule().getCachedDuration();
 
-					float totalWaitTime = duration;
+				float point;
+				if (wrapper.getEmitter().getEmitterModule().isContinuousCached()) {
+					point = duration;
+				} else {
+					float life = wrapper.getEmitter().getParticleModule().getCachedLife();
+					point = delay + duration + life;
+				}
 
-					if (maxWindow < totalWaitTime) {
-						maxWindow = totalWaitTime;
-					}
+				if (furthestPoint < point) {
+					furthestPoint = point;
 				}
 			}
-
-			return maxWindow;
-		} else {
-			float furthestPoint = 0;
-			for (ParticleEmitterWrapper wrapper : activeWrappers) {
-				if(wrapper.getEmitter().getEmitterModule() != null && wrapper.getEmitter().getParticleModule() != null) {
-					float delay = wrapper.getEmitter().getEmitterModule().getDelay();
-					float duration = wrapper.getEmitter().getEmitterModule().getDuration();
-					float life = wrapper.getEmitter().getParticleModule().getLife();
-
-					float point = delay + duration + life;
-
-					if (furthestPoint < point) {
-						furthestPoint = point;
-					}
-				}
-			}
-
-			return furthestPoint;
 		}
+
+		return furthestPoint;
 	}
 
 	@Override

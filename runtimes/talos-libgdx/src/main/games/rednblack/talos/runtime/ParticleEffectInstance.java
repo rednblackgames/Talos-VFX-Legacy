@@ -195,6 +195,27 @@ public class ParticleEffectInstance {
 	}
 
 
+	public void seekToTime (float time) {
+		// Full reset: clear all particles and reinitialize emitters
+		for (int i = 0; i < emitters.size; i++) {
+			emitters.get(i).reset();
+		}
+		totalTime = 0;
+		paused = false;
+
+		// Simulate forward in fixed steps
+		float step = 1f / 60f;
+		float remaining = time;
+		while (remaining > step) {
+			update(step);
+			remaining -= step;
+		}
+		if (remaining > 0) {
+			update(remaining);
+		}
+		paused = true;
+	}
+
 	public void restart () {
 		for (int i = 0; i < emitters.size; i++) {
 			emitters.get(i).restart();

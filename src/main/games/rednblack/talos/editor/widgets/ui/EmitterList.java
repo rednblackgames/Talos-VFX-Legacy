@@ -9,9 +9,14 @@ import games.rednblack.talos.editor.widgets.ui.timeline.BasicRow;
 import games.rednblack.talos.editor.widgets.ui.timeline.TimelineListener;
 import games.rednblack.talos.editor.widgets.ui.timeline.TimelineWidget;
 
+import com.badlogic.gdx.utils.TimeUtils;
+
 import java.util.Comparator;
 
 public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
+
+    private long lastSeekTimeMs = 0;
+    private static final long SEEK_THROTTLE_MS = 100;
 
     public EmitterList(Skin skin) {
         super(skin);
@@ -89,7 +94,21 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
                 } else {
                     TalosMain.Instance().TalosProject().getParticleEffect().pause();
                 }
+            }
 
+            @Override
+            protected void onSeekToTime (float time) {
+                long now = TimeUtils.millis();
+                if (now - lastSeekTimeMs >= SEEK_THROTTLE_MS) {
+                    TalosMain.Instance().TalosProject().getParticleEffect().seekToTime(time);
+                    lastSeekTimeMs = now;
+                }
+                getActionWidget().getPlayButton().setChecked(false);
+            }
+
+            @Override
+            protected void onScrubEnd (float time) {
+                TalosMain.Instance().TalosProject().getParticleEffect().seekToTime(time);
             }
 
             @Override
@@ -169,12 +188,15 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     public void act (float delta) {
         super.act(delta);
 
-        float totalTime = TalosMain.Instance().TalosProject().getParticleEffect().getTotalTime();
-        float duration = TalosMain.Instance().TalosProject().estimateTotalEffectDuration();
-
-        float time = totalTime % duration;
-
-        setTimeCursor(time);
+        if (!isScrubbing()) {
+            float totalTime = TalosMain.Instance().TalosProject().getParticleEffect().getTotalTime();
+            float duration = TalosMain.Instance().TalosProject().estimateTotalEffectDuration();
+            if (totalTime > 0 && duration > 0) {
+                setTimeCursor(totalTime % duration);
+            } else {
+                setTimeCursor(0);
+            }
+        }
     }
 
     public void setPaused (boolean paused) {

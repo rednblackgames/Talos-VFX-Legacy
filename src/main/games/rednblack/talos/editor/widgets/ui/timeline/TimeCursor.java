@@ -41,7 +41,7 @@ public class TimeCursor extends Table {
         line.setWidth(1);
         line.setColor(ColorLibrary.BLUE);
 
-        setTouchable(Touchable.disabled);
+        setTouchable(Touchable.enabled);
 
         addActor(head);
         addActor(line);

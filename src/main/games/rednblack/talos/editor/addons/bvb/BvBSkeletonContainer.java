@@ -11,6 +11,7 @@ import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.widgets.propertyWidgets.*;
 import games.rednblack.talos.runtime.ParticleEffectDescriptor;
+import games.rednblack.talos.runtime.ParticleEffectInstance;
 import games.rednblack.talos.runtime.bvb.AttachmentPoint;
 import games.rednblack.talos.runtime.bvb.SkeletonContainer;
 
@@ -284,6 +285,33 @@ public class BvBSkeletonContainer extends SkeletonContainer implements Json.Seri
         }
     }
 
+
+    public void seekToTime(float time) {
+        if (skeleton == null || animationState == null || currentAnimation == null) return;
+
+        float duration = currentAnimation.getDuration();
+        if (duration <= 0) return;
+        float seekTime = time % duration;
+
+        // Reset animation state to the beginning and fast-forward
+        animationState.getTracks().first().setTrackTime(seekTime);
+        animationState.apply(skeleton);
+        skeleton.updateWorldTransform(Skeleton.Physics.update);
+
+        // Re-simulate bound particle effects
+        for (BvBBoundEffect effect : getBoundEffects()) {
+            for (ParticleEffectInstance instance : effect.getParticleEffects()) {
+                float effectStartTime = effect.getTimePosition();
+                float effectTime = seekTime - effectStartTime;
+                if (effectTime > 0) {
+                    instance.seekToTime(effectTime);
+                } else {
+                    instance.restart();
+                    instance.pause();
+                }
+            }
+        }
+    }
 
     public Skeleton getSkeleton() {
         return skeleton;

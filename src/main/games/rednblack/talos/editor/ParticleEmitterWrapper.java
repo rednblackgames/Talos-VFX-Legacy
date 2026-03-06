@@ -89,42 +89,32 @@ public class ParticleEmitterWrapper implements TimelineItemDataProvider<Particle
     public boolean isFull () {
         if(getEmitter().getParticleModule() == null || getEmitter().getEmitterModule() == null) return false;
 
-        return getEmitter().isContinuous();
+        return getEmitter().getEmitterModule().isContinuousCached();
     }
 
     @Override
     public float getDurationOne () {
         if(getEmitter().getParticleModule() == null || getEmitter().getEmitterModule() == null) return 0;
 
-        if(getEmitter().getEffectDescriptor().isContinuous() && !getEmitter().isContinuous()) {
-            // apparently if effect is continuous, non continuous effect currently don't play
-            return 0;
-        }
-
-        return getEmitter().getEmitterModule().getDuration();
+        return getEmitter().getEmitterModule().getCachedDuration();
     }
 
     @Override
     public float getDurationTwo () {
         if(getEmitter().getParticleModule() == null || getEmitter().getEmitterModule() == null) return 0;
 
-        if(getEmitter().getEffectDescriptor().isContinuous() && !getEmitter().isContinuous()) {
-            // apparently if effect is continuous, non continuous effect currently don't play
+        if(getEmitter().getEmitterModule().isContinuousCached()) {
             return 0;
         }
 
-        if(getEmitter().isContinuous()) {
-            return 0;
-        }
-
-        return getEmitter().getParticleModule().getLife();
+        return getEmitter().getParticleModule().getCachedLife();
     }
 
     @Override
     public float getTimePosition () {
         if(getEmitter().getParticleModule() == null || getEmitter().getEmitterModule() == null) return 0;
 
-        return getEmitter().getEmitterModule().getDelay();
+        return getEmitter().getEmitterModule().getCachedDelay();
     }
 
     @Override

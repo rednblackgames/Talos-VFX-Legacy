@@ -49,6 +49,17 @@ public class ParticleList extends TimelineWidget<BvBBoundEffect> {
                 BvBBoundEffect selectedItem = (BvBBoundEffect) identifier;
                 workspace.effectSelected(selectedItem);
             }
+
+            @Override
+            protected void onSeekToTime (float time) {
+                workspace.seekToTime(time);
+                getActionWidget().getPlayButton().setChecked(false);
+            }
+
+            @Override
+            protected void onScrubEnd (float time) {
+                workspace.seekToTime(time);
+            }
         });
     }
 
@@ -64,7 +75,7 @@ public class ParticleList extends TimelineWidget<BvBBoundEffect> {
     @Override
     public void act (float delta) {
         super.act(delta);
-        if (workspace.getSkeletonContainer().getAnimationState() != null) {
+        if (!isScrubbing() && workspace.getSkeletonContainer().getAnimationState() != null) {
             float animTime = workspace.getSkeletonContainer().getAnimationState().getTracks().first().getTrackTime();
             float duration = workspace.getSkeletonContainer().getCurrentAnimation().getDuration();
 

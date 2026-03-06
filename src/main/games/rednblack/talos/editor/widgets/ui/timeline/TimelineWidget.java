@@ -19,6 +19,8 @@ public abstract class TimelineWidget<U> extends Table {
     private float leftScrollTracker;
     private float rightScrollTracker;
 
+    private boolean scrubbing = false;
+
     protected boolean enforceSelection = true;
 
     public TimelineWidget(Skin skin) {
@@ -144,6 +146,21 @@ public abstract class TimelineWidget<U> extends Table {
 
     public void onItemNameChange(ActionRow<U> item, String newName) {
         fire(obtainEvent().as(TimelineListener.Type.rename).payload(newName).target(item));
+    }
+
+    public void onSeekToTime(float time) {
+        scrubbing = true;
+        setTimeCursor(time);
+        fire(obtainEvent().as(TimelineListener.Type.seekToTime).payload(time));
+    }
+
+    public void onScrubEnd(float time) {
+        scrubbing = false;
+        fire(obtainEvent().as(TimelineListener.Type.scrubEnd).payload(time));
+    }
+
+    public boolean isScrubbing() {
+        return scrubbing;
     }
 
     public void onActionButtonClicked(TimelineListener.Type type) {
