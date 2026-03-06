@@ -1,12 +1,13 @@
 package games.rednblack.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.github.tommyettinger.textra.TextraLabel;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 
 import java.util.function.Supplier;
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
 public class FloatPropertyWidget extends PropertyWidget<Float>  {
 
     private ValueWidget valueWidget;
-    private Label title;
+    private TextraLabel title;
     private ValueProperty annotation;
 
     public FloatPropertyWidget() {
@@ -47,7 +48,7 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
         valueWidget.setValue(0);
         valueWidget.setLabel("");
 
-        title = new Label(name, TalosMain.Instance().getSkin());
+        title = MsdfFonts.label(name);
         title.setAlignment(Align.left);
 
         add(title).minWidth(70);
@@ -93,7 +94,7 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
     public PropertyWidget clone() {
         FloatPropertyWidget clone = (FloatPropertyWidget) super.clone();
         clone.configureFromAnnotation(this.annotation);
-        clone.title.setText(this.title.getText());
+        clone.title.setText(this.title.storedText);
 
         return clone;
     }

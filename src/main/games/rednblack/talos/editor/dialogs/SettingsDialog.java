@@ -26,6 +26,7 @@ import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 public class SettingsDialog extends VisWindow {
 
@@ -66,7 +67,7 @@ public class SettingsDialog extends VisWindow {
     public void addPathSetting(String name, final String id) {
         Table inputTable = new Table();
 
-        inputTable.add(new Label(name, getSkin())).width(220);
+        inputTable.add(MsdfFonts.label(name)).width(220);
         final TextField inputPathField = new TextField("", getSkin());
         inputPathField.setDisabled(true);
         inputTable.add(inputPathField).padLeft(13).width(270);

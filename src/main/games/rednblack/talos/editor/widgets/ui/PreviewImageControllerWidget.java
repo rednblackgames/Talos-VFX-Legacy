@@ -21,6 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 public class PreviewImageControllerWidget extends Table {
 
@@ -50,12 +52,12 @@ public class PreviewImageControllerWidget extends Table {
 			}
 		};
 
-		Label imgLbl = new Label("Image: ", getSkin(), "small"); add(imgLbl).padRight(5f);
+		TextraLabel imgLbl = MsdfFonts.smallLabel("Image: "); add(imgLbl).padRight(5f);
 		imageSizeField = new TextField("", skin);
 		imageSizeField.setTextFieldFilter(filter);
 		add(imageSizeField).width(70).left();
 
-		Label bgLbl = new Label("Grid: ", getSkin(), "small"); add(bgLbl).padRight(5f);
+		TextraLabel bgLbl = MsdfFonts.smallLabel("Grid: "); add(bgLbl).padRight(5f);
 		backgroundSizeField = new TextField("1", skin);
 		backgroundSizeField.setTextFieldFilter(filter);
 		add(backgroundSizeField).width(70);

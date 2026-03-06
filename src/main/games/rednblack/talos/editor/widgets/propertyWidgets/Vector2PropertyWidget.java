@@ -2,13 +2,14 @@ package games.rednblack.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Pool;
+import com.github.tommyettinger.textra.TextraLabel;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 
 import java.util.function.Supplier;
@@ -19,7 +20,7 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
     public ValueWidget yValue;
 
     private ValueProperty annotation;
-    private Label title;
+    private TextraLabel title;
 
     public Vector2PropertyWidget() {
         super();
@@ -80,7 +81,7 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
         Table left = new Table();
         Table right = new Table();
 
-        title = new Label(name, TalosMain.Instance().getSkin());
+        title = MsdfFonts.label(name);
         title.setAlignment(Align.left);
 
         left.add(title).left().expand().pad(2).top();
@@ -138,7 +139,7 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
     public PropertyWidget clone() {
         Vector2PropertyWidget clone = (Vector2PropertyWidget) super.clone();
         clone.configureFromAnnotation(this.annotation);
-        clone.title.setText(this.title.getText());
+        clone.title.setText(this.title.storedText);
 
         return clone;
     }

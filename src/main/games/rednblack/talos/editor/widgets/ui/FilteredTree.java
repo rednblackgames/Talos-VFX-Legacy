@@ -24,10 +24,10 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -39,6 +39,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Predicate;
 import games.rednblack.talos.editor.TalosInputProcessor;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
 import java.util.Comparator;
@@ -387,7 +388,7 @@ public class FilteredTree<T> extends WidgetGroup {
                     } else if (node.actor instanceof ActorCloneable) {
                         dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
                     } else {
-                        dragging = new Label("Dragging label", skin);
+                        dragging = MsdfFonts.label("Dragging label");
                     }
 
                     payload.setDragActor(dragging);
@@ -580,7 +581,7 @@ public class FilteredTree<T> extends WidgetGroup {
             Table nameTable = new Table(skin);
             nameTable.defaults().padLeft(4).padRight(4);
             nameTable.setBackground("panel_button_bg");
-            Label name = new Label(item.getName(), skin);
+            TextraLabel name = MsdfFonts.label(item.getName());
             if (i > 3) {
                 nameTable.getColor().a = MathUtils.lerp(1, 0.2f, (i-3) / 3f);
             }

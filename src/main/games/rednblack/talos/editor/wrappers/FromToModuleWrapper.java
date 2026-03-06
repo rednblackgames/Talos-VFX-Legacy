@@ -17,7 +17,7 @@
 package games.rednblack.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.TalosMain;
@@ -31,8 +31,8 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     private DragPoint dragFrom;
     private DragPoint dragTo;
 
-    private Label fromLabel;
-    private Label toLabel;
+    private TextraLabel fromLabel;
+    private TextraLabel toLabel;
 
     private boolean lock = false;
 

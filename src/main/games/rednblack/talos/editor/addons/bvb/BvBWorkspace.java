@@ -13,12 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.project.FileTracker;
 import games.rednblack.talos.editor.utils.SharedShapeDrawer;
 import games.rednblack.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
@@ -57,7 +58,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
     public BvBBoundEffect selectedEffect = null;
 
-    private Label hintLabel;
+    private TextraLabel hintLabel;
 
     private Vector2 tmp = new Vector2();
     private Vector2 tmp2 = new Vector2();
@@ -101,7 +102,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
 
         setCameraPos(0, 0);
 
-        hintLabel = new Label("", TalosMain.Instance().getSkin());
+        hintLabel = MsdfFonts.label("");
         add(hintLabel).left().expandX().pad(25f);
         row();
         add().expand();
@@ -717,7 +718,7 @@ public class BvBWorkspace extends ViewportWidget implements Json.Serializable, I
     }
 
     public void flyLabel(String text) {
-        Label label = new Label(text, TalosMain.Instance().getSkin());
+        TextraLabel label = MsdfFonts.label(text);
         label.setPosition(getWidth() / 2f - label.getPrefWidth() / 2f, 0);
         addActor(label);
 

@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
@@ -12,6 +11,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ui.FilteredTree;
 import games.rednblack.talos.editor.widgets.ui.SearchFilteredTree;
 
@@ -144,7 +144,7 @@ public class NodeListPopup extends VisWindow {
     private void parseCategory(FilteredTree<String> tree, FilteredTree.Node parent, XmlReader.Element element) {
         Array<XmlReader.Element> categories = element.getChildrenByName("category");
         for(XmlReader.Element category: categories) {
-            FilteredTree.Node categoryNode = new FilteredTree.Node(category.getAttribute("title"), new Label(category.getAttribute("title"), getSkin()));
+            FilteredTree.Node categoryNode = new FilteredTree.Node(category.getAttribute("title"), MsdfFonts.label(category.getAttribute("title")));
 
             if(parent != null) parent.add(categoryNode);
             else tree.add(categoryNode);
@@ -155,7 +155,7 @@ public class NodeListPopup extends VisWindow {
         // get modules
         Array<XmlReader.Element> modules = element.getChildrenByName("module");
         for(XmlReader.Element module: modules) {
-            FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("title"), new Label(module.getAttribute("title"), getSkin()));
+            FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("title"), MsdfFonts.label(module.getAttribute("title")));
 
             titleToNodeName.put(module.getAttribute("title"),module.getAttribute("name"));
 

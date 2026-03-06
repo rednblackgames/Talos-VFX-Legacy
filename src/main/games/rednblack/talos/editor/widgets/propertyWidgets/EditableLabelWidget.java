@@ -1,7 +1,6 @@
 package games.rednblack.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Align;
 import games.rednblack.talos.TalosMain;

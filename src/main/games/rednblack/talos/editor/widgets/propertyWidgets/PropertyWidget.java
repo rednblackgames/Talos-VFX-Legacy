@@ -2,21 +2,20 @@ package games.rednblack.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import games.rednblack.talos.TalosMain;
-import games.rednblack.talos.editor.notifications.Notifications;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 import java.util.function.Supplier;
 
 public abstract class PropertyWidget<T> extends Table {
 
-	protected Label propertyName;
+	protected TextraLabel propertyName;
 	protected Table valueContainer;
 	protected T value;
 
@@ -82,7 +81,7 @@ public abstract class PropertyWidget<T> extends Table {
 	protected void build(String name) {
 		if(name != null) {
 			hasName = true;
-			propertyName = new Label(name + ":", TalosMain.Instance().getSkin());
+			propertyName = MsdfFonts.label(name + ":");
 			propertyName.setAlignment(Align.left);
 			valueContainer = new Table();
 
@@ -146,7 +145,7 @@ public abstract class PropertyWidget<T> extends Table {
 			widget.supplier = this.supplier;
 			widget.valueChanged = this.valueChanged;
 			if (widget.propertyName != null && this.propertyName != null) {
-				widget.propertyName.setText(this.propertyName.getText());
+				widget.propertyName.setText(this.propertyName.storedText);
 			}
 			return widget;
 

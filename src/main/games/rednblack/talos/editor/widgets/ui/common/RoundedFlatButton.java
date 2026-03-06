@@ -1,5 +1,6 @@
 package games.rednblack.talos.editor.widgets.ui.common;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
@@ -24,13 +25,11 @@ public class RoundedFlatButton extends Button {
         build(skin, drawable, false);
     }
 
-    public RoundedFlatButton(Skin skin, Label label) {
+    public RoundedFlatButton(Skin skin, Actor labelActor) {
         setSkin(skin);
         makeStyle(skin);
 
-        label.setAlignment(Align.center);
-
-        iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
+        iconCell = add(labelActor).center().pad(5).padLeft(10).padRight(10);
 
     }
 

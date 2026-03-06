@@ -22,6 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.runtime.values.NumericalValue;
 
 public class FloatInputWidget extends Table {
@@ -36,7 +38,7 @@ public class FloatInputWidget extends Table {
     private TextField regularCarrier;
     private RotatorWidget angleCarrier;
 
-    private Label regularLabel;
+    private TextraLabel regularLabel;
 
     private float value;
 
@@ -68,7 +70,7 @@ public class FloatInputWidget extends Table {
     private void buildRegular(String text) {
         Table table = flavourContainers.get(NumericalValue.Flavour.REGULAR);
 
-        regularLabel = new Label(text, getSkin());
+        regularLabel = MsdfFonts.label(text);
         regularCarrier = new TextField("", getSkin());
 
         table.add(regularLabel).left().row();

@@ -5,6 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -101,19 +103,15 @@ public class AttachmentPointBox extends Table {
 
     protected class SlotWidget extends Table {
 
-        Label label;
+        TextraLabel label;
 
         public SlotWidget(CharSequence text, Skin skin) {
             setSkin(skin);
 
             setBackground(skin.getDrawable("panel_button_bg"));
 
-            label = new Label(text, skin);
+            label = MsdfFonts.label(text.toString());
             label.setAlignment(Align.center);
-            Label.LabelStyle style = new Label.LabelStyle();
-            style.fontColor = label.getStyle().fontColor;
-            style.font = label.getStyle().font;
-            label.setStyle(style);
 
             add(label).center().height(25f).padLeft(6f).padRight(6f);
         }
@@ -122,7 +120,7 @@ public class AttachmentPointBox extends Table {
             if(id == -1) {
                 label.setText("position");
             } else {
-                label.setText(id);
+                label.setText(String.valueOf(id));
             }
         }
     }

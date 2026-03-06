@@ -4,6 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
 import games.rednblack.talos.editor.widgets.ui.common.SquareButton;
 
@@ -14,7 +16,7 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
     private int DEFAULT_ACTION_PAD = 16;
 
     private Table contentTable;
-    private Label typeLabel;
+    private TextraLabel typeLabel;
     private ScrollPane scrollPane;
 
     private SquareButton repeatBtn;
@@ -87,9 +89,9 @@ public class TimelineLeft<U> extends AbstractList<ActionRow<U>, U> {
 
         topActionCell = topPart.add().right();
 
-        typeLabel = new Label("Items", skin);
+        typeLabel = MsdfFonts.label("Items");
         typeLabel.setColor(ColorLibrary.FONT_GRAY);
-        bottomPart.add(typeLabel).padBottom(2).padLeft(5).left().expandX();
+        bottomPart.add(typeLabel).padBottom(4).padTop(4).padLeft(5).left().expandX();
 
         header.add(topPart).height(33).padBottom(1).growX().row();
         header.add(bottomPart).height(16).growX().row();

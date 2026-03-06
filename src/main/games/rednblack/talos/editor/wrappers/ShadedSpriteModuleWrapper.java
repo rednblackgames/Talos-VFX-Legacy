@@ -1,8 +1,9 @@
 package games.rednblack.talos.editor.wrappers;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.editor.notifications.FileActorBinder;
@@ -12,14 +13,14 @@ import games.rednblack.talos.runtime.utils.VectorField;
 
 public class ShadedSpriteModuleWrapper extends ModuleWrapper<ShadedSpriteModule> {
 
-    private Label dropLabel;
+    private TextraLabel dropLabel;
     private String shaderFileName;
 
     @Override
     protected void configureSlots () {
         addOutputSlot("output", ShadedSpriteModule.OUTPUT);
 
-        dropLabel = new Label("drop .shdr file here", getSkin());
+        dropLabel = MsdfFonts.label("drop .shdr file here");
         dropLabel.setAlignment(Align.center);
         dropLabel.setWrap(true);
         contentWrapper.add(dropLabel).padTop(10f).padBottom(10f).size(180, 50).left().expand();

@@ -24,8 +24,8 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     EditableLabel title;
 
-    protected ObjectMap<String, Table> inputSlotMap = new ObjectMap<>();
-    protected ObjectMap<String, Table> outputSlotMap = new ObjectMap<>();
+    protected ObjectMap<String, Actor> inputSlotMap = new ObjectMap<>();
+    protected ObjectMap<String, Actor> outputSlotMap = new ObjectMap<>();
 
     public NodeBoard nodeBoard;
 
@@ -223,19 +223,19 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
 
     protected void addConnection(AbstractWidget widget, String variableName, boolean isInput) {
-        Table portTable = widget.addPort(isInput);
+        CircularPort port = widget.addPort(isInput);
 
         if (isInput) {
-             configureNodeActions(portTable, variableName, true);
+             configureNodeActions(port, variableName, true);
             inputSlots.add(variableName);
         } else {
-            configureNodeActions(portTable, variableName, false);
+            configureNodeActions(port, variableName, false);
             outputSlots.add(variableName);
         }
     }
 
 
-    private void configureNodeActions (Table port, String key, boolean isInput) {
+    private void configureNodeActions (Actor port, String key, boolean isInput) {
         if(isInput) {
             inputSlotMap.put(key, port);
         } else {

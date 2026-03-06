@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ClippedNinePatchDrawable;
 import games.rednblack.talos.editor.widgets.ui.ViewportWidget;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
@@ -19,8 +21,8 @@ public class ValueWidget extends AbstractWidget<Float> {
     private final Table progressContainer;
     private final Table progress;
 
-    private Label label;
-    private Label valueLabel;
+    private TextraLabel label;
+    private TextraLabel valueLabel;
     private TextField textField;
     private ClippedNinePatchDrawable progressDrawable;
 
@@ -59,8 +61,8 @@ public class ValueWidget extends AbstractWidget<Float> {
         type = Type.NORMAL;
         isSelected = false;
 
-        label = new Label("", skin);
-        valueLabel = new Label("", skin);
+        label = new TextraLabel("", MsdfFonts.getInstance().getDefaultFont());
+        valueLabel = new TextraLabel("", MsdfFonts.getInstance().getDefaultFont());
         textField = new TextField("0", getSkin(), "no-bg");
         progressDrawable = ColorLibrary.createClippedPatch(skin, getShape(), ColorLibrary.BackgroundColor.LIGHT_BLUE);
 

@@ -2,8 +2,9 @@ package games.rednblack.talos.editor.wrappers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.TalosMain;
@@ -14,7 +15,7 @@ import games.rednblack.talos.runtime.utils.VectorField;
 
 public class VectorFieldModuleWrapper extends ModuleWrapper<VectorFieldModule> {
 
-    Label vectorFieldLabel;
+    TextraLabel vectorFieldLabel;
 
     @Override
     protected void configureSlots () {
@@ -28,7 +29,7 @@ public class VectorFieldModuleWrapper extends ModuleWrapper<VectorFieldModule> {
         leftWrapper.add().expandY().row();
         rightWrapper.add().expandY().row();
 
-        vectorFieldLabel = new Label("drop .fga file here", getSkin());
+        vectorFieldLabel = MsdfFonts.label("drop .fga file here");
         vectorFieldLabel.setAlignment(Align.center);
         vectorFieldLabel.setWrap(true);
         contentWrapper.add(vectorFieldLabel).padTop(60f).padBottom(10f).size(180, 50).center().expand();

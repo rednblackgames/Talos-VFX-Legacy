@@ -1,5 +1,6 @@
 package games.rednblack.talos.editor.widgets.ui.common;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
@@ -14,14 +15,12 @@ public class SquareButton extends Button {
         addListener(new TextTooltip(tooltip, skin));
     }
 
-    public SquareButton(Skin skin, Label label, String tooltip) {
+    public SquareButton(Skin skin, Actor actor, String tooltip) {
         setSkin(skin);
         ButtonStyle square = skin.get("square", ButtonStyle.class);
         setStyle(square);
 
-        label.setAlignment(Align.center);
-
-        iconCell = add(label).center().pad(5).padLeft(10).padRight(10);
+        iconCell = add(actor).center().pad(5).padLeft(10).padRight(10);
 
         addListener(new TextTooltip(tooltip, skin));
     }

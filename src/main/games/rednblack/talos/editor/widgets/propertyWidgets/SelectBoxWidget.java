@@ -1,13 +1,14 @@
 package games.rednblack.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.github.tommyettinger.textra.TextraLabel;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 import java.util.function.Supplier;
 
@@ -15,7 +16,7 @@ import java.util.function.Supplier;
 public class SelectBoxWidget extends PropertyWidget<String> {
 
     Stack stack;
-    Label noValueLabel;
+    TextraLabel noValueLabel;
     SelectBox<String> selectBox;
 
     Supplier<Array<String>> optionListSupplier;
@@ -40,7 +41,7 @@ public class SelectBoxWidget extends PropertyWidget<String> {
     @Override
     public Actor getSubWidget() {
         selectBox = new SelectBox<>(TalosMain.Instance().UIStage().getSkin(), "propertyValue");
-        noValueLabel = new Label("", TalosMain.Instance().UIStage().getSkin());
+        noValueLabel = MsdfFonts.label("");
         noValueLabel.setAlignment(Align.right);
         stack = new Stack();
         stack.add(noValueLabel);

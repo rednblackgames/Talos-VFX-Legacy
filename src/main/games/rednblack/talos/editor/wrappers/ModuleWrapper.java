@@ -31,11 +31,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.kotcrab.vis.ui.widget.*;
 import com.kotcrab.vis.ui.widget.Tooltip;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.nodes.widgets.AbstractWidget;
+import games.rednblack.talos.editor.nodes.widgets.CircularPort;
 import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ui.DynamicTable;
 import games.rednblack.talos.editor.widgets.ui.EditableLabel;
 import games.rednblack.talos.editor.widgets.ui.ModuleBoardWidget;
@@ -162,9 +165,15 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         // Content area with slot wrappers
         content = new Table();
         leftWrapper = new DynamicTable();
+        leftWrapper.defaults().padBottom(4);
+        leftWrapper.defaults().padTop(4);
         rightWrapper = new DynamicTable();
+        rightWrapper.defaults().padBottom(4);
+        rightWrapper.defaults().padTop(4);
         contentWrapper = new DynamicTable();
         outputRow = new Table();
+        outputRow.defaults().padBottom(4);
+        outputRow.defaults().padTop(4);
 
         Stack slotStack = new Stack();
         slotStack.add(leftWrapper);
@@ -236,13 +245,8 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         return 300;
     }
 
-    protected Table createCircularPort() {
-        Table portBody = new Table();
-        Image portBorder = new Image(ColorLibrary.obtainBackground(getSkin(), "circle-border", BackgroundColor.BROKEN_WHITE));
-        portBody.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, BackgroundColor.BROKEN_WHITE));
-        portBody.add(portBorder).growX().pad(-1f);
-        portBody.setSize(15, 15);
-        return portBody;
+    protected CircularPort createCircularPort() {
+        return new CircularPort(BackgroundColor.BROKEN_WHITE.getColor(), BackgroundColor.BROKEN_WHITE.getColor());
     }
 
     protected void addSeparator(boolean input) {
@@ -253,17 +257,17 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
         }
     }
 
-    protected Label getLabelFromCell(Cell cell) {
+    protected TextraLabel getLabelFromCell(Cell cell) {
         for(Actor actor: ((Table)cell.getActor()).getChildren()) {
-            if(actor instanceof Label) {
-                return (Label) actor;
+            if(actor instanceof TextraLabel) {
+                return (TextraLabel) actor;
             }
         }
 
         return null;
     }
 
-    protected void markLabelAsHilighted(final Label label) {
+    protected void markLabelAsHilighted(final Actor label) {
         label.clearActions();
         label.setColor(Color.ORANGE);
         label.addAction(Actions.sequence(Actions.delay(1f), Actions.run(new Runnable() {
@@ -276,10 +280,10 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected Cell addInputSlot(String title, int key) {
         Table slotRow = new Table();
-        Table port = createCircularPort();
-        VisLabel label = new VisLabel(title, "small");
+        CircularPort port = createCircularPort();
+        TextraLabel label = new TextraLabel(title, MsdfFonts.getInstance().getSmallFont());
         slotRow.add(port).left().size(15).padLeft(-24);
-        slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
+        slotRow.add(label).left().padLeft(5).padRight(10);
 
         Cell cell = leftWrapper.addRow(slotRow, true);
 
@@ -292,9 +296,9 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected Cell addOutputSlot(String title, int key) {
         Table slotRow = new Table();
-        Table port = createCircularPort();
-        VisLabel label = new VisLabel(title, "small");
-        slotRow.add(label).right().padBottom(4).padLeft(10).padRight(5);
+        CircularPort port = createCircularPort();
+        TextraLabel label = new TextraLabel(title, MsdfFonts.getInstance().getSmallFont());
+        slotRow.add(label).right().padLeft(10).padRight(5);
         slotRow.add(port).right().size(15).padRight(-24);
 
         Cell cell = outputRow.add(slotRow).right().expandX();
@@ -544,16 +548,16 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
     public void setSlotActive(int slotTo, boolean isInput) {
         Actor slot = isInput ? inputSlotMap.get(slotTo) : outputSlotMap.get(slotTo);
         if (slot == null) return;
-        if (slot instanceof Table) {
-            ((Table) slot).setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, BackgroundColor.LIGHT_BLUE));
+        if (slot instanceof CircularPort) {
+            ((CircularPort) slot).setFillColor(BackgroundColor.LIGHT_BLUE.getColor());
         }
     }
 
     public void setSlotInactive(int slotTo, boolean isInput) {
         Actor slot = isInput ? inputSlotMap.get(slotTo) : outputSlotMap.get(slotTo);
         if (slot == null) return;
-        if (slot instanceof Table) {
-            ((Table) slot).setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, BackgroundColor.BROKEN_WHITE));
+        if (slot instanceof CircularPort) {
+            ((CircularPort) slot).setFillColor(BackgroundColor.BROKEN_WHITE.getColor());
         }
         if (!isInput) {
             lastAttachedWrapper = null;
@@ -571,8 +575,8 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected VisTextArea addInputSlotWithTextArea (String title, int key) {
         Table slotRow = new Table();
-        Table port = createCircularPort();
-        VisLabel label = new VisLabel(title, "small");
+        CircularPort port = createCircularPort();
+        TextraLabel label = new TextraLabel(title, MsdfFonts.getInstance().getSmallFont());
         slotRow.add(port).left().size(15).padLeft(-24);
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
@@ -588,8 +592,8 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected VisTextField addInputSlotWithTextField(String title, int key, float size, boolean grow) {
         Table slotRow = new Table();
-        Table port = createCircularPort();
-        VisLabel label = new VisLabel(title, "small");
+        CircularPort port = createCircularPort();
+        TextraLabel label = new TextraLabel(title, MsdfFonts.getInstance().getSmallFont());
         slotRow.add(port).left().size(15).padLeft(-24);
         slotRow.add(label).left().padBottom(4).padLeft(5).padRight(10);
 
@@ -622,7 +626,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected ValueWidget addInputSlotWithValueWidget(String label, int key) {
         Table slotRow = new Table();
-        Table port = createCircularPort();
+        CircularPort port = createCircularPort();
 
         ValueWidget valueWidget = new ValueWidget();
         valueWidget.init(getSkin());
@@ -707,7 +711,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     protected <W extends AbstractWidget<?>> W addWidgetWithPort(W widget, int slotKey, boolean isInput) {
         widget.init(getSkin());
-        Table port = widget.addPort(isInput);
+        CircularPort port = widget.addPort(isInput);
         configureNodeActions(port, slotKey, isInput);
         if (isInput) {
             leftSlotNames.put(slotKey, "");

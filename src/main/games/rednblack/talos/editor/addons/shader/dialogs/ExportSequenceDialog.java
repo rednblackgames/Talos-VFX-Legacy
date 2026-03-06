@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.VisWindow;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import games.rednblack.talos.editor.addons.shader.workspace.ShaderNodeStage;
@@ -49,7 +50,7 @@ public class ExportSequenceDialog extends VisWindow {
     private Table makeRow(String labelText, Actor field) {
         Table table = new Table();
 
-        table.add(new Label(labelText, getSkin())).width(220);
+        table.add(MsdfFonts.label(labelText)).width(220);
         table.add(field).padLeft(13).grow().left().expandX();
 
         return table;

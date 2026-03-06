@@ -3,6 +3,7 @@ package games.rednblack.talos.editor.widgets.propertyWidgets;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
 import games.rednblack.talos.runtime.bvb.AttachmentPoint;
@@ -40,7 +41,7 @@ public class GlobalValueListContainer extends Table {
         bottomPanel.add().expandX();
 
         listContainer.add(list).grow().minHeight(90);
-        main.add(new Label("Global Values", getSkin())).left().padTop(10).row();
+        main.add(MsdfFonts.label("Global Values")).left().padTop(10).row();
         main.add(stack).grow();
         add(main).growX();
 

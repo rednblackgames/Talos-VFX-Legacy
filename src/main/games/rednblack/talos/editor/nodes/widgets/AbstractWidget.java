@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
+import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary.BackgroundColor;
 
 public abstract class AbstractWidget<T> extends Table {
 
@@ -14,7 +15,7 @@ public abstract class AbstractWidget<T> extends Table {
     protected Table portContainer;
 
     private boolean isInput;
-    private Table portBody;
+    private CircularPort portBody;
 
     public AbstractWidget() {
         content = new Table();
@@ -34,19 +35,13 @@ public abstract class AbstractWidget<T> extends Table {
 
     public void loadFromXML(XmlReader.Element element) { /* no-op by default */ }
 
-    public Table addPort(boolean isInput) {
+    public CircularPort addPort(boolean isInput) {
         portContainer.clearChildren();
 
         this.isInput = isInput;
 
-        portBody = new Table();
-        Image portBorder = new Image(ColorLibrary.obtainBackground(getSkin(), "circle-border", ColorLibrary.BackgroundColor.BROKEN_WHITE));
-        portBody.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_CIRCLE, ColorLibrary.BackgroundColor.BROKEN_WHITE));
-        portBody.add(portBorder).growX().pad(-1f);
-
-        portBody.setSize(15, 15);
+        portBody = new CircularPort(BackgroundColor.BROKEN_WHITE.getColor(), BackgroundColor.BROKEN_WHITE.getColor());
         portContainer.addActor(portBody);
-
 
         if(isInput) {
             portBody.setX(-24);

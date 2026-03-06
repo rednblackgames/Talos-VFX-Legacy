@@ -2,7 +2,6 @@ package games.rednblack.talos.editor.dialogs;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -12,6 +11,7 @@ import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 public class NewProjectDialog extends VisWindow {
 
@@ -93,7 +93,7 @@ public class NewProjectDialog extends VisWindow {
 
         Table inputTable = new Table();
 
-        inputTable.add(new Label("Project Name: ", getSkin())).width(220);
+        inputTable.add(MsdfFonts.label("Project Name: ")).width(220);
         projectNameField = new TextField("", getSkin());
         inputTable.add(projectNameField).padLeft(13).growX();
 
@@ -104,7 +104,7 @@ public class NewProjectDialog extends VisWindow {
     public void addPathRow() {
         Table inputTable = new Table();
 
-        inputTable.add(new Label("Create project directory in: ", getSkin())).width(220);
+        inputTable.add(MsdfFonts.label("Create project directory in: ")).width(220);
         parentPathField = new TextField("", getSkin());
         inputTable.add(parentPathField).padLeft(13).width(270);
         TextButton browseInputBtn = new TextButton("Browse", getSkin());

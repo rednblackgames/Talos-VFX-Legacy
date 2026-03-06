@@ -4,15 +4,17 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.badlogic.gdx.utils.Array;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import games.rednblack.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import games.rednblack.talos.editor.widgets.ui.ContextualMenu;
 
 public class PropertiesPanel extends Table {
 
-    Label titleLabel;
+    TextraLabel titleLabel;
     Table propertyGroup = new Table();
     Array<IPropertyProvider> currentPropertyPanels = new Array<>();
 
@@ -27,8 +29,8 @@ public class PropertiesPanel extends Table {
 
         setRound(false);
 
-        titleLabel = new Label("", getSkin());
-        titleLabel.setEllipsis(true);
+        titleLabel = MsdfFonts.label("Title");
+        titleLabel.setEllipsis("...");
         Table titleContainer = new Table();
         titleContainer.add(titleLabel).padTop(-titleLabel.getPrefHeight()-3).growX().left();
 

@@ -20,8 +20,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Json;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.editor.widgets.TextureDropWidget;
 import games.rednblack.talos.runtime.modules.AbstractModule;
@@ -29,7 +30,7 @@ import games.rednblack.talos.runtime.modules.TextureModule;
 
 public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule> {
 
-    private Label assetNameLabel;
+    private TextraLabel assetNameLabel;
 
     public TextureModuleWrapper() {
         super();
@@ -67,7 +68,7 @@ public class TextureModuleWrapper extends TextureDropModuleWrapper<TextureModule
 
         addOutputSlot("output", TextureModule.OUTPUT);
 
-        assetNameLabel = new Label("fire", getSkin());
+        assetNameLabel = MsdfFonts.label("fire");
 
         leftWrapper.add(assetNameLabel).padLeft(10).expand().fill().row();
 

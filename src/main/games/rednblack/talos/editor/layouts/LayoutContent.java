@@ -3,7 +3,8 @@ package games.rednblack.talos.editor.layouts;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.kotcrab.vis.ui.widget.VisLabel;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 public class LayoutContent extends LayoutItem {
 
@@ -11,7 +12,7 @@ public class LayoutContent extends LayoutItem {
 	public LayoutContent (Skin skin, LayoutGrid grid) {
 		super(skin, grid);
 
-		VisLabel label = new VisLabel("TestContent: " + MathUtils.random(10));
+		TextraLabel label = MsdfFonts.label("TestContent: " + MathUtils.random(10));
 
 		Table innerContents = new Table();
 

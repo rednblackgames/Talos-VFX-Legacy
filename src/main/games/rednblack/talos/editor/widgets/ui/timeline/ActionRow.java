@@ -28,7 +28,7 @@ public class ActionRow<U> extends BasicRow<U> {
         selectorBox = new Button(getSkin(), "miniSelector");
 
         add(eye).left().pad(3);
-        add(label).padLeft(7).padBottom(4).left().expandX();
+        add(label).padLeft(7).left().expandX();
         actionCell = add(selectorBox).right().pad(4);
 
         eye.addListener(new ClickListener() {

@@ -2,11 +2,12 @@ package games.rednblack.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.github.tommyettinger.textra.TextraLabel;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ui.common.SquareButton;
 
 import java.util.function.Supplier;
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
 public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
 
     private T payload;
-    private Label buttonLabel;
+    private TextraLabel buttonLabel;
     private SquareButton button;
     private ButtonListener btnListener;
 
@@ -30,7 +31,7 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
     public PropertyWidget clone() {
         ButtonPropertyWidget clone = (ButtonPropertyWidget) super.clone();
         clone.btnListener = this.btnListener;
-        clone.buttonLabel.setText(buttonLabel.getText());
+        clone.buttonLabel.setText(buttonLabel.storedText);
 
         return clone;
     }
@@ -74,7 +75,7 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         Skin skin = TalosMain.Instance().getSkin();
         Table table = new Table();
 
-        buttonLabel = new Label("Edit", skin);
+        buttonLabel = MsdfFonts.label("Edit");
         button = new SquareButton(skin, buttonLabel, "Edit");
 
         table.add(button).expand().right().growX();

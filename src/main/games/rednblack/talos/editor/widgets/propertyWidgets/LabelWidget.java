@@ -1,15 +1,15 @@
 package games.rednblack.talos.editor.widgets.propertyWidgets;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import games.rednblack.talos.TalosMain;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 import java.util.function.Supplier;
 
 public class LabelWidget extends PropertyWidget<String> {
 
-	private Label propertyValue;
+	private TextraLabel propertyValue;
 
 	public LabelWidget() {
 		super();
@@ -21,8 +21,8 @@ public class LabelWidget extends PropertyWidget<String> {
 
 	@Override
 	public Actor getSubWidget() {
-		propertyValue = new Label("", TalosMain.Instance().getSkin());
-		propertyValue.setEllipsis(true);
+		propertyValue = MsdfFonts.label("");
+		propertyValue.setEllipsis("...");
 		propertyValue.setAlignment(Align.right);
 
 		return propertyValue;

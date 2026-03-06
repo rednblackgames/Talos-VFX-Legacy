@@ -25,14 +25,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.github.tommyettinger.textra.Font;
+import com.github.tommyettinger.textra.TextraLabel;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 public class EditableLabel extends Table implements ActorCloneable {
 
     private Table labelTable;
     private Table inputTable;
 
-    private Label label;
+    private TextraLabel label;
     private TextField textField;
 
     private EditableLabelChangeListener listener;
@@ -42,8 +45,9 @@ public class EditableLabel extends Table implements ActorCloneable {
     private boolean editMode = false;
     private boolean editable = true;
 
-    private Cell<Label> labelCell;
+    private Cell<TextraLabel> labelCell;
     private Actor keyboardFocus;
+    private String currentText;
 
     public void setEditable (boolean editable) {
         this.editable = editable;
@@ -56,6 +60,8 @@ public class EditableLabel extends Table implements ActorCloneable {
     public EditableLabel(String text, Skin skin) {
         super(skin);
 
+        currentText = text;
+
         Stack stack = new Stack();
 
         labelTable = new Table();
@@ -66,8 +72,8 @@ public class EditableLabel extends Table implements ActorCloneable {
 
         add(stack).expand().grow();
 
-        label = new Label(text, getSkin(), "default");
-        label.setEllipsis(true);
+        label = new TextraLabel(text, MsdfFonts.getInstance().getDefaultFont());
+        label.setEllipsis("...");
         labelCell = labelTable.add(label).width(0).growX();
 
 		TextField.TextFieldStyle textFieldStyle = getSkin().get("no-bg", TextField.TextFieldStyle.class);
@@ -112,7 +118,7 @@ public class EditableLabel extends Table implements ActorCloneable {
     public void finishTextEdit () {
         setStaticMode();
         if(listener != null) {
-            listener.changed(label.getText().toString());
+            listener.changed(currentText);
         }
     }
 
@@ -135,7 +141,7 @@ public class EditableLabel extends Table implements ActorCloneable {
         labelTable.setVisible(false);
         inputTable.setVisible(true);
 
-        textField.setText(label.getText().toString());
+        textField.setText(currentText);
         if( TalosMain.Instance() != null) {
             TalosMain.Instance().NodeStage().getStage().unfocusAll();
         }
@@ -148,7 +154,8 @@ public class EditableLabel extends Table implements ActorCloneable {
         labelTable.setVisible(true);
         inputTable.setVisible(false);
 
-        label.setText(textField.getText());
+        currentText = textField.getText();
+        label.setText(currentText);
         textField.clearSelection();
 
         if (getStage() != null) {
@@ -176,10 +183,11 @@ public class EditableLabel extends Table implements ActorCloneable {
 	}
 
     public String getText() {
-        return label.getText().toString();
+        return currentText;
     }
 
     public void setText(String text) {
+        currentText = text;
         label.setText(text);
     }
 
@@ -188,22 +196,22 @@ public class EditableLabel extends Table implements ActorCloneable {
     }
 
     public void setAlignment (int alignment) {
-        label.setAlignment(alignment);
+        label.layout.setTargetWidth(label.getWidth());
         textField.setAlignment(alignment);
     }
 
     @Override
     public Actor copyActor (Actor copyFrom) {
-        Label label = new Label(this.label.getText(), getSkin());
-        return label;
+        TextraLabel copy = new TextraLabel(currentText, MsdfFonts.getInstance().getDefaultFont());
+        return copy;
     }
-    public Label getLabel() {
+    public TextraLabel getLabel() {
         return label;
     }
 
     public TextField getTextField() { return textField; }
 
-    public Cell<Label> getLabelCell() {
+    public Cell<TextraLabel> getLabelCell() {
         return labelCell;
     }
 

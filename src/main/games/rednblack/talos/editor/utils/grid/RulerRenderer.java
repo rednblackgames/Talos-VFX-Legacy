@@ -1,20 +1,21 @@
 package games.rednblack.talos.editor.utils.grid;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ui.ViewportWidget;
 
 import static com.kotcrab.vis.ui.VisUI.getSkin;
 
 public class RulerRenderer extends Group {
 
-    public static final float RULER_SIZE = 20f;
+    public static final float RULER_SIZE = 26f;
 
     private GridPropertyProvider gridPropertyProvider;
 
@@ -44,35 +45,21 @@ public class RulerRenderer extends Group {
         addActor(yRulerTable);
     }
 
-    private final ObjectMap<String, Array<Label>> labelCache = new ObjectMap<>();
-    private final Array<Table> tableCache = new Array<>();
+    private final ObjectMap<String, Array<TextraLabel>> labelCache = new ObjectMap<>();
 
-    private Label getOrCreateLabel(String text) {
+    private TextraLabel getOrCreateLabel(String text) {
         if (labelCache.containsKey(text)) {
-            Array<Label> cache = labelCache.get(text);
+            Array<TextraLabel> cache = labelCache.get(text);
             for (int i = 0; i < cache.size; i++) {
                 if (!cache.get(i).hasParent()) return cache.get(i);
             }
-            cache.add(new Label(text, getSkin()));
+            cache.add(MsdfFonts.label(text));
             return cache.get(cache.size -1);
         }
-        Array<Label> cache = new Array<>();
-        cache.add(new Label(text, getSkin()));
+        Array<TextraLabel> cache = new Array<>();
+        cache.add(MsdfFonts.label(text));
         labelCache.put(text, cache);
         return cache.get(0);
-    }
-
-    private Table getTable() {
-        for (int i = 0; i < tableCache.size; i++) {
-            if (!tableCache.get(i).hasParent()) {
-                Table table = tableCache.get(i);
-                table.clearChildren(true);
-                return table;
-            }
-        }
-        Table table = new Table();
-        tableCache.add(table);
-        return table;
     }
 
     public void configureRulers () {
@@ -99,9 +86,11 @@ public class RulerRenderer extends Group {
             int testInt = (int)xStart;
             float tmp = xStart - testInt;
             coordText = tmp > 0 ? "" + xStart : "" + testInt;
-            Label coordinateLabel = getOrCreateLabel(coordText);
+            TextraLabel coordinateLabel = getOrCreateLabel(coordText);
             float x = viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f;
             coordinateLabel.setX(x);
+            coordinateLabel.setY(coordinateLabel.getPrefHeight() / 2);
+            coordinateLabel.setRotation(0);
             xRulerTable.addActor(coordinateLabel);
             xStart += xSkipCount * gridPropertyProvider.getUnitX();
         }
@@ -112,9 +101,11 @@ public class RulerRenderer extends Group {
             int testInt = (int)xStart;
             float tmp = xStart - testInt;
             coordText = tmp < 0 ? "" + xStart : "" + testInt;
-            Label coordinateLabel = getOrCreateLabel(coordText);
+            TextraLabel coordinateLabel = getOrCreateLabel(coordText);
             float x = viewportWidget.getLocalFromWorld(xStart, 0).x - coordinateLabel.getWidth() / 2f;
             coordinateLabel.setX(x);
+            coordinateLabel.setY(coordinateLabel.getPrefHeight() / 2);
+            coordinateLabel.setRotation(0);
             xRulerTable.addActor(coordinateLabel);
             xStart -= xSkipCount * gridPropertyProvider.getUnitX();;
         }
@@ -133,9 +124,9 @@ public class RulerRenderer extends Group {
 
         yStart = 0;
 
-        yRulerTable.setTransform(true);
         yRulerTable.clearChildren();
         yRulerTable.setHeight(viewportWidget.getHeight());
+        yRulerTable.setWidth(RULER_SIZE);
 
         while (yStart <= gridPropertyProvider.getGridEndY()) {
             String coordText;
@@ -143,25 +134,17 @@ public class RulerRenderer extends Group {
             float tmp = yStart - testInt;
             coordText = tmp > 0 ? "" + yStart : "" + testInt;
 
-            Table wrapperTable = getTable();
-            wrapperTable.setTransform(true);
-            wrapperTable.setRotation(90);
-            Label coordinateLabel = getOrCreateLabel(coordText);
-            float height = coordinateLabel.getHeight();
-            float y = viewportWidget.getLocalFromWorld(0, yStart).y - height / 2f;
-            wrapperTable.setY(y);
+            TextraLabel coordinateLabel = getOrCreateLabel(coordText);
             coordinateLabel.setAlignment(Align.center);
-            coordinateLabel.setOrigin(Align.center);
+            float labelWidth = coordinateLabel.getWidth();
+            float labelHeight = coordinateLabel.getHeight();
+            coordinateLabel.setOrigin(labelWidth / 2f, labelHeight / 2f);
+            coordinateLabel.setRotation(90);
+            float y = viewportWidget.getLocalFromWorld(0, yStart).y - labelHeight / 2f;
+            coordinateLabel.setY(y);
+            coordinateLabel.setX((RULER_SIZE - labelWidth) / 2f);
 
-            float width = coordinateLabel.getWidth();
-            wrapperTable.setSize(width, height);
-            wrapperTable.setX((RULER_SIZE - width) / 2f);
-            wrapperTable.setOrigin(width / 2f, height / 2f);
-
-
-            wrapperTable.addActor(coordinateLabel);
-
-            yRulerTable.addActor(wrapperTable);
+            yRulerTable.addActor(coordinateLabel);
             yStart += ySkipCount * gridPropertyProvider.getUnitY();
         }
 
@@ -172,28 +155,19 @@ public class RulerRenderer extends Group {
             float tmp = yStart - testInt;
             coordText = tmp < 0 ? "" + yStart : "" + testInt;
 
-            Table wrapperTable = getTable();
-            wrapperTable.setTransform(true);
-            wrapperTable.setRotation(90);
-            Label coordinateLabel = getOrCreateLabel(coordText);
-            float height = coordinateLabel.getHeight();
-            float y = viewportWidget.getLocalFromWorld(0, yStart).y - height / 2f;
-            wrapperTable.setY(y);
+            TextraLabel coordinateLabel = getOrCreateLabel(coordText);
             coordinateLabel.setAlignment(Align.center);
-            coordinateLabel.setOrigin(Align.center);
+            float labelWidth = coordinateLabel.getWidth();
+            float labelHeight = coordinateLabel.getHeight();
+            coordinateLabel.setOrigin(labelWidth / 2f, labelHeight / 2f);
+            coordinateLabel.setRotation(90);
+            float y = viewportWidget.getLocalFromWorld(0, yStart).y - labelHeight / 2f;
+            coordinateLabel.setY(y);
+            coordinateLabel.setX((RULER_SIZE - labelWidth) / 2f);
 
-            float width = coordinateLabel.getWidth();
-            wrapperTable.setSize(width, height);
-            wrapperTable.setX((RULER_SIZE - width) / 2f);
-            wrapperTable.setOrigin(width / 2f, height / 2f);
-
-            wrapperTable.addActor(coordinateLabel);
-
-            yRulerTable.addActor(wrapperTable);
+            yRulerTable.addActor(coordinateLabel);
             yStart -= ySkipCount * gridPropertyProvider.getUnitY();
         }
-
-        yRulerTable.setWidth(RULER_SIZE);
     }
 
 }

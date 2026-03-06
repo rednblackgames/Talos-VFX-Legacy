@@ -3,15 +3,16 @@ package games.rednblack.talos.editor.nodes.widgets;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class ColorWidget extends AbstractWidget<Color> {
@@ -23,7 +24,7 @@ public class ColorWidget extends AbstractWidget<Color> {
     public void init(Skin skin) {
         super.init(skin);
 
-        Label label = new Label("Color", skin);
+        TextraLabel label = new TextraLabel("Color", MsdfFonts.getInstance().getDefaultFont());
 
         colorButton = new Table();
         colorButton.setBackground(skin.newDrawable(ColorLibrary.SHAPE_SQUIRCLE));

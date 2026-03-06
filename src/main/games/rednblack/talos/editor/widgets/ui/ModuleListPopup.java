@@ -18,7 +18,6 @@ package games.rednblack.talos.editor.widgets.ui;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
@@ -27,6 +26,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.wrappers.EmitterModuleWrapper;
 import games.rednblack.talos.editor.wrappers.WrapperRegistry;
 import games.rednblack.talos.runtime.modules.EmitterModule;
@@ -116,7 +116,7 @@ public class ModuleListPopup extends VisWindow {
     private void parseCategory(FilteredTree<String> tree, FilteredTree.Node parent, XmlReader.Element element) {
         Array<XmlReader.Element> categories = element.getChildrenByName("category");
         for(XmlReader.Element category: categories) {
-            FilteredTree.Node categoryNode = new FilteredTree.Node(category.getAttribute("name"), new Label(category.getAttribute("name"), getSkin()));
+            FilteredTree.Node categoryNode = new FilteredTree.Node(category.getAttribute("name"), MsdfFonts.label(category.getAttribute("name")));
 
             if(parent != null) parent.add(categoryNode);
             else tree.add(categoryNode);
@@ -127,7 +127,7 @@ public class ModuleListPopup extends VisWindow {
         // get modules
         Array<XmlReader.Element> modules = element.getChildrenByName("module");
         for(XmlReader.Element module: modules) {
-            FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("name"), new Label(module.getAttribute("name"), getSkin()));
+            FilteredTree.Node node = new FilteredTree.Node(module.getAttribute("name"), MsdfFonts.label(module.getAttribute("name")));
             nameToModuleClass.put(module.getAttribute("name"), module.getText());
 
             registerModule(module);

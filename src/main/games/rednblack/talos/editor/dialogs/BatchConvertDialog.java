@@ -22,10 +22,12 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 import java.io.File;
 
@@ -35,11 +37,11 @@ public class BatchConvertDialog extends VisWindow {
     TextField inputPathField;
     TextField outputPathField;
     TextField inputFilterField;
-    List<Label> logArea;
+    List<TextraLabel> logArea;
 
     String outputPath;
     Array<String> fileList = new Array<>();
-    Array<Label> logItems = new Array<>();
+    Array<TextraLabel> logItems = new Array<>();
 
     ScrollPane scrollPane;
 
@@ -69,12 +71,12 @@ public class BatchConvertDialog extends VisWindow {
     private void initContent() {
         Table inputTable = new Table();
 
-        inputTable.add(new Label("Input Folder: ", getSkin()));
+        inputTable.add(MsdfFonts.label("Input Folder: "));
         inputPathField = new TextField("", getSkin());
         inputTable.add(inputPathField).padLeft(13).width(200);
         TextButton browseInputBtn = new TextButton("Browse", getSkin());
         inputTable.add(browseInputBtn).padLeft(3);
-        inputTable.add(new Label("Ext: ", getSkin())).padLeft(10);
+        inputTable.add(MsdfFonts.label("Ext: ")).padLeft(10);
         inputFilterField = new TextField("p", getSkin());
         inputTable.add(inputFilterField).width(50);
 
@@ -82,7 +84,7 @@ public class BatchConvertDialog extends VisWindow {
         row();
 
         Table outputTable = new Table();
-        outputTable.add(new Label("Output Folder: ", getSkin()));
+        outputTable.add(MsdfFonts.label("Output Folder: "));
 
         outputPathField = new TextField("", getSkin());
         outputTable.add(outputPathField).width(200);
@@ -202,9 +204,9 @@ public class BatchConvertDialog extends VisWindow {
         String text = "converting: " + fileHandle.name() + "        " + result + "\n";
 
 
-        logItems.add(new Label(text, getSkin()));
+        logItems.add(MsdfFonts.label(text));
         logArea.setItems(logItems);
-        Label lbl = logArea.getItems().get(logArea.getItems().size-1);
+        TextraLabel lbl = logArea.getItems().get(logArea.getItems().size-1);
         logArea.setSelected(lbl);
         scrollPane.layout();
         scrollPane.scrollTo(0, 0, 0, 0);

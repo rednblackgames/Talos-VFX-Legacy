@@ -41,6 +41,7 @@ import games.rednblack.talos.editor.project.TalosProject;
 import games.rednblack.talos.editor.project.ProjectController;
 import games.rednblack.talos.editor.utils.CameraController;
 import games.rednblack.talos.editor.utils.CursorUtil;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.utils.ScreenshotService;
 import games.rednblack.talos.editor.utils.SharedShapeDrawer;
 import games.rednblack.talos.editor.utils.grid.GridLine;
@@ -178,8 +179,13 @@ public class TalosMain extends ApplicationAdapter {
 		preferences = Gdx.app.getPreferences("talos-preferences");
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("skin/uiskin.atlas"));
-		skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+		skin = new Skin();
 		skin.addRegions(atlas);
+
+		MsdfFonts.getInstance().init();
+		MsdfFonts.getInstance().replaceSkinFonts(skin);
+
+		skin.load(Gdx.files.internal("skin/uiskin.json"));
 
 		VisUI.load(skin);
 
@@ -299,6 +305,7 @@ public class TalosMain extends ApplicationAdapter {
 			currentWorkplaceStage.resize(width, height);
 		}
 		uiStage.resize(width, height);
+		MsdfFonts.getInstance().resize(width, height);
 	}
 
 	@Override
@@ -309,6 +316,7 @@ public class TalosMain extends ApplicationAdapter {
 		}
 		uiStage.getStage().dispose();
 		SharedShapeDrawer.getInstance().dispose();
+		MsdfFonts.getInstance().dispose();
 	}
 
 	public Skin getSkin() {

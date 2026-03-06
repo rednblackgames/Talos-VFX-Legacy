@@ -9,6 +9,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ui.ViewportWidget;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -17,8 +19,8 @@ public class TextValueWidget extends AbstractWidget<String> {
     private final Table editing;
     private final Table main;
 
-    private Label label;
-    private Label valueLabel;
+    private TextraLabel label;
+    private TextraLabel valueLabel;
     private TextField textField;
 
     private Stage stageRef;
@@ -48,8 +50,8 @@ public class TextValueWidget extends AbstractWidget<String> {
         type = ValueWidget.Type.NORMAL;
         isSelected = false;
 
-        label = new Label("", skin);
-        valueLabel = new Label("", skin);
+        label = new TextraLabel("", MsdfFonts.getInstance().getDefaultFont());
+        valueLabel = new TextraLabel("", MsdfFonts.getInstance().getDefaultFont());
         textField = new TextField("0", getSkin(), "no-bg");
 
         Stack mainStack = new Stack();
@@ -58,8 +60,7 @@ public class TextValueWidget extends AbstractWidget<String> {
 
         main.add(label).padLeft(12).left().expandX();
         main.add(valueLabel).padRight(12).right().width(0).growX();
-        valueLabel.setEllipsis(true);
-        valueLabel.setAlignment(Align.right);
+        valueLabel.setEllipsis("...");
 
         mainStack.add(editing);
         mainStack.add(main);

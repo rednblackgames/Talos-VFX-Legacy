@@ -1,15 +1,16 @@
 package games.rednblack.talos.editor.nodes.widgets;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 
 public class LabelWidget extends AbstractWidget<Object> {
 
-    private Label label;
+    private TextraLabel label;
 
     public LabelWidget() {
         super();
@@ -20,7 +21,7 @@ public class LabelWidget extends AbstractWidget<Object> {
     public void init(Skin skin) {
         super.init(skin);
 
-        label = new Label("", skin);
+        label = new TextraLabel("", MsdfFonts.getInstance().getDefaultFont());
     }
 
     public void set(String text, int align) {

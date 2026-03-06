@@ -6,16 +6,17 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.github.tommyettinger.textra.TextraLabel;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
 
 public class TimeCursor extends Table {
 
     private final Image head;
-    private final Label label;
+    private final TextraLabel label;
     private Table cursorTable;
     private Image line;
 
@@ -31,9 +32,8 @@ public class TimeCursor extends Table {
 
         cursorTable.setBackground(skin.getDrawable("timeline-time-indicator-bg"));
 
-        label = new Label("00 : 00", getSkin());
-        label.setFontScale(0.65f);
-        cursorTable.add(label).padLeft(6).padRight(6).padTop(0).padBottom(1.5f).left().expandX();
+        label = MsdfFonts.label("00 : 00");
+        cursorTable.add(label).padLeft(6).padRight(6).padTop(2).left().expandX();
         cursorTable.pack();
 
         head.setSize(9, 23);

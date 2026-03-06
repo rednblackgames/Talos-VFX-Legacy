@@ -2,8 +2,8 @@ package games.rednblack.talos.editor.wrappers;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.github.tommyettinger.textra.TextraLabel;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.TalosMain;
@@ -20,8 +20,8 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
     private DragPoint dragPointFrom;
     private DragPoint dragPointTo;
 
-    private Label fromLabel;
-    private Label toLabel;
+    private TextraLabel fromLabel;
+    private TextraLabel toLabel;
 
     private boolean lock = false;
 

@@ -29,13 +29,14 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.CharArray;
 import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.github.tommyettinger.textra.TextraLabel;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.utils.SharedShapeDrawer;
 import games.rednblack.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import games.rednblack.talos.editor.wrappers.IDragPointProvider;
@@ -67,11 +68,11 @@ public class PreviewWidget extends ViewportWidget {
     private String cpuTimeStr = "CPU: ";
     private String msStr = "ms";
 
-    private Label countLbl;
-    private Label trisCountLbl;
-    private Label nodeCallsLbl;
-    private Label gpuTimeLbl;
-    private Label cpuTimeLbl;
+    private TextraLabel countLbl;
+    private TextraLabel trisCountLbl;
+    private TextraLabel nodeCallsLbl;
+    private TextraLabel gpuTimeLbl;
+    private TextraLabel cpuTimeLbl;
 
     private GLProfiler glProfiler = new GLProfiler(Gdx.graphics);
     private FPSLogger fpsLogger = new FPSLogger();
@@ -114,11 +115,11 @@ public class PreviewWidget extends ViewportWidget {
             }
         };
 
-        countLbl = new Label(countStr, TalosMain.Instance().getSkin());
-        trisCountLbl = new Label(trisCountStr, TalosMain.Instance().getSkin());
-        nodeCallsLbl = new Label(nodeCallsStr, TalosMain.Instance().getSkin());
-        gpuTimeLbl = new Label(gpuTimeStr, TalosMain.Instance().getSkin());
-        cpuTimeLbl = new Label(cpuTimeStr, TalosMain.Instance().getSkin());
+        countLbl = MsdfFonts.label(countStr);
+        trisCountLbl = MsdfFonts.label(trisCountStr);
+        nodeCallsLbl = MsdfFonts.label(nodeCallsStr);
+        gpuTimeLbl = MsdfFonts.label(gpuTimeStr);
+        cpuTimeLbl = MsdfFonts.label(cpuTimeStr);
 
         countLbl.setColor(Color.GRAY);
         trisCountLbl.setColor(Color.GRAY);
@@ -128,11 +129,11 @@ public class PreviewWidget extends ViewportWidget {
 
         addActor(rulerRenderer);
 
-        add(countLbl).left().top().padLeft(22).padTop(20).row();
-        add(trisCountLbl).left().top().padLeft(22).row();
-        add(nodeCallsLbl).left().top().padLeft(22).row();
-        add(cpuTimeLbl).left().top().padLeft(22).row();
-        add(gpuTimeLbl).left().top().padLeft(22).row();
+        add(countLbl).left().top().padLeft(28).padTop(28).row();
+        add(trisCountLbl).left().top().padLeft(28).row();
+        add(nodeCallsLbl).left().top().padLeft(28).row();
+        add(cpuTimeLbl).left().top().padLeft(28).row();
+        add(gpuTimeLbl).left().top().padLeft(28).row();
         add().expand();
         row();
         add(previewController).bottom().left().growX();
