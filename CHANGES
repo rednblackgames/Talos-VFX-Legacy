@@ -2,6 +2,7 @@
 - Improve node UI using same style of shader graph
 - Improve fonts and zoom in/out visualization
 - Interactive timeline
+- Timeline scrolls
 
 [1.5.3]
 - Update Spine 4.2.10

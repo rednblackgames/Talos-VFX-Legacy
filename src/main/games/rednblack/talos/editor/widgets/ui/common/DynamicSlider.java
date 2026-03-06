@@ -40,8 +40,13 @@ public class DynamicSlider extends Slider {
         this.dataSize = dataSize;
         this.windowSize = windowSize;
 
-        float sliderSizePercent = windowSize/dataSize;
-        sliderSizePercent = MathUtils.clamp(sliderSizePercent, 0, 1);
+        if (dataSize <= 0 || windowSize >= dataSize) {
+            knobDrawable.setMinWidth(getWidth());
+            return;
+        }
+
+        float sliderSizePercent = windowSize / dataSize;
+        sliderSizePercent = MathUtils.clamp(sliderSizePercent, 0.05f, 1);
 
         knobDrawable.setMinWidth(sliderSizePercent * getWidth());
     }

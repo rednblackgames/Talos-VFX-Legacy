@@ -1,5 +1,6 @@
 package games.rednblack.talos.editor.widgets.ui.timeline;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -28,6 +29,11 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     private DynamicSlider timeSlider;
     private Slider scroll;
     private TimeCursor timeCursorWidget;
+
+    private FlatButton scrollUpBtn;
+    private FlatButton scrollDownBtn;
+    private float maxDataExtent = 0;
+    private boolean updatingScrollFromCode = false;
 
     private CharArray stringBuilder = new CharArray();
     private final String ZERO_STRING = "0";
@@ -62,6 +68,39 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 updateTimeWindow(zoomSlider.getValue());
+            }
+        });
+
+        timeSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                float sliderPercent = timeSlider.getValue() / 100f;
+                float maxOffset = Math.max(0, maxDataExtent - timeWindowSize);
+                timeWindowPosition = sliderPercent * maxOffset;
+            }
+        });
+
+        scroll.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (updatingScrollFromCode) return;
+                float maxScrollY = scrollPane.getMaxY();
+                float scrollPercent = scroll.getValue() / 100f;
+                scrollPane.setScrollY((1f - scrollPercent) * maxScrollY);
+            }
+        });
+
+        scrollUpBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                scrollPane.setScrollY(scrollPane.getScrollY() - 21);
+            }
+        });
+
+        scrollDownBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                scrollPane.setScrollY(scrollPane.getScrollY() + 21);
             }
         });
     }
@@ -139,20 +178,20 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
         mainTable.add().height(33).row();
 
-        FlatButton up = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
-        up.flipVertical();
-        up.getIconCell().padTop(2);
+        scrollUpBtn = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
+        scrollUpBtn.flipVertical();
+        scrollUpBtn.getIconCell().padTop(2);
 
         scroll = new Slider(0, 100, 1, true, getSkin(), "timeline-vertical");
         scroll.setHeight(10);
-        FlatButton down = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
-        down.flipHorizontal();
-        down.flipVertical();
-        down.getIconCell().padTop(2).padRight(2);
+        scrollDownBtn = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
+        scrollDownBtn.flipHorizontal();
+        scrollDownBtn.flipVertical();
+        scrollDownBtn.getIconCell().padTop(2).padRight(2);
         Table sliderTable = new Table();
-        sliderTable.add(up).size(18).row();
+        sliderTable.add(scrollUpBtn).size(18).row();
         sliderTable.add(scroll).growY().width(18).padTop(-1).padBottom(-1).row();
-        sliderTable.add(down).size(18).row();
+        sliderTable.add(scrollDownBtn).size(18).row();
 
         mainTable.add(sliderTable).padLeft(-1).grow().row();
 
@@ -217,6 +256,7 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
         contentTable = new Table();
         scrollPane = new ScrollPane(contentTable);
+        scrollPane.setScrollingDisabled(true, false);
         scrollPane.setSmoothScrolling(false);
         scrollPane.setOverscroll(false, false);
 
@@ -243,8 +283,28 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
         FlatButton left = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
         left.flipHorizontal();
         left.getIconCell().padTop(2).padRight(2);
+        left.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float step = timeWindowSize * 0.1f;
+                timeWindowPosition = Math.max(0, timeWindowPosition - step);
+                float maxOffset = Math.max(0, maxDataExtent - timeWindowSize);
+                float sliderValue = maxOffset > 0 ? (timeWindowPosition / maxOffset) * 100f : 0;
+                timeSlider.setValue(sliderValue);
+            }
+        });
         FlatButton right = new FlatButton(getSkin(), getSkin().getDrawable("timeline-btn-icon-play"));
         right.getIconCell().padTop(2).padLeft(2);
+        right.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float step = timeWindowSize * 0.1f;
+                float maxOffset = Math.max(0, maxDataExtent - timeWindowSize);
+                timeWindowPosition = Math.min(maxOffset, timeWindowPosition + step);
+                float sliderValue = maxOffset > 0 ? (timeWindowPosition / maxOffset) * 100f : 0;
+                timeSlider.setValue(sliderValue);
+            }
+        });
 
         Table sliderTable = new Table();
         sliderTable.add(left).padTop(0).width(24).height(18);
@@ -320,17 +380,41 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
     public void act(float delta) {
         super.act(delta);
 
+        // calculate max data extent from items
+        float maxExtent = 0;
+        for (TimeRow<U> row : getItems()) {
+            TimelineItemDataProvider<U> dp = row.getDataProvider();
+            if (dp != null) {
+                float extent = dp.getTimePosition() + dp.getDurationOne() + dp.getDurationTwo();
+                if (extent > maxExtent) maxExtent = extent;
+            }
+        }
+        maxDataExtent = Math.max(maxExtent, timeWindowSize);
+
+        // clamp timeWindowPosition
+        float maxOffset = Math.max(0, maxDataExtent - timeWindowSize);
+        timeWindowPosition = MathUtils.clamp(timeWindowPosition, 0, maxOffset);
+
         // update time related values
         for(TimeRow<U> row: getItems()) {
             row.updateTimeWindow(timeWindowPosition, timeWindowSize);
         }
-        timeSlider.updateConfig(0, timeWindowSize);
+        timeSlider.updateConfig(maxDataExtent, timeWindowSize);
+
+        // sync vertical scroll slider with scrollPane
+        float maxScrollY = scrollPane.getMaxY();
+        if (maxScrollY > 0) {
+            updatingScrollFromCode = true;
+            float scrollPercent = scrollPane.getScrollY() / maxScrollY;
+            scroll.setValue((1f - scrollPercent) * 100f);
+            updatingScrollFromCode = false;
+        }
     }
 
     public void setTimeCursor (float time) {
         timeCursor = time;
 
-        float pos = (time/timeWindowSize) * contentPane.getWidth() * 0.5f; // jesus, this is 0.5 is just... I can't, this is so stupid. wtf
+        float pos = ((time - timeWindowPosition)/timeWindowSize) * contentPane.getWidth() * 0.5f; // jesus, this is 0.5 is just... I can't, this is so stupid. wtf
 
         timeCursorWidget.setPosition(pos, 0);
 
@@ -357,5 +441,9 @@ public class TimelineRight<U> extends AbstractList<TimeRow<U>, U> {
 
     public float getTimeWindowSize () {
         return timeWindowSize;
+    }
+
+    public float getTimeWindowPosition () {
+        return timeWindowPosition;
     }
 }

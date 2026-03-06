@@ -199,7 +199,7 @@ public abstract class TimelineWidget<U> extends Table {
     public float stageToTime (Vector2 vec2) {
         rightList.getTimeBar().stageToLocalCoordinates(vec2);
         float posPercent = vec2.x/rightList.getTimeBar().getWidth();
-        float time = posPercent * rightList.getTimeWindowSize();
+        float time = rightList.getTimeWindowPosition() + posPercent * rightList.getTimeWindowSize();
 
         if(time < 0) return 0;
 

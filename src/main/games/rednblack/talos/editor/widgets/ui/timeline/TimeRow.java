@@ -78,7 +78,7 @@ public class TimeRow<U> extends BasicRow<U> {
             areaWidget.setVisible(true);
         }
 
-        areaWidget.setPosition((timePosition/timeWindowSize) * getWidth(),2);
+        areaWidget.setPosition(((timePosition - timeWindowPosition)/timeWindowSize) * getWidth(),2);
     }
 
     private class AreaWidget extends Table {
@@ -159,6 +159,10 @@ public class TimeRow<U> extends BasicRow<U> {
 
             this.timePosition = timePosition;
         }
+    }
+
+    public TimelineItemDataProvider<U> getDataProvider() {
+        return dataProviderRef;
     }
 
     @Override
