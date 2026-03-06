@@ -488,6 +488,8 @@ public class UIStage {
 		leftTable.clearChildren();
 		rightTable.clearChildren();
 		bottomTable.clearChildren();
+		verticalPane.setMaxSplitAmount(0.70f);
+		verticalPane.setSplitAmount(0.7f);
 		TalosMain.Instance().disableNodeStage();
 
 		leftTable.add(left).grow();
@@ -503,10 +505,16 @@ public class UIStage {
 			verticalPane.setVisible(false);
 		}
 
+		if(left != null && right != null && bottom == null) {
+			verticalPane.setMaxSplitAmount(1);
+			verticalPane.setSplitAmount(1);
+		}
 	}
 
 	public void swapToTalosContent() {
 		hideCustomLayout();
+		verticalPane.setMaxSplitAmount(0.70f);
+		verticalPane.setSplitAmount(0.7f);
 		verticalPane.setVisible(true);
 		horizontalPane.setVisible(true);
 

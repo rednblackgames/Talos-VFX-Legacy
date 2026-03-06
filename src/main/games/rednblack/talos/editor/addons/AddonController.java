@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.MenuBar;
 import games.rednblack.talos.editor.addons.bvb.BvBAddon;
 import games.rednblack.talos.editor.addons.shader.ShaderAddon;
+import games.rednblack.talos.editor.addons.vectorfield.VectorFieldAddon;
 import games.rednblack.talos.editor.dialogs.SettingsDialog;
 
 public class AddonController {
@@ -14,6 +15,7 @@ public class AddonController {
     public AddonController() {
         registerAddon(new BvBAddon());
         registerAddon(new ShaderAddon());
+        registerAddon(new VectorFieldAddon());
     }
 
     private void registerAddon(IAddon addon) {

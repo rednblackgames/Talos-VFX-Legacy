@@ -3,6 +3,7 @@
 - Improve fonts and zoom in/out visualization
 - Interactive timeline
 - Timeline scrolls
+- Vector Fields Addon (read and generate .fga)
 
 [1.5.3]
 - Update Spine 4.2.10
