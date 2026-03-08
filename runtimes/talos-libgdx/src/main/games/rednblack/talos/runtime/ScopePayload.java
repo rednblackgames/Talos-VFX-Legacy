@@ -30,7 +30,7 @@ public class ScopePayload {
     public static final int REQUESTER_ID = 3;
     public static final int EMITTER_ALPHA_AT_P_INIT = 4;
     public static final int DRAWABLE_ASPECT_RATIO = 5;
-    public static final int SECONDARY_SEED = 6;
+    public static final int POINT_ALPHA = 6;
     public static final int TOTAL_TIME = 7;
     public static final int PARTICLE_POSITION = 8;
 

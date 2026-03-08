@@ -80,7 +80,7 @@ public class PolylineModule extends AbstractModule {
         for(int i = 0; i < pointCount; i++) {
 
             float pointAlpha = (float)i/(pointCount-1);
-            getScope().set(ScopePayload.SECONDARY_SEED, pointAlpha);
+            getScope().set(ScopePayload.POINT_ALPHA, pointAlpha);
             getScope().set(ScopePayload.REQUESTER_ID, requester + pointAlpha*0.1f);
 
             for(Slot inputSlot : inputSlots.values()) {

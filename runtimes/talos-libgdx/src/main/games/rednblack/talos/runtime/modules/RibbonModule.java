@@ -62,7 +62,7 @@ public class RibbonModule extends AbstractModule {
 
             float pointAlpha = (float)i/(detail-1);
             if(pointAlpha == 0) pointAlpha = 0.001f;
-            getScope().set(ScopePayload.SECONDARY_SEED, pointAlpha);
+            getScope().set(ScopePayload.POINT_ALPHA, pointAlpha);
             getScope().set(ScopePayload.REQUESTER_ID, requester + pointAlpha*0.1f);
 
             for(Slot inputSlot : inputSlots.values()) {

@@ -78,7 +78,7 @@ The runtime maintains a **scope** — a set of context variables available to al
 | REQUESTER_ID | 3 | ID of the requesting entity |
 | EMITTER_ALPHA_AT_P_INIT | 4 | Emitter alpha at the moment this particle was spawned |
 | DRAWABLE_ASPECT_RATIO | 5 | Aspect ratio of the current particle drawable |
-| SECONDARY_SEED | 6 | Secondary random seed for additional randomization |
+| POINT_ALPHA | 6 | Interpolation alpha (0-1) for the current point in ribbon/polyline rendering |
 | TOTAL_TIME | 7 | Total elapsed time since effect start |
 | PARTICLE_POSITION | 8 | Current particle world position |
 
