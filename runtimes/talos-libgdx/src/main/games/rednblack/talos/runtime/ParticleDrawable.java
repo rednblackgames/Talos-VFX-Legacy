@@ -19,8 +19,19 @@ package games.rednblack.talos.runtime;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import games.rednblack.talos.runtime.render.ParticleMaterial;
 
 public abstract class ParticleDrawable {
+
+    protected ParticleMaterial material;
+
+    public void setMaterial(ParticleMaterial material) {
+        this.material = material;
+    }
+
+    public ParticleMaterial getMaterial() {
+        return material;
+    }
 
     public abstract void draw(Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY);
 

@@ -19,12 +19,22 @@ public class ShaderBox extends Actor {
     protected Skin skin;
 
     protected Texture white;
+    protected Texture baseTexture;
 
     private Blending blending = Blending.NORMAL;
 
     public ShaderBox() {
         white = new Texture(Gdx.files.internal("white.png")); //TODO: not cool
         this.skin = skin;
+    }
+
+    /**
+     * Sets a custom base texture to use instead of white.png on texture unit 0.
+     * This is used by InputTextureNode to preview with a test texture bound to u_texture.
+     * Pass null to revert to the default white texture.
+     */
+    public void setBaseTexture(Texture texture) {
+        this.baseTexture = texture;
     }
 
     public void setBlending (Blending blending) {
@@ -106,6 +116,7 @@ public class ShaderBox extends Actor {
     }
 
     protected void drawCall (Batch batch) {
-        batch.draw(white, getX(), getY(), getWidth(), getHeight());
+        Texture tex = baseTexture != null ? baseTexture : white;
+        batch.draw(tex, getX(), getY(), getWidth(), getHeight());
     }
 }

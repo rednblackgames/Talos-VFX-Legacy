@@ -26,7 +26,8 @@
         <module name = "Sprite Renderer" wrapper = "TextureModuleWrapper">TextureModule</module>
         <module name = "Nine Patch Renderer" wrapper = "NinePatchModuleWrapper">NinePatchModule</module>
         <module name = "FlipBook (Sprite Animation)" wrapper = "FlipbookModuleWrapper">FlipbookModule</module>
-        <module name = "Shaded Sprite" wrapper = "ShadedSpriteModuleWrapper">ShadedSpriteModule</module>
+        <module name = "Shaded Sprite (Deprecated)" wrapper = "ShadedSpriteModuleWrapper">ShadedSpriteModule</module>
+        <module name = "Shader Material" wrapper = "ShaderModuleWrapper">ShaderModule</module>
     </category>
     <category name = "Randomness">
         <module name = "Random Range" wrapper = "RandomRangeModuleWrapper">RandomRangeModule</module>

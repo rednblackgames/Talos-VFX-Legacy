@@ -2,14 +2,10 @@ package games.rednblack.talos.runtime.render.drawables;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.BSpline;
-import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import games.rednblack.talos.runtime.Particle;
@@ -24,8 +20,6 @@ public class RibbonRenderer extends ParticleDrawable {
 
     TextureRegionDrawable textureRegionDrawable;
     TextureRegion ribbonRegion;
-
-    ShadedDrawable shadedDrawable;
 
     public Pool<Polyline> polylinePool = new Pool<Polyline>() {
         @Override
@@ -46,7 +40,7 @@ public class RibbonRenderer extends ParticleDrawable {
     @Override
     public void draw(Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY) {
         if(interpolationPointCount < 1) return;
-        if(ribbonRegion == null && shadedDrawable == null) return;
+        if(ribbonRegion == null && material == null) return;
 
         accumulator.update(particleRef, x, y);
 
@@ -54,14 +48,21 @@ public class RibbonRenderer extends ParticleDrawable {
 
         accumulator.setDrawLocations(particleRef, polyline.getPoints());
 
-        if(shadedDrawable != null) {
-            ShaderProgram prevShader = batch.getShader();
-            ShaderProgram shaderProgram = shadedDrawable.getShaderProgram(batch, Color.WHITE, particleRef.alpha, particleRef.life);
-            ribbonRegion = shadedDrawable.getTextureRegion();
-            polyline.draw(batch, ribbonRegion, shaderProgram);
-            batch.setShader(prevShader);
-        } else {
-            polyline.draw(batch, ribbonRegion, null);
+        ShaderProgram prevShader = null;
+        TextureRegion drawRegion = ribbonRegion;
+
+        if (material != null && material.isValid()) {
+            float time = particleRef.alpha * particleRef.life;
+            prevShader = material.bind(batch, time);
+            if (material.getMainRegion() != null) {
+                drawRegion = material.getMainRegion();
+            }
+        }
+
+        polyline.draw(batch, drawRegion, material != null && material.isValid() ? material.getShaderProgram() : null);
+
+        if (material != null && prevShader != null) {
+            material.unbind(batch, prevShader);
         }
     }
 
@@ -85,6 +86,10 @@ public class RibbonRenderer extends ParticleDrawable {
         }
 
         return polylineMap.get(particleRef);
+    }
+
+    public TextureRegionDrawable getHeadDrawable() {
+        return textureRegionDrawable;
     }
 
     @Override
@@ -155,8 +160,14 @@ public class RibbonRenderer extends ParticleDrawable {
        }
     }
 
+    /**
+     * @deprecated Use {@link #setMaterial(games.rednblack.talos.runtime.render.ParticleMaterial)} instead.
+     */
+    @Deprecated
     public void setShadedDrawable(ShadedDrawable drawable) {
-        shadedDrawable = drawable;
+        if (drawable != null && drawable.getMaterial() != null) {
+            setMaterial(drawable.getMaterial());
+        }
     }
 
     public class PointMemoryAccumulator {

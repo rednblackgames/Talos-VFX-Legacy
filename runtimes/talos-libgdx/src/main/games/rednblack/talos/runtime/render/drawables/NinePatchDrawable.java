@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import games.rednblack.talos.runtime.Particle;
 import games.rednblack.talos.runtime.ParticleDrawable;
 
@@ -28,8 +29,18 @@ public class NinePatchDrawable extends ParticleDrawable {
         if(region == null) return;
         if(ninePatch != null) {
             ninePatch.setColor(color);
+
+            ShaderProgram prevShader = null;
+            if (material != null && material.isValid()) {
+                float time = particle.alpha * particle.life;
+                prevShader = material.bind(batch, time);
+            }
+
             draw(batch, x, y, width, height, rotation, particle.pivot.x, particle.pivot.y);
 
+            if (material != null && prevShader != null) {
+                material.unbind(batch, prevShader);
+            }
         }
     }
 

@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import games.rednblack.talos.runtime.Particle;
@@ -35,6 +36,8 @@ public class SpriteAnimationDrawable extends ParticleDrawable {
     private float globalPhase;
 
     private float phase;
+
+    private Particle currentParticle;
 
     private class Frame {
         public float u1;
@@ -136,10 +139,20 @@ public class SpriteAnimationDrawable extends ParticleDrawable {
         if(batch instanceof PolygonSpriteBatch) {
             PolygonSpriteBatch polygonSpriteBatch = (PolygonSpriteBatch) batch;
 
+            ShaderProgram prevShader = null;
+            if (material != null && material.isValid() && currentParticle != null) {
+                float time = currentParticle.alpha * currentParticle.life;
+                prevShader = material.bind(batch, time);
+            }
+
             Frame frame = animation.getKeyFrame(phase, false);
 
             updateVertices(x-width*originX, y-height*originY, width, height, batch.getColor(), frame.u1, frame.v1, frame.u2, frame.v2, rotation, originX, originY);
             polygonSpriteBatch.draw(region.getTexture(), vertices, 0, vertices.length, indexes, 0, indexes.length);
+
+            if (material != null && prevShader != null) {
+                material.unbind(batch, prevShader);
+            }
         }
 
     }
@@ -166,6 +179,7 @@ public class SpriteAnimationDrawable extends ParticleDrawable {
 
     @Override
     public void setCurrentParticle(Particle particle) {
+        this.currentParticle = particle;
         phase = globalPhase + particle.seed;
         phase = phase - (int)phase; // normalize to 0-1
     }

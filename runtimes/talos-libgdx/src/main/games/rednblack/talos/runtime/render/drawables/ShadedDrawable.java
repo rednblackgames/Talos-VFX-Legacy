@@ -1,8 +1,6 @@
 package games.rednblack.talos.runtime.render.drawables;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -11,22 +9,28 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.ObjectMap;
 import games.rednblack.talos.runtime.Particle;
 import games.rednblack.talos.runtime.ParticleDrawable;
-import games.rednblack.talos.runtime.utils.DefaultShaders;
+import games.rednblack.talos.runtime.render.ParticleMaterial;
 
+/**
+ * @deprecated Use any {@link ParticleDrawable} with a {@link ParticleMaterial} instead.
+ * This class is kept for backward compatibility with existing .tls effect files.
+ */
+@Deprecated
 public class ShadedDrawable extends ParticleDrawable {
-
-    private ShaderProgram shaderProgram;
 
     private Texture texture;
     private TextureRegion region;
-    private ObjectMap<String, TextureRegion> textureMap;
-
-    private Color defaultUVOffset = new Color(0, 0, 1, 1);
 
     public ShadedDrawable() {
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
         texture = new Texture(pixmap);
         region = new TextureRegion(texture);
+        pixmap.dispose();
+
+        material = new ParticleMaterial();
+        material.setMainRegion(region);
     }
 
     @Override
@@ -35,8 +39,7 @@ public class ShadedDrawable extends ParticleDrawable {
 
     @Override
     public void draw(Batch batch, Particle particle, Color color) {
-
-        if (shaderProgram == null || !shaderProgram.isCompiled()) return;
+        if (material == null || !material.isValid()) return;
 
         float rotation = particle.rotation;
         float width = particle.size.x;
@@ -44,15 +47,14 @@ public class ShadedDrawable extends ParticleDrawable {
         float y = particle.getY();
         float x = particle.getX();
 
-        ShaderProgram prevShader = batch.getShader();
-
-        batch.setShader(shaderProgram);
-
-        shaderProgram = processShaderData(shaderProgram, particle.alpha * particle.life);
+        ShaderProgram prev = material.bind(batch, particle.alpha * particle.life);
 
         batch.setColor(color);
         batch.draw(texture, x - width * particle.pivot.x, y - height * particle.pivot.y, width * particle.pivot.x, height * particle.pivot.y, width, height, 1f, 1f, rotation, 0, 0, 1, 1, false, false);
-        batch.setShader(prevShader);
+
+        if (prev != null) {
+            material.unbind(batch, prev);
+        }
     }
 
     @Override
@@ -65,61 +67,35 @@ public class ShadedDrawable extends ParticleDrawable {
 
     }
 
-    public ShaderProgram processShaderData(ShaderProgram shaderProgram, float time) {
-        shaderProgram.setUniformf("u_time", time); // TODO this should be exposed as port later on
-
-        if (textureMap != null) {
-            int bind = 1;
-            for (String uniformName : textureMap.keys()) {
-                TextureRegion region = textureMap.get(uniformName);
-                if (region == null) continue;
-                Texture texture = region.getTexture();
-                texture.bind(bind);
-                shaderProgram.setUniformi(uniformName, bind);
-
-                defaultUVOffset.set(region.getU(), region.getV(), region.getU2(), region.getV2());
-
-                shaderProgram.setUniformf(uniformName + "regionUV", defaultUVOffset); // todo: this needs some refactoring maybe
-
-                Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
-                bind++;
-            }
-        }
-
-        return shaderProgram;
-    }
-
-    public ShaderProgram getShaderProgram(Batch batch, Color color, float alpha, float life) {
-        if (shaderProgram == null || !shaderProgram.isCompiled()) return null;
-
-        batch.setShader(shaderProgram);
-
-        shaderProgram = processShaderData(shaderProgram, alpha * life);
-
-        return shaderProgram;
-    }
-
     @Override
     public TextureRegion getTextureRegion() {
         return region;
     }
 
     public void setShader(String fragCode) {
-        if (fragCode == null) return;
-
-        ShaderProgram.pedantic = false;
-
-        shaderProgram = new ShaderProgram(
-                DefaultShaders.DEFAULT_VERTEX_SHADER,
-                fragCode
-        );
-
-        if(!shaderProgram.isCompiled()){
-            Gdx.app.log("GL SHADER ERROR", shaderProgram.getLog());
-        }
+        material.setShader(fragCode);
     }
 
     public void setTextures(ObjectMap<String, TextureRegion> textureMap) {
-        this.textureMap = textureMap;
+        material.setTextures(textureMap);
+    }
+
+    /**
+     * @deprecated Use {@link ParticleMaterial#bind(Batch, float)} directly.
+     */
+    @Deprecated
+    public ShaderProgram getShaderProgram(Batch batch, Color color, float alpha, float life) {
+        if (!material.isValid()) return null;
+        return material.bind(batch, alpha * life);
+    }
+
+    /**
+     * @deprecated Access {@link #getMaterial()} and call
+     * {@link ParticleMaterial#bind(Batch, float)} instead.
+     */
+    @Deprecated
+    public ShaderProgram processShaderData(ShaderProgram shaderProgram, float time) {
+        // Legacy callers: material.bind() now handles this
+        return shaderProgram;
     }
 }

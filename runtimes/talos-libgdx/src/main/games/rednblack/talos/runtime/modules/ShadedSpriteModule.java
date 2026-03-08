@@ -12,6 +12,11 @@ import games.rednblack.talos.runtime.render.drawables.ShadedDrawable;
 import games.rednblack.talos.runtime.utils.ShaderDescriptor;
 import games.rednblack.talos.runtime.values.DrawableValue;
 
+/**
+ * @deprecated Use {@link ShaderModule} instead, which separates shading from geometry
+ * and supports dynamic uniform exposure through the node graph.
+ */
+@Deprecated
 public class ShadedSpriteModule extends AbstractModule {
 
     public static final int OUTPUT = 0;

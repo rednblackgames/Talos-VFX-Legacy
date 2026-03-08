@@ -19,6 +19,7 @@ package games.rednblack.talos.runtime.render.drawables;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
@@ -46,7 +47,18 @@ public class PolylineRenderer extends ParticleDrawable {
     public void draw(Batch batch, float x, float y, float width, float height, float rotation, float originX, float originY) {
         Polyline polyline = polyline();
         polyline.set(width, rotation);
-        polyline.draw(batch, region, x, y, null);
+
+        ShaderProgram prevShader = null;
+        if (material != null && material.isValid()) {
+            float time = particleRef.alpha * particleRef.life;
+            prevShader = material.bind(batch, time);
+        }
+
+        polyline.draw(batch, region, x, y, material != null && material.isValid() ? material.getShaderProgram() : null);
+
+        if (material != null && prevShader != null) {
+            material.unbind(batch, prevShader);
+        }
 
         tmpArr.clear();
         for(Particle key: polylineMap.keys()) {

@@ -6,9 +6,8 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.runtime.ScopePayload;
 import games.rednblack.talos.runtime.Slot;
+import games.rednblack.talos.runtime.render.ParticleMaterial;
 import games.rednblack.talos.runtime.render.drawables.RibbonRenderer;
-import games.rednblack.talos.runtime.render.drawables.ShadedDrawable;
-import games.rednblack.talos.runtime.render.drawables.TextureRegionDrawable;
 import games.rednblack.talos.runtime.values.DrawableValue;
 import games.rednblack.talos.runtime.values.NumericalValue;
 
@@ -103,13 +102,20 @@ public class RibbonModule extends AbstractModule {
 
         if(!mainDrawableValue.isEmpty() && mainDrawableValue.getDrawable() != null) {
             mainRegion = mainDrawableValue.getDrawable().getTextureRegion();
+
+            // Propagate material from main drawable to the head sprite
+            ParticleMaterial mainMaterial = mainDrawableValue.getDrawable().getMaterial();
+            if (mainMaterial != null) {
+                renderer.getHeadDrawable().setMaterial(mainMaterial);
+            }
         }
         if(!ribbonDrawableValue.isEmpty() && ribbonDrawableValue.getDrawable() != null) {
+            ribbonRegion = ribbonDrawableValue.getDrawable().getTextureRegion();
 
-            if(ribbonDrawableValue.getDrawable() instanceof TextureRegionDrawable) {
-                ribbonRegion = ribbonDrawableValue.getDrawable().getTextureRegion();
-            } else if(ribbonDrawableValue.getDrawable() instanceof ShadedDrawable) {
-                renderer.setShadedDrawable((ShadedDrawable) ribbonDrawableValue.getDrawable());
+            // Propagate material from ribbon drawable to the ribbon geometry
+            ParticleMaterial ribbonMaterial = ribbonDrawableValue.getDrawable().getMaterial();
+            if (ribbonMaterial != null) {
+                renderer.setMaterial(ribbonMaterial);
             }
         }
 
