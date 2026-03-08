@@ -49,7 +49,7 @@ import games.rednblack.talos.editor.addons.IAddon;
 import games.rednblack.talos.editor.dialogs.BatchConvertDialog;
 import games.rednblack.talos.editor.dialogs.NewProjectDialog;
 import games.rednblack.talos.editor.dialogs.SettingsDialog;
-import games.rednblack.talos.editor.dialogs.YesNoDialog;
+import games.rednblack.talos.editor.dialogs.TalosDialog;
 import games.rednblack.talos.editor.notifications.Notifications;
 import games.rednblack.talos.editor.notifications.events.AssetFileDroppedEvent;
 import games.rednblack.talos.editor.project.IProject;
@@ -82,7 +82,7 @@ public class UIStage {
 
 	ModuleListPopup moduleListPopup;
 
-	public TabbedPane tabbedPane;
+	public TalosTabbedPane tabbedPane;
 
 	private VisSplitPane bottomPane;
 	private Table leftTable;
@@ -187,7 +187,7 @@ public class UIStage {
 
 
 	private void constructTabPane() {
-		tabbedPane = new TabbedPane();
+		tabbedPane = new TalosTabbedPane();
 		fullScreenTable.row();
 		fullScreenTable.add(tabbedPane.getTable()).left().expandX().fillX().growX();
 
@@ -633,7 +633,6 @@ public class UIStage {
 	}
 
 	public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {
-		YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
-		stage.addActor(yesNoDialog.fadeIn());
+		TalosDialog.showConfirm(stage, title, message, yes, no);
 	}
 }

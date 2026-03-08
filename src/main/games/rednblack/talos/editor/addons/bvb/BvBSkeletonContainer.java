@@ -6,9 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
-import com.kotcrab.vis.ui.util.dialog.Dialogs;
-import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import games.rednblack.talos.TalosMain;
+import games.rednblack.talos.editor.dialogs.TalosDialog;
 import games.rednblack.talos.editor.widgets.propertyWidgets.*;
 import games.rednblack.talos.runtime.ParticleEffectDescriptor;
 import games.rednblack.talos.runtime.ParticleEffectInstance;
@@ -121,47 +120,37 @@ public class BvBSkeletonContainer extends SkeletonContainer implements Json.Seri
             description += effectsToRemove.size + " effects.";
             description += "\n Are you sure you want to update this skeleton?";
 
-            Dialogs.showOptionDialog(TalosMain.Instance().UIStage().getStage(), "Skeleton Reload Issue", description, Dialogs.OptionDialogType.YES_NO, new OptionDialogListener() {
-                @Override
-                public void yes() {
-                    for(String skinName: skinsToRemove) {
-                        boundEffects.remove(skinName);
-                    }
-
-                    for(String skinName: boundEffects.keys()) {
-                        for(String animName: animationsToRemove) {
-                            boundEffects.get(skinName).remove(animName);
+            TalosDialog.showConfirm(TalosMain.Instance().UIStage().getStage(), "Skeleton Reload Issue", description,
+                    () -> {
+                        for(String skinName: skinsToRemove) {
+                            boundEffects.remove(skinName);
                         }
-                    }
 
-                    for(BvBBoundEffect effect: effectsToRemove) {
-                        if(workspace.selectedEffect == effect) {
-                            workspace.effectUnselected(effect);
+                        for(String skinName: boundEffects.keys()) {
+                            for(String animName: animationsToRemove) {
+                                boundEffects.get(skinName).remove(animName);
+                            }
                         }
-                    }
 
-                    for(String skinName: boundEffects.keys()) {
-                        for(String animationName: boundEffects.get(skinName).keys()) {
-                            boundEffects.get(skinName).get(animationName).removeAll(effectsToRemove, true);
+                        for(BvBBoundEffect effect: effectsToRemove) {
+                            if(workspace.selectedEffect == effect) {
+                                workspace.effectUnselected(effect);
+                            }
                         }
-                    }
 
-                    configureSkeleton(skeletonData);
-                    workspace.bvb.properties.showPanel(BvBSkeletonContainer.this);
+                        for(String skinName: boundEffects.keys()) {
+                            for(String animationName: boundEffects.get(skinName).keys()) {
+                                boundEffects.get(skinName).get(animationName).removeAll(effectsToRemove, true);
+                            }
+                        }
 
-                    TalosMain.Instance().ProjectController().setDirty();
-                }
+                        configureSkeleton(skeletonData);
+                        workspace.bvb.properties.showPanel(BvBSkeletonContainer.this);
 
-                @Override
-                public void no() {
-                    TalosMain.Instance().ProjectController().closeCurrentTab();
-                }
-
-                @Override
-                public void cancel() {
-                    TalosMain.Instance().ProjectController().closeCurrentTab();
-                }
-            });
+                        TalosMain.Instance().ProjectController().setDirty();
+                    },
+                    () -> TalosMain.Instance().ProjectController().closeCurrentTab()
+            );
 
             return true;
         }

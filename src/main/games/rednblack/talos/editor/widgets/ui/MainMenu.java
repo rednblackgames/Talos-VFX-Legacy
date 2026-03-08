@@ -9,8 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.widget.*;
+import games.rednblack.talos.editor.dialogs.TalosDialog;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.UIStage;
 import games.rednblack.talos.editor.project.ProjectController;
@@ -56,7 +56,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                Dialogs.showOKDialog(stage.getStage(), "About Talos Legacy", "Talos Legacy is a an open source node based FX and Shader editor");
+                TalosDialog.showInfo(stage.getStage(), "About Talos Legacy", "Talos Legacy is an open source node based\nFX and Shader editor.");
             }
         });
 
