@@ -21,8 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.kotcrab.vis.ui.widget.VisTextField;
 import games.rednblack.talos.editor.nodes.widgets.SelectWidget;
+import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.runtime.Expression;
 import games.rednblack.talos.runtime.modules.MathModule;
 import games.rednblack.talos.runtime.utils.MathExpressionMappings;
@@ -30,8 +30,8 @@ import games.rednblack.talos.runtime.values.NumericalValue;
 
 public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 
-    private VisTextField aField;
-    private VisTextField bField;
+    private ValueWidget aField;
+    private ValueWidget bField;
 
     private SelectWidget selectWidget;
 
@@ -64,8 +64,8 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
     @Override
     public void setModule(MathModule module) {
         super.setModule(module);
-        aField.setText(module.getDefaultA() + "");
-        bField.setText(module.getDefaultB() + "");
+        aField.setValue(module.getDefaultA());
+        bField.setValue(module.getDefaultB());
     }
 
     @Override
@@ -77,23 +77,21 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
         selectWidget.init(getSkin());
         selectWidget.setItems(mathsExpressions, mathsExpressions);
 
-        aField = addInputSlotWithTextField("A: ", MathModule.A);
+        aField = addInputSlotWithValueWidget("A: ", MathModule.A);
         leftWrapper.add(selectWidget).left().expandX().pad(5).padLeft(17).growX().row();
-        bField = addInputSlotWithTextField("B: ", MathModule.B);
+        bField = addInputSlotWithValueWidget("B: ", MathModule.B);
 
         aField.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                float a = floatFromText(aField);
-                module.setA(a);
+                module.setA(aField.getValue());
             }
         });
 
         bField.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                float b = floatFromText(bField);
-                module.setB(b);
+                module.setB(bField.getValue());
             }
         });
 
@@ -116,7 +114,7 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
         super.read(json, jsonData);
         selectWidget.setSelected(MathExpressionMappings.getNameForMathExpression(module.getExpression()));
 
-        aField.setText(module.getDefaultA() + "");
-        bField.setText(module.getDefaultB() + "");
+        aField.setValue(module.getDefaultA());
+        bField.setValue(module.getDefaultB());
     }
 }

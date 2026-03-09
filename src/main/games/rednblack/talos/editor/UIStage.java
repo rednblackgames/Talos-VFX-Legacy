@@ -83,8 +83,6 @@ public class UIStage {
 	ModuleListPopup moduleListPopup;
 
 	public TalosTabbedPane tabbedPane;
-
-	private VisSplitPane bottomPane;
 	private Table leftTable;
 	private Table rightTable;
 	private Table bottomTable;
@@ -428,23 +426,8 @@ public class UIStage {
 		bottomTable.setBackground(skin.getDrawable("button-main-menu"));
 
 		bottomContainer = new Table();
-		Table libraryContainer = new Table();
-
-		libraryContainer.addListener(new ClickListener(0) { //Quick hack for library container intercepting touch as its an empty table currently
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-			}
-		});
-		libraryContainer.addListener(new ClickListener(1) { //Quick hack for library container intercepting touch as its an empty table currently
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-			}
-		});
-		libraryContainer.setTouchable(Touchable.enabled);
-		bottomPane = new VisSplitPane(bottomContainer, libraryContainer, false);
-		bottomPane.setSplitAmount(1f); // remove this line when the bottom-right panel content will be implemented (which is the library container)
 		bottomContainer.add(emitterList).grow().expand().fill();
-		bottomTable.add(bottomPane).expand().grow();
+		bottomTable.add(bottomContainer).expand().grow();
 
 		verticalPane = new VisSplitPane(midTable, bottomTable, true);
 		verticalPane.setMaxSplitAmount(0.70f);
@@ -523,7 +506,7 @@ public class UIStage {
 		bottomTable.clearChildren();
 
 		leftTable.add(previewWidget).grow();
-		bottomTable.add(bottomPane).expand().grow();
+		bottomTable.add(bottomContainer).expand().grow();
 		TalosMain.Instance().enableNodeStage();
 
 		TalosMain.Instance().UIStage().getStage().setKeyboardFocus(rightTable);

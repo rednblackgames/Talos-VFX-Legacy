@@ -6,13 +6,10 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.ObjectMap;
 
 public class CursorUtil {
-
-
 	public static CursorType currentCursorType = null;
 	public static Cursor currentActualCursor = null;
 	public static Cursor currentChosenModeCursor = null;
 	public static Cursor currentDynamicCursor = null;
-
 
 	private static ObjectMap<CursorType, Boolean> dynamicCursorFlags = new ObjectMap<>();
 
@@ -32,7 +29,6 @@ public class CursorUtil {
 			currentDynamicCursor = null;
 		}
 
-
 		//Prioritize dynamic over chosen
 		if (currentDynamicCursor != null) {
 			if (currentActualCursor != currentDynamicCursor) {
@@ -51,8 +47,6 @@ public class CursorUtil {
 
 		dynamicCursorFlags.clear();
 	}
-
-
 
 	public static CursorType getDynamicCursorFlag () {
 		for (CursorType value : CursorType.values()) {
@@ -85,7 +79,4 @@ public class CursorUtil {
 			return cursor;
 		}
 	}
-
-
-
 }

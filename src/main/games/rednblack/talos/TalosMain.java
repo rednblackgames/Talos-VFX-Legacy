@@ -272,8 +272,6 @@ public class TalosMain extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		CursorUtil.checkAndReset();
-
 		if (currentWorkplaceStage != null) {
 			Gdx.gl.glClearColor(currentWorkplaceStage.getBgColor().r, currentWorkplaceStage.getBgColor().g, currentWorkplaceStage.getBgColor().b, 1);
 		} else {

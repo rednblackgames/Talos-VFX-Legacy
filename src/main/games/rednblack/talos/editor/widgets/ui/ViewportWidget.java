@@ -246,7 +246,6 @@ public abstract class ViewportWidget extends Table {
 		super.act(delta);
 
 		if (isDragging) {
-			CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.GRABBED);
 			disableClickListener();
 		} else {
 			enableClickListener();

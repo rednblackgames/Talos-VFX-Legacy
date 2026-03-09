@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.widget.VisSplitPane;
 import games.rednblack.talos.TalosMain;
 
 import java.util.Comparator;
@@ -34,7 +35,7 @@ public abstract class TimelineWidget<U> extends Table {
 
         leftList.setTypeName(getItemTypeName());
 
-        SplitPane splitPane = new SplitPane(leftList, rightList, false, skin, "timeline");
+        VisSplitPane splitPane = new VisSplitPane(leftList, rightList, false, "timeline");
         splitPane.setSplitAmount(0.3f);
 
         add(splitPane).grow();
