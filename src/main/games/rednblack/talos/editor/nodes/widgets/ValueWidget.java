@@ -3,16 +3,21 @@ package games.rednblack.talos.editor.nodes.widgets;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.github.tommyettinger.textra.TextraLabel;
+import com.kotcrab.vis.ui.widget.VisWindow;
 import games.rednblack.talos.editor.utils.MsdfFonts;
 import games.rednblack.talos.editor.widgets.ClippedNinePatchDrawable;
+import games.rednblack.talos.editor.widgets.RotatorWidget;
 import games.rednblack.talos.editor.widgets.ui.ViewportWidget;
 import games.rednblack.talos.editor.widgets.ui.common.ColorLibrary;
+import games.rednblack.talos.runtime.values.NumericalValue;
 
 public class ValueWidget extends AbstractWidget<Float> {
 
@@ -45,6 +50,12 @@ public class ValueWidget extends AbstractWidget<Float> {
     private Vector2 tmpVec = new Vector2();
 
     private boolean isDragging = false;
+
+    private NumericalValue.Flavour flavour = NumericalValue.Flavour.REGULAR;
+    private RotatorWidget rotatorWidget;
+    private Table regularContainer;
+    private Table angleContainer;
+    private Cell angleContainerCell, regularContainerCell;
 
     public ValueWidget() {
         editing = new Table();
@@ -88,7 +99,24 @@ public class ValueWidget extends AbstractWidget<Float> {
 
         hideEditMode();
 
-        content.add(mainStack).height(32).growX();
+        regularContainer = new Table();
+        regularContainer.add(mainStack).height(32).growX();
+
+        angleContainer = new Table();
+        rotatorWidget = new RotatorWidget(skin);
+        rotatorWidget.setListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                value = rotatorWidget.getValue();
+                fireChangedEvent();
+            }
+        });
+        angleContainer.add(rotatorWidget).size(68);
+        angleContainer.setVisible(false);
+
+        regularContainerCell = content.add(regularContainer).height(32).growX();
+        content.row();
+        angleContainerCell = content.add(angleContainer).height(0).center();
 
         setTouchable(Touchable.enabled);
 
@@ -232,6 +260,10 @@ public class ValueWidget extends AbstractWidget<Float> {
     }
 
     private void setBackgrounds () {
+        if (flavour != NumericalValue.Flavour.REGULAR) {
+            setBackground((Drawable) null);
+            return;
+        }
         String shape = getShape();
 
         ColorLibrary.BackgroundColor color = ColorLibrary.BackgroundColor.LIGHT_GRAY;
@@ -273,6 +305,10 @@ public class ValueWidget extends AbstractWidget<Float> {
 
         valueLabel.setText(text);
         textField.setText(text);
+
+        if (flavour == NumericalValue.Flavour.ANGLE && rotatorWidget != null) {
+            rotatorWidget.setValue(value);
+        }
 
         updateProgress();
 
@@ -346,5 +382,43 @@ public class ValueWidget extends AbstractWidget<Float> {
 
     public void setNone() {
         valueLabel.setText("-");
+    }
+
+    public void setFlavour(NumericalValue.Flavour newFlavour) {
+        if (this.flavour == newFlavour) return;
+        this.flavour = newFlavour;
+
+        if (flavour == NumericalValue.Flavour.ANGLE) {
+            regularContainer.setVisible(false);
+            angleContainer.setVisible(true);
+            rotatorWidget.setValue(value);
+            angleContainerCell.height(68);
+            regularContainerCell.height(0);
+            content.invalidateHierarchy();
+            packParentWindow();
+        } else {
+            regularContainer.setVisible(true);
+            angleContainer.setVisible(false);
+            angleContainerCell.height(0);
+            regularContainerCell.height(32);
+            content.invalidateHierarchy();
+            packParentWindow();
+        }
+
+        setBackgrounds();
+    }
+
+    private void packParentWindow() {
+        Actor actor = this;
+        while ((actor = actor.getParent()) != null) {
+            if (actor instanceof VisWindow) {
+                ((VisWindow) actor).pack();
+                return;
+            }
+        }
+    }
+
+    public NumericalValue.Flavour getFlavour() {
+        return flavour;
     }
 }

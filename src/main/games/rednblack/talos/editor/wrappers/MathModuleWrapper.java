@@ -50,6 +50,8 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
 
         module.a.setFlavour(module.output.getFlavour());
         module.b.setFlavour(module.output.getFlavour());
+        aField.setFlavour(module.output.getFlavour());
+        bField.setFlavour(module.output.getFlavour());
     }
 
     @Override
@@ -58,6 +60,8 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
         if(!isInput) {
             module.a.setFlavour(NumericalValue.Flavour.REGULAR);
             module.b.setFlavour(NumericalValue.Flavour.REGULAR);
+            aField.setFlavour(NumericalValue.Flavour.REGULAR);
+            bField.setFlavour(NumericalValue.Flavour.REGULAR);
         }
     }
 

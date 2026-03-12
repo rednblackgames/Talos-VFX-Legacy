@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import games.rednblack.talos.editor.nodes.widgets.ValueWidget;
 import games.rednblack.talos.runtime.modules.StaticValueModule;
+import games.rednblack.talos.runtime.values.NumericalValue;
 
 public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
 
@@ -29,6 +30,23 @@ public class StaticValueModuleWrapper extends ModuleWrapper<StaticValueModule> {
 
     public StaticValueModuleWrapper() {
         super();
+    }
+
+    @Override
+    public void attachModuleToMyOutput(ModuleWrapper moduleWrapper, int mySlot, int targetSlot) {
+        super.attachModuleToMyOutput(moduleWrapper, mySlot, targetSlot);
+
+        valueWidget.setFlavour(module.getOutputValue().getFlavour());
+    }
+
+    @Override
+    public void setSlotInactive(int slotTo, boolean isInput) {
+        super.setSlotInactive(slotTo, isInput);
+        if(!isInput) {
+            module.getOutputValue().setFlavour(NumericalValue.Flavour.REGULAR);
+            valueWidget.setFlavour(NumericalValue.Flavour.REGULAR);
+            valueWidget.setLabel("Number");
+        }
     }
 
     @Override

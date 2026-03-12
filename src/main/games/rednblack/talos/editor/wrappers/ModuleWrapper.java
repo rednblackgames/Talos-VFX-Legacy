@@ -125,6 +125,8 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
     public ModuleWrapper() {
         super("", "panel");
 
+        setClip(false);
+
         // Strip VisWindow's default chrome
         clearChildren();
         padTop(0); padLeft(0); padRight(0); padBottom(0);

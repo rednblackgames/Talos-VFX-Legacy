@@ -18,23 +18,25 @@ package games.rednblack.talos.editor.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.CharArray;
 import com.github.tommyettinger.textra.TextraLabel;
 import games.rednblack.talos.editor.utils.MsdfFonts;
+import games.rednblack.talos.editor.utils.SharedShapeDrawer;
+import space.earlygrey.shapedrawer.JoinType;
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class RotatorWidget extends Actor {
 
     private Skin skin;
-
-    private Image image;
 
     private float value;
 
@@ -46,15 +48,17 @@ public class RotatorWidget extends Actor {
 
     private boolean isActive = false;
 
-    private final String ROTATOR = "rotator";
-    private final String ROTATORBG = "rotator-bg";
-    private final String ROTATORACTIVE = "rotator-active";
+    private static final Color BG_COLOR = new Color(0.15f, 0.15f, 0.15f, 1f);
+    private static final Color RING_COLOR = new Color(0.35f, 0.35f, 0.35f, 1f);
+    private static final Color RING_ACTIVE_COLOR = new Color(0.5f, 0.6f, 0.9f, 1f);
+    private static final Color NEEDLE_COLOR = new Color(0.7f, 0.7f, 0.7f, 1f);
+    private static final Color NEEDLE_ACTIVE_COLOR = new Color(0.6f, 0.7f, 1f, 1f);
+    private static final Color TICK_COLOR = new Color(0.3f, 0.3f, 0.3f, 1f);
 
     CharArray stringBuilder;
 
     public RotatorWidget(Skin skin) {
         this.skin = skin;
-        image = new Image(skin.getDrawable(ROTATOR));
 
         label = MsdfFonts.smallLabel("");
 
@@ -66,7 +70,7 @@ public class RotatorWidget extends Actor {
             float prevAngle;
 
             public void applyAngle(float x, float y) {
-                float newAngle = tmp.set(x - image.getOriginX(), y - image.getOriginY()).angle();
+                float newAngle = tmp.set(x - getWidth() / 2f, y - getHeight() / 2f).angle();
                 if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                     float step = 15f;
                     float offset = newAngle % step;
@@ -119,28 +123,62 @@ public class RotatorWidget extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        ShapeDrawer shapeDrawer = SharedShapeDrawer.getInstance().getShapeDrawer(batch);
+        Color bc = batch.getColor();
 
-        getSkin().getDrawable(ROTATORBG).draw(batch, getX(), getY(), getWidth(), getHeight());
+        float cx = getX() + getWidth() / 2f;
+        float cy = getY() + getHeight() / 2f;
+        float radius = Math.min(getWidth(), getHeight()) / 2f - 2f;
 
+        // Background circle
+        shapeDrawer.setColor(BG_COLOR.r, BG_COLOR.g, BG_COLOR.b, BG_COLOR.a * parentAlpha);
+        shapeDrawer.filledCircle(cx, cy, radius);
+
+        // Tick marks at 0, 90, 180, 270
+        shapeDrawer.setColor(TICK_COLOR.r, TICK_COLOR.g, TICK_COLOR.b, TICK_COLOR.a * parentAlpha);
+        float tickInner = radius * 0.7f;
+        float tickOuter = radius * 0.9f;
+        for (int deg = 0; deg < 360; deg += 90) {
+            float rad = deg * MathUtils.degreesToRadians;
+            float cos = MathUtils.cos(rad);
+            float sin = MathUtils.sin(rad);
+            shapeDrawer.line(
+                    cx + cos * tickInner, cy + sin * tickInner,
+                    cx + cos * tickOuter, cy + sin * tickOuter,
+                    1f
+            );
+        }
+
+        // Outer ring
+        Color ringColor = isActive ? RING_ACTIVE_COLOR : RING_COLOR;
+        shapeDrawer.setColor(ringColor.r, ringColor.g, ringColor.b, ringColor.a * parentAlpha);
+        shapeDrawer.polygon(cx, cy, 50, radius, radius, 0, 2f, JoinType.SMOOTH);
+
+        // Needle
+        float needleRad = value * MathUtils.degreesToRadians;
+        float needleCos = MathUtils.cos(needleRad);
+        float needleSin = MathUtils.sin(needleRad);
+        Color needleColor = isActive ? NEEDLE_ACTIVE_COLOR : NEEDLE_COLOR;
+        shapeDrawer.setColor(needleColor.r, needleColor.g, needleColor.b, needleColor.a * parentAlpha);
+        shapeDrawer.line(cx, cy, cx + needleCos * (radius * 0.85f), cy + needleSin * (radius * 0.85f), 2f);
+
+        // Needle tip dot
+        shapeDrawer.filledCircle(cx + needleCos * (radius * 0.85f), cy + needleSin * (radius * 0.85f), 3f);
+
+        // Center dot
+        shapeDrawer.setColor(ringColor.r, ringColor.g, ringColor.b, ringColor.a * parentAlpha);
+        shapeDrawer.filledCircle(cx, cy, 3f);
+
+        shapeDrawer.setColor(bc);
+
+        // Label above
         int intVal = (int) value;
         stringBuilder.clear();
         stringBuilder.append(intVal);
 
         label.setText(stringBuilder.toString());
-        label.setPosition(getX() + getWidth()/2f - label.getPrefWidth()/2f, getY() + getHeight()/2f + 20 - label.getPrefHeight()/2f);
+        label.setPosition(cx - label.getPrefWidth() / 2f, cy + 20 - label.getPrefHeight() / 2f);
         label.draw(batch, parentAlpha);
-
-
-        image.setDrawable(skin.getDrawable(ROTATOR));
-        if(isActive) {
-            image.setDrawable(skin.getDrawable(ROTATORACTIVE));
-        }
-        image.setPosition(getX(), getY());
-        image.setSize(getWidth(), getHeight());
-        image.setOrigin(getWidth()/2f, getHeight()/2f);
-        image.setRotation(value - 90f);
-
-        image.draw(batch, parentAlpha);
     }
 
     public Skin getSkin() {
