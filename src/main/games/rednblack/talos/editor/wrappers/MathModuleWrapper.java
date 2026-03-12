@@ -78,8 +78,10 @@ public class MathModuleWrapper extends ModuleWrapper<MathModule> {
         selectWidget.setItems(mathsExpressions, mathsExpressions);
 
         aField = addInputSlotWithValueWidget("A: ", MathModule.A);
+        aField.setRange(-9999, 9999);
         leftWrapper.add(selectWidget).left().expandX().pad(5).padLeft(17).growX().row();
         bField = addInputSlotWithValueWidget("B: ", MathModule.B);
+        bField.setRange(-9999, 9999);
 
         aField.addListener(new ChangeListener() {
             @Override
