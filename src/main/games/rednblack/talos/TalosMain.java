@@ -59,7 +59,14 @@ import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class TalosMain extends ApplicationAdapter {
-    public static PoolManager POOLS = new PoolManager(FileActorBinder.FileEvent::new, Vector2::new, ChangeListener.ChangeEvent::new, GridLine::new, TimelineListener.TimelineEvent::new);
+    public static PoolManager POOLS = new PoolManager();
+	static {
+		POOLS.addPool(FileActorBinder.FileEvent.class, FileActorBinder.FileEvent::new);
+		POOLS.addPool(ChangeListener.ChangeEvent.class, ChangeListener.ChangeEvent::new);
+		POOLS.addPool(Vector2.class, Vector2::new);
+		POOLS.addPool(GridLine.class, GridLine::new);
+		POOLS.addPool(TimelineListener.TimelineEvent.class, TimelineListener.TimelineEvent::new);
+	}
 
 	private UIStage uiStage;
 
