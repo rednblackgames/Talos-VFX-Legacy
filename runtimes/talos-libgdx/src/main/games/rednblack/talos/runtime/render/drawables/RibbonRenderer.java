@@ -14,6 +14,8 @@ import games.rednblack.talos.runtime.ParticleDrawable;
 public class RibbonRenderer extends ParticleDrawable {
 
     Particle particleRef;
+    /** Polyline of particleRef, resolved once per particle instead of on every setPointData call. */
+    Polyline currentPolyline;
     int interpolationPointCount;
 
     PointMemoryAccumulator accumulator;
@@ -42,11 +44,11 @@ public class RibbonRenderer extends ParticleDrawable {
         if(interpolationPointCount < 1) return;
         if(ribbonRegion == null && material == null) return;
 
-        accumulator.update(particleRef, x, y);
+        PointMemoryAccumulator.AccData data = accumulator.update(particleRef, x, y);
 
         Polyline polyline = polyline();
 
-        accumulator.setDrawLocations(particleRef, polyline.getPoints());
+        accumulator.setDrawLocations(data, polyline.getPoints());
 
         ShaderProgram prevShader = null;
         TextureRegion drawRegion = ribbonRegion;
@@ -79,13 +81,13 @@ public class RibbonRenderer extends ParticleDrawable {
     }
 
     private Polyline polyline() {
-        if(polylineMap.get(particleRef) == null) {
-            Polyline polyline = polylinePool.obtain();
-            polyline.initPoints(interpolationPointCount, particleRef.getX(), particleRef.getY());
-            polylineMap.put(particleRef, polyline);
+        if(currentPolyline == null) {
+            currentPolyline = polylinePool.obtain();
+            currentPolyline.initPoints(interpolationPointCount, particleRef.getX(), particleRef.getY());
+            polylineMap.put(particleRef, currentPolyline);
         }
 
-        return polylineMap.get(particleRef);
+        return currentPolyline;
     }
 
     public TextureRegionDrawable getHeadDrawable() {
@@ -99,7 +101,10 @@ public class RibbonRenderer extends ParticleDrawable {
 
     @Override
     public void setCurrentParticle (Particle particle) {
+        if(particle == particleRef) return;
+
         this.particleRef = particle;
+        this.currentPolyline = polylineMap.get(particle);
     }
 
     @Override
@@ -143,6 +148,7 @@ public class RibbonRenderer extends ParticleDrawable {
         // reset all existing items from the pool
         polylinePool.freeAll(polylineMap.values().toArray());
         polylineMap.clear();
+        currentPolyline = null;
     }
 
     @Override
@@ -157,6 +163,9 @@ public class RibbonRenderer extends ParticleDrawable {
        if(polyline != null) {
            polylineMap.remove(particle);
            polylinePool.free(polyline);
+       }
+       if(particle == particleRef) {
+           currentPolyline = null;
        }
     }
 
@@ -232,87 +241,109 @@ public class RibbonRenderer extends ParticleDrawable {
             }
         }
 
-        private void initIfNull(Particle particle) {
-            if(!dataMap.containsKey(particle)) {
-                AccData accData = dataPool.obtain();
+        private AccData obtainData(Particle particle) {
+            AccData accData = dataMap.get(particle);
+            if(accData == null) {
+                accData = dataPool.obtain();
                 dataMap.put(particle, accData);
             }
+
+            return accData;
         }
 
-        public void update(Particle particle, float x, float y) {
-            initIfNull(particle);
+        public AccData update(Particle particle, float x, float y) {
+            AccData data = obtainData(particle);
 
             float delta = Gdx.graphics.getDeltaTime();
 
             if(delta > 1f/60f) delta = 1f/60f;
 
-            dataMap.get(particle).leadPoint.set(x, y);
+            data.leadPoint.set(x, y);
 
-            dataMap.get(particle).leadLife = dataMap.get(particle).leadLife + delta;
+            float interval = getInterval();
+            if(interval <= 0) {
+                data.leadLife = 0;
+                return data;
+            }
 
-            if(dataMap.get(particle).leadLife > memoryDuration/pointCount) { // adding new point data
-                Array<Vector2> points = dataMap.get(particle).points;
-                int currPointCount = dataMap.get(particle).pointCount;
+            data.leadLife = data.leadLife + delta;
+
+            // a single frame can be longer than the sampling interval, so drain every matured one of them,
+            // otherwise leadLife grows unbounded and the drawn points get extrapolated instead of interpolated
+            int iterations = 0;
+            while(data.leadLife > interval && iterations < pointCount) { // adding new point data
+                Array<Vector2> points = data.points;
+                int currPointCount = data.pointCount;
 
                 if(currPointCount < pointCount - 1) {
                     currPointCount++;
                 }
-                dataMap.get(particle).pointCount = currPointCount;
+                data.pointCount = currPointCount;
 
                 // now shift
                 for(int i  = currPointCount - 1; i > 0; i--) {
                     points.get(i).set(points.get(i-1));
                 }
-                points.get(0).set(dataMap.get(particle).leadPoint); // set the value of lead point
+                points.get(0).set(data.leadPoint); // set the value of lead point
 
-                dataMap.get(particle).leadLife = dataMap.get(particle).leadLife - memoryDuration/pointCount;
+                data.leadLife = data.leadLife - interval;
+                iterations++;
             }
+
+            if(data.leadLife > interval) data.leadLife = interval;
+
+            return data;
         }
 
-        public void setDrawLocations(Particle particle, Array<Polyline.PointData> points) {
-            if(points != null && points.size == pointCount) {
-                points.get(0).position.set(dataMap.get(particle).leadPoint);
+        private float getInterval() {
+            if(pointCount <= 0) return 0;
+            return memoryDuration/pointCount;
+        }
 
-                if(dataMap.get(particle).pointCount == 0) {
+        public void setDrawLocations(AccData data, Array<Polyline.PointData> points) {
+            if(points != null && points.size == pointCount) {
+                points.get(0).position.set(data.leadPoint);
+
+                if(data.pointCount == 0) {
                     for(int i = 0; i < points.size; i++) {
                         points.get(i).color.a = 0;
-                        points.get(i).position.set(dataMap.get(particle).leadPoint);
+                        points.get(i).position.set(data.leadPoint);
                     }
 
                     return;
                 }
 
+                float progress = getProgress(data);
 
                 for(int i = 0; i < points.size-1; i++) {
 
-                    if(i >= 0 && i < dataMap.get(particle).pointCount) {
-                        Vector2 top = dataMap.get(particle).points.get(i);
-                        Vector2 bottom = dataMap.get(particle).leadPoint;
-                        if(i > 0) {
-                            bottom = dataMap.get(particle).points.get(i - 1);
-                        }
-                        tmpVec.set(bottom).sub(top).scl(dataMap.get(particle).leadLife/(memoryDuration/pointCount)).add(top);
-                    } else {
-                        tmpVec.set(dataMap.get(particle).points.get(i));
-                    }
+                    if(i < data.pointCount) {
+                        Vector2 top = data.points.get(i);
+                        Vector2 bottom = i > 0 ? data.points.get(i - 1) : data.leadPoint;
 
-                    if(i < dataMap.get(particle).pointCount) {
+                        tmpVec.set(bottom).sub(top).scl(progress).add(top);
                         points.get(i + 1).position.set(tmpVec);
                     } else {
-                        if(dataMap.get(particle).pointCount > 0) {
-                            points.get(i + 1).position.set(dataMap.get(particle).points.get(dataMap.get(particle).pointCount - 1));
-                        } else {
-                            points.get(i + 1).color.a = 0;
-                        }
+                        points.get(i + 1).position.set(data.points.get(data.pointCount - 1));
                     }
                 }
             }
         }
 
         public float getPointAlpha(Particle particle) {
-            if(dataMap.get(particle) == null) return 0;
+            return getProgress(dataMap.get(particle));
+        }
 
-            return dataMap.get(particle).leadLife/(memoryDuration/pointCount);
+        /** How far the trail has travelled inside the current sampling interval, always within [0, 1]. */
+        private float getProgress(AccData data) {
+            float interval = getInterval();
+            if(data == null || interval <= 0) return 0;
+
+            float progress = data.leadLife/interval;
+            if(progress < 0) return 0;
+            if(progress > 1f) return 1f;
+
+            return progress;
         }
     }
 }

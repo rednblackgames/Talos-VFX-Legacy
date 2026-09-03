@@ -43,14 +43,25 @@ public class Polyline implements Pool.Poolable {
     private float[] vertices;
     private short[] indexes;
 
-    private Color tmpColor = new Color(Color.WHITE);
-    private Vector2 tmp = new Vector2();
-    private Vector2 tmp2 = new Vector2();
-    private Vector2 tmp3 = new Vector2();
-    private Vector2 point0 = new Vector2();
-    private Vector2 point1 = new Vector2();
-    private Vector2 point2 = new Vector2();
-    private Vector2 point3 = new Vector2();
+    private static final float EPSILON = 0.0001f;
+    /** How wide the ribbon may get compared to how long it actually is. */
+    private static final float MAX_THICKNESS_TO_LENGTH = 0.5f;
+
+    private float thicknessCap = Float.MAX_VALUE;
+    private float[] arcLengths;
+    private float[] thicknesses;
+    private float[] directionsX;
+    private float[] directionsY;
+    private float[] packedColors;
+    private final Color profileColor = new Color();
+
+    private final Vector2 tmp = new Vector2();
+    private final Vector2 tmp2 = new Vector2();
+    private final Vector2 tmp3 = new Vector2();
+    private final Vector2 point0 = new Vector2();
+    private final Vector2 point1 = new Vector2();
+    private final Vector2 point2 = new Vector2();
+    private final Vector2 point3 = new Vector2();
 
     Batch batch;
 
@@ -63,7 +74,7 @@ public class Polyline implements Pool.Poolable {
         }
     }
 
-    class PointData {
+    static class PointData {
         Vector2 position = new Vector2();
         Vector2 offset = new Vector2();
         float thickness;
@@ -105,6 +116,14 @@ public class Polyline implements Pool.Poolable {
             vertices = new float[vertexCount * attributeCount];
             indexes = new short[trisCount * 3];
         }
+
+        if(arcLengths == null || arcLengths.length != pointCount) {
+            arcLengths = new float[pointCount];
+            thicknesses = new float[pointCount];
+            directionsX = new float[pointCount];
+            directionsY = new float[pointCount];
+            packedColors = new float[pointCount];
+        }
     }
 
     public void setPointData(int index, float offsetX, float offsetY, float thickness, Color color) {
@@ -122,6 +141,8 @@ public class Polyline implements Pool.Poolable {
         if(batch instanceof PolygonBatch) {
             PolygonBatch polygonSpriteBatch = (PolygonBatch) batch;
             this.batch = polygonSpriteBatch;
+
+            updateProfile();
 
             for(int i = 0; i < points.size - 1; i++) {
                 // extrude each point
@@ -154,6 +175,7 @@ public class Polyline implements Pool.Poolable {
             this.batch = polygonSpriteBatch;
 
             updatePointPositions(x, y);
+            updateProfile();
 
             for(int i = 0; i < points.size - 1; i++) {
                 // extrude each point
@@ -191,11 +213,68 @@ public class Polyline implements Pool.Poolable {
             points.get(i).position.add(points.get(i).offset);
 
             // apply rotation while origin is at 0
-            points.get(i).position.rotate(rotation);
+            points.get(i).position.rotateDeg(rotation);
 
             //apply origin position
             points.get(i).position.add(x, y);
         }
+    }
+
+    /**
+     * Thickness and color arrive indexed by point, but the points do not stay evenly spread: a trail that is
+     * being pulled back into its anchor piles its first indices onto a single spot while the rest still covers
+     * the old path. Reading the profile by index then hands a several units long quad the thickness of a point
+     * that should sit at the very end of the ribbon, which draws as a thin needle out of the anchor. Measuring
+     * the arc the polyline really covers lets the profile be sampled by distance instead.
+     */
+    private void updateProfile() {
+        arcLengths[0] = 0;
+        for(int i = 1; i < points.size; i++) {
+            arcLengths[i] = arcLengths[i - 1] + points.get(i - 1).position.dst(points.get(i).position);
+        }
+
+        thicknessCap = arcLengths[points.size - 1] * MAX_THICKNESS_TO_LENGTH;
+
+        for(int i = 0; i < points.size; i++) {
+            float position = profilePosition(i);
+            thicknesses[i] = thicknessAt(position);
+            // The tint is constant over the whole draw, so each point is packed once instead of once per vertex.
+            packedColors[i] = colorAt(position).mul(batch.getColor()).toFloatBits();
+        }
+
+        // Every point is shared by two quads, so its direction is worked out once here rather than twice
+        // while extruding.
+        for(int i = 0; i < points.size; i++) {
+            directionAt(i, thicknesses[i], tmp3);
+            directionsX[i] = tmp3.x;
+            directionsY[i] = tmp3.y;
+        }
+    }
+
+    /** Where the given point sits along the ribbon, as a fraction of the length actually covered. */
+    private float profilePosition(int index) {
+        float length = arcLengths[points.size - 1];
+        if(length < EPSILON) return (float)index/(points.size - 1); // fully collapsed, nothing is drawn anyway
+
+        return arcLengths[index]/length * (points.size - 1);
+    }
+
+    private float thicknessAt(float position) {
+        int low = (int)position;
+        int high = low + 1 < points.size ? low + 1 : low;
+        float alpha = position - low;
+
+        float thickness = points.get(low).thickness + (points.get(high).thickness - points.get(low).thickness) * alpha;
+
+        return Math.min(thickness, thicknessCap);
+    }
+
+    private Color colorAt(float position) {
+        int low = (int)position;
+        int high = low + 1 < points.size ? low + 1 : low;
+        float alpha = position - low;
+
+        return profileColor.set(points.get(low).color).lerp(points.get(high).color, alpha);
     }
 
     private void extrudePoint(TextureRegion region, int index, int pos) {
@@ -203,66 +282,68 @@ public class Polyline implements Pool.Poolable {
         int i = index + pos;
         float v = (float)(i)/(points.size-1);
 
-        float thickness = points.get(i).thickness;
+        float thickness = thicknesses[i];
 
-        if(i > 0 && i < points.size - 1) {
-            point1.set(points.get(i-1).position);
-            point2.set(points.get(i).position);
-            point3.set(points.get(i+1).position);
+        Vector2 position = points.get(i).position;
 
-            tmp.set(point2).sub(point1).nor().rotate90(1).nor(); //Left hand side normal of first edge
-            tmp2.set(point3).sub(point2).nor().rotate90(1).nor(); //Left hand side normal of second edge
-            tmp3.set(tmp).add(tmp2).nor(); //Bisector
-            tmp3.scl(thickness/2f);
-            tmp.set(tmp3).add(point2);
-            tmp3.scl(-1f);
-            tmp2.set(tmp3).add(point2);
+        // A zero length segment has to stay zero area. Extruding its two ends along even slightly different
+        // directions turns it into a bow tie as wide as the ribbon, which is what piles up around the anchor
+        // once the trail stops moving and every point collapses onto the same spot.
+        int directionIndex = position.dst2(points.get(index).position) < EPSILON * EPSILON ? index : i;
 
-            packVertex(region, vertices, index * 4 + 1 + pos * 2, tmp.x, tmp.y, points.get(i).color, 0, v); // left extension vertex
-            packVertex(region, vertices, index * 4 + pos * 2, tmp2.x, tmp2.y, points.get(i + 1).color, 1, v); // right extension vertex
+        tmp3.set(directionsX[directionIndex], directionsY[directionIndex]);
+        tmp3.rotate90(1).scl(thickness/2f); //Left hand side normal, half thickness
+
+        tmp.set(position).add(tmp3);
+        tmp2.set(position).sub(tmp3);
+
+        if(i == points.size - 1) {
+            packVertex(region, vertices, index * 4 + 1 + pos * 2, tmp.x, tmp.y, packedColors[i - 1], 0, v); // left extension vertex
+            packVertex(region, vertices, index * 4 + pos * 2, tmp2.x, tmp2.y, packedColors[i], 1, v); // right extension vertex
         } else {
-            if(i == 0) {
-                point1.set(points.get(i).position);
-                point2.set(points.get(i+1).position);
-
-                final Vector2 nor = tmp.set(point2).sub(point1).nor();
-
-                tmp2.set(nor).rotate90(1).scl(thickness/2f);
-                tmp3.set(nor).rotate90(-1).scl(thickness/2f);
-
-                tmp.set(tmp2).add(point1);
-                tmp2.set(tmp3).add(point1);
-
-                packVertex(region, vertices,index * 4 + 1 + pos * 2, tmp.x, tmp.y, points.get(i).color, 0, v); // left extension vertex
-                packVertex(region, vertices, index * 4 + pos * 2, tmp2.x, tmp2.y,  points.get(i + 1).color, 1, v); // right extension vertex
-            }
-            if(i == points.size - 1) {
-                point1.set(points.get(i - 1).position);
-                point2.set(points.get(i).position);
-
-                final Vector2 nor = tmp.set(point2).sub(point1).nor();
-
-                tmp2.set(nor).rotate90(1).scl(thickness/2f);
-                tmp3.set(nor).rotate90(-1).scl(thickness/2f);
-
-                tmp.set(tmp2).add(point2);
-                tmp2.set(tmp3).add(point2);
-
-                packVertex(region, vertices,index * 4 + 1 + pos * 2, tmp.x, tmp.y, points.get(i - 1).color, 0, v); // left extension vertex
-                packVertex(region, vertices, index * 4 + pos * 2 , tmp2.x, tmp2.y, points.get(i).color, 1, v); // right extension vertex
-            }
+            packVertex(region, vertices, index * 4 + 1 + pos * 2, tmp.x, tmp.y, packedColors[i], 0, v); // left extension vertex
+            packVertex(region, vertices, index * 4 + pos * 2, tmp2.x, tmp2.y, packedColors[i + 1], 1, v); // right extension vertex
         }
     }
 
+    /**
+     * Direction of the polyline at the given point, measured over a baseline of at least minLength.
+     * Widening the neighbour window keeps the extrusion normal stable when consecutive points sit much
+     * closer to each other than the ribbon is thick, which is what makes slow moving trails fold over
+     * themselves. Coincident points are skipped by construction.
+     */
+    private Vector2 directionAt(int index, float minLength, Vector2 out) {
+        Vector2 position = points.get(index).position;
+        float halfLength = minLength/2f;
+        float halfLength2 = halfLength * halfLength; // squared, so walking the window costs no square roots
 
-    private void packVertex(TextureRegion region, float[] vertices, int index, float x, float y, Color color, float u, float v) {
+        int prev = index;
+        while(prev > 0 && position.dst2(points.get(prev).position) < halfLength2) prev--;
+
+        int next = index;
+        while(next < points.size - 1 && position.dst2(points.get(next).position) < halfLength2) next++;
+
+        out.set(points.get(next).position).sub(points.get(prev).position);
+
+        if(out.len2() < EPSILON * EPSILON) {
+            // whole window is coincident, fall back to the overall direction of the polyline
+            out.set(points.get(points.size - 1).position).sub(points.get(0).position);
+        }
+
+        if(out.len2() < EPSILON * EPSILON) {
+            return out.set(0, 0); // fully degenerate, collapse the quad instead of extruding a random direction
+        }
+
+        return out.nor();
+    }
+
+
+    private void packVertex(TextureRegion region, float[] vertices, int index, float x, float y, float packedColor, float u, float v) {
         float insideOffset = 0.0f; // needed in case region has have some weird transparent edge. maybe.
-
-        tmpColor.set(color).mul(batch.getColor());
 
         vertices[index * 5] = x;
         vertices[index * 5 + 1] = y;
-        vertices[index * 5 + 2] = tmpColor.toFloatBits();
+        vertices[index * 5 + 2] = packedColor;
         vertices[index * 5 + 3] = region.getU() + u * (region.getU2() - region.getU() - insideOffset) + insideOffset;
         vertices[index * 5 + 4] = region.getV() + v * (region.getV2() - region.getV() - insideOffset) + insideOffset;
 
