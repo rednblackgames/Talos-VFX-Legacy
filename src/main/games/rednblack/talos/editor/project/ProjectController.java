@@ -26,6 +26,8 @@ public class ProjectController {
 
     private SnapshotTracker snapshotTracker;
 
+    public static final int MAX_RECENTS = 10;
+
     public static TalosProject TLS = new TalosProject();
     private boolean lastDirTracking = true;
 
@@ -414,7 +416,7 @@ public class ProjectController {
     Comparator<RecentsEntry> recentsEntryComparator = new Comparator<RecentsEntry>() {
         @Override
         public int compare(RecentsEntry o1, RecentsEntry o2) {
-            return (int) (o2.time - o1.time);
+            return Long.compare(o2.time, o1.time);
         }
     };
 
@@ -436,6 +438,7 @@ public class ProjectController {
         list.add(newEntry);
         //sort
         list.sort(recentsEntryComparator);
+        list.truncate(MAX_RECENTS);
         //write
         String result = json.toJson(list);
         prefs.putString("recents", result);
@@ -454,6 +457,8 @@ public class ProjectController {
             if (data != null && !data.isEmpty()) {
                 Array<RecentsEntry> rList = new Array<>();
                 rList = json.fromJson(rList.getClass(), data);
+                rList.sort(recentsEntryComparator);
+                rList.truncate(MAX_RECENTS);
                 for (RecentsEntry entry : rList) {
                     list.add(entry.path);
                 }
