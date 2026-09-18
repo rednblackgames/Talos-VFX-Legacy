@@ -18,6 +18,7 @@ package games.rednblack.talos;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
 
 import java.util.Locale;
 
@@ -35,6 +36,15 @@ public class TalosLauncher {
 		config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 3, 2);
 		config.setBackBufferConfig(8,8,8,8,16,8, 16);
 		config.setWindowIcon("icon/talos-64x64.png");
+
+		config.setWindowListener(new Lwjgl3WindowAdapter() {
+			@Override
+			public boolean closeRequested () {
+				// closing the window must not throw away unsaved projects either, the dialog decides
+				return TalosMain.Instance() == null || TalosMain.Instance().UIStage() == null
+						|| TalosMain.Instance().UIStage().requestExit();
+			}
+		});
 
 		TalosMain talos = new TalosMain();
 

@@ -16,13 +16,24 @@ public class FileTracker {
 
     }
 
+    /**
+     * Adds the resources the project file declares, keeping whatever the load itself registered through
+     * {@link #trackFile}: those entries carry the real reload callbacks and must not be dropped.
+     */
     public void addSavedResourcePathsFor (FileTab currentTab, Array<String> savedResourcePaths) {
 
         if(savedResourcePaths == null) return;
 
-        final ObjectMap<FileHandle, FileEntry> entries = new ObjectMap<>();
+        ObjectMap<FileHandle, FileEntry> entries = tabMaps.get(currentTab);
+        if (entries == null) {
+            entries = new ObjectMap<>();
+            tabMaps.put(currentTab, entries);
+        }
+
         for (String savedResourcePath : savedResourcePaths) {
             FileHandle fileHandle = Gdx.files.absolute(savedResourcePath);
+            if (entries.containsKey(fileHandle)) continue;
+
             FileEntry fileEntry = new FileEntry(fileHandle, new Tracker() {
                 @Override
                 public void updated (FileHandle handle) {
@@ -31,12 +42,14 @@ public class FileTracker {
             });
             entries.put(fileHandle, fileEntry);
         }
-
-        tabMaps.put(currentTab, entries);
     }
 
     public void addTab (FileTab tab) {
         tabMaps.put(tab, new ObjectMap<>());
+    }
+
+    public void removeTab (FileTab tab) {
+        tabMaps.remove(tab);
     }
 
     public FileHandle findFileByName(String name) {

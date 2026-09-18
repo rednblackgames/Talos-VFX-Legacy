@@ -205,7 +205,7 @@ public class MainMenu extends Table {
             @Override
             public void clicked (InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                Gdx.app.exit();
+                stage.exitAction();
             }
         });
         settings.addListener(new ClickListener() {

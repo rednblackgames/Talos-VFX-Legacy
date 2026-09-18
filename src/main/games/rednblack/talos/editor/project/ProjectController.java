@@ -4,97 +4,125 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
+import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.dialogs.NewProjectDialog;
 import games.rednblack.talos.editor.widgets.ui.FileTab;
+import games.rednblack.talos.editor.widgets.ui.TalosTabbedPane;
 
 import java.io.File;
 import java.util.Comparator;
 
+/**
+ * Owns the notion of "what is currently being edited".
+ *
+ * Every project type is a singleton holding the live model, so only one project can be alive at a time:
+ * switching tab means serializing the outgoing tab into {@link FileTab} and deserializing the incoming one
+ * back into the live model. All per tab state (content, bound file, undo history, export path) lives on the
+ * tab itself, so tabs can never trade content with each other, no matter their name or their type.
+ */
 public class ProjectController {
 
-    private String currentProjectPath = null;
-    private String projectFileName = null;
     public FileTab currentTab;
-    private ObjectMap<String, String> fileCache = new ObjectMap<>();
-    private ObjectMap<String, String> pathCache = new ObjectMap<>();
-    private ObjectMap<String, FileTab> tabCache = new ObjectMap<>();
-    private ObjectMap<String, String> exporthPathCache = new ObjectMap<>();
     private boolean loading = false;
 
     IProject currentProject;
 
-    private SnapshotTracker snapshotTracker;
-
     public static final int MAX_RECENTS = 10;
 
     public static TalosProject TLS = new TalosProject();
-    private boolean lastDirTracking = true;
 
     public ProjectController() {
         currentProject = TLS;
+    }
 
-        snapshotTracker = new SnapshotTracker();
+    private TalosTabbedPane tabbedPane() {
+        return TalosMain.Instance().UIStage().tabbedPane;
     }
 
     public void loadProject (FileHandle projectFileHandle) {
+        loadProject(projectFileHandle, false);
+    }
+
+    /**
+     * @param anonymous true when the content must not stay bound to the file it came from, as for the
+     *                  examples shipped with the editor: the tab is filled but saving will ask where to
+     */
+    public void loadProject (FileHandle projectFileHandle, boolean anonymous) {
         try {
-            if (projectFileHandle.exists()) {
-                FileTab prevTab = currentTab;
-                boolean removingUnworthy = false;
-
-                if (currentTab != null) {
-                    if (currentTab.getProjectType() == currentProject && currentTab.isUnworthy()) {
-                        removingUnworthy = true;
-                        clearCache(currentTab.getFileName());
-                    } else {
-                        IProject tmp = currentProject;
-                        currentProject = currentTab.getProjectType();
-                        saveProjectToCache(currentProjectPath);
-                        currentProject = tmp;
-                    }
-                }
-                currentProjectPath = projectFileHandle.path();
-                projectFileName = projectFileHandle.name();
-                loading = true;
-                currentTab = new FileTab(projectFileHandle, currentProject); // trackers need to know what current tab is
-                String string = projectFileHandle.readString();
-                currentProject.loadProject(projectFileHandle, string, false);
-                snapshotTracker.reset(string);
-                reportProjectFileInterraction(projectFileHandle);
-                loading = false;
-
-                if (lastDirTracking) {
-                    TalosMain.Instance().Prefs().putString("lastOpen" + currentProject.getExtension(), projectFileHandle.parent().path());
-                    TalosMain.Instance().Prefs().flush();
-                }
-
-                TalosMain.Instance().UIStage().tabbedPane.add(currentTab);
-
-                final Array<String> savedResourcePaths = currentProject.getSavedResourcePaths();
-                TalosMain.Instance().FileTracker().addSavedResourcePathsFor(currentTab, savedResourcePaths);
-
-                if (removingUnworthy) {
-                    safeRemoveTab(prevTab);
-                }
-            } else {
+            if (!projectFileHandle.exists()) {
                 //error handle
+                return;
+            }
+
+            if (!anonymous) {
+                FileTab alreadyOpen = findTabBoundTo(projectFileHandle.path());
+                if (alreadyOpen != null) {
+                    // opening it twice would fork its content into two tabs that then overwrite each other
+                    tabbedPane().switchTab(alreadyOpen);
+                    return;
+                }
+            }
+
+            FileTab prevTab = currentTab;
+            boolean removingUnworthy = prevTab != null
+                    && prevTab.getProjectType() == currentProject && prevTab.isUnworthy();
+
+            cacheCurrentTab();
+
+            FileTab tab = new FileTab(projectFileHandle, currentProject);
+            tab.setCachedData(projectFileHandle.readString(), false);
+            if (anonymous) {
+                tab.setUnworthy();
+            } else {
+                tab.setBoundPath(projectFileHandle.path());
+                tab.setSuggestedDir(projectFileHandle.parent().path());
+            }
+
+            TalosMain.Instance().FileTracker().addTab(tab);
+            // adding the tab selects it, and selecting it is what actually loads the content, see loadFromTab
+            tabbedPane().add(tab);
+
+            if (!anonymous) {
+                reportProjectFileInterraction(projectFileHandle);
+
+                TalosMain.Instance().Prefs().putString("lastOpen" + currentProject.getExtension(), projectFileHandle.parent().path());
+                TalosMain.Instance().Prefs().flush();
+            }
+
+            if (removingUnworthy) {
+                safeRemoveTab(prevTab);
             }
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
         }
     }
 
-    private void saveProjectToCache(String projectPath) {
+    /**
+     * Stores the live model into the active tab. Called before anything can replace what is on screen, so
+     * that leaving a tab, even an anonymous one that was never saved, can not lose its content.
+     */
+    private void cacheCurrentTab() {
+        if (currentTab == null) return;
+
         try {
-            if (projectPath != null && currentTab != null) {
-                String cacheKey = currentTab.getFileName();
-                fileCache.put(cacheKey, currentProject.getProjectString(true));
-                pathCache.put(cacheKey, projectPath);
-            }
+            currentTab.setCachedData(currentTab.getProjectType().getProjectString(true), true);
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
         }
+    }
+
+    private FileTab findTabBoundTo(String path) {
+        if (path == null) return null;
+
+        for (Tab tab : tabbedPane().getTabs()) {
+            FileTab fileTab = (FileTab) tab;
+            if (path.equals(fileTab.getBoundPath())) {
+                return fileTab;
+            }
+        }
+
+        return null;
     }
 
     private void getProjectFromString(String string, boolean fromMemory) {
@@ -110,18 +138,40 @@ public class ProjectController {
 
     public void loadFromExportedP(FileHandle fileHandle) {
         try {
+            setProject(TLS);
+            // an exported .p is not a project file, so the tab stays anonymous and saving will ask for a .tls
+            createNewProjectTab(TLS, getUniqueFilename(fileHandle.nameWithoutExtension() + TLS.getExtension()));
+            if (currentTab != null) {
+                currentTab.setSuggestedDir(fileHandle.parent().path());
+            }
             loading = true;
-            currentProjectPath = fileHandle.path().replace(".p", ".tls");
-            ((TalosProject)currentProject).loadFromExportP(fileHandle);
+            TLS.loadFromExportP(fileHandle);
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
         } finally {
             loading = false;
-            TalosMain.Instance().ProjectController().setDirty();
         }
+
+        setDirty();
     }
 
     public void saveProject (FileHandle destination) {
+        saveProject(currentTab, destination);
+    }
+
+    /**
+     * Writes the content of the given tab, activating it first if it is not the one being edited: the live
+     * model only ever holds the active tab, so saving anything else would write the wrong project.
+     */
+    public void saveProject (FileTab tab, FileHandle destination) {
+        if (tab == null) return;
+
+        if (tab != currentTab) {
+            if (!tabbedPane().getTabs().contains(tab, true)) return; // closed while we were away
+            tabbedPane().switchTab(tab);
+            if (tab != currentTab) return;
+        }
+
         try {
             String data = currentProject.getProjectString(false);
             destination.writeString(data, false);
@@ -131,17 +181,13 @@ public class ProjectController {
             TalosMain.Instance().Prefs().putString("lastSave" + currentProject.getExtension(), destination.parent().path());
             TalosMain.Instance().Prefs().flush();
 
-            currentTab.setDirty(false);
-            currentTab.setWorthy();
-            currentProjectPath = destination.path();
-            projectFileName = destination.name();
-
-            if (!currentTab.getFileName().equals(projectFileName)) {
-                clearCache(currentTab.getFileName());
-                currentTab.setProjectFileHandle(destination);
-                TalosMain.Instance().UIStage().tabbedPane.updateTabTitle(currentTab);
-                fileCache.put(projectFileName, data);
-            }
+            tab.setDirty(false);
+            tab.setWorthy();
+            tab.setBoundPath(destination.path());
+            tab.setSuggestedDir(destination.parent().path());
+            tab.setCachedData(data, false);
+            tab.setProjectFileHandle(destination);
+            tabbedPane().updateTabTitle(tab);
         } catch (Exception e) {
             TalosMain.Instance().reportException(e);
         }
@@ -149,9 +195,74 @@ public class ProjectController {
 
     public void saveProject() {
         if(isBoundToFile()) {
-            FileHandle handle = Gdx.files.absolute(currentProjectPath);
+            FileHandle handle = Gdx.files.absolute(currentTab.getBoundPath());
             saveProject(handle);
         }
+    }
+
+    /**
+     * Saves a tab that is not necessarily the active one, then runs the given action. Saving always writes
+     * the content of the requested tab, so closing a dirty background tab can not write the wrong project.
+     * The action does not run if the user cancels the destination chooser.
+     */
+    public void saveTabThen(FileTab tab, Runnable onSaved) {
+        if (tab == null) {
+            if (onSaved != null) onSaved.run();
+            return;
+        }
+
+        if (tab != currentTab) {
+            tabbedPane().switchTab(tab);
+        }
+
+        if (tab.isBoundToFile()) {
+            saveProject(tab, Gdx.files.absolute(tab.getBoundPath()));
+            if (onSaved != null) onSaved.run();
+        } else {
+            TalosMain.Instance().UIStage().saveAsProjectAction(onSaved);
+        }
+    }
+
+    public boolean hasUnsavedChanges() {
+        return getUnsavedTabCount() > 0;
+    }
+
+    public int getUnsavedTabCount() {
+        if (TalosMain.Instance().UIStage() == null || tabbedPane() == null) return 0;
+
+        int count = 0;
+        for (Tab tab : tabbedPane().getTabs()) {
+            if (tab.isDirty()) count++;
+        }
+
+        return count;
+    }
+
+    /**
+     * Saves every tab holding unsaved changes, one after the other, then runs the given action. Projects
+     * that were never saved ask for a destination in turn, and backing out of one stops the whole chain,
+     * so nothing is written and the action never runs.
+     */
+    public void saveAllDirtyTabsThen(Runnable onAllSaved) {
+        Array<FileTab> dirtyTabs = new Array<>();
+        if (tabbedPane() != null) {
+            for (Tab tab : tabbedPane().getTabs()) {
+                if (tab.isDirty()) {
+                    dirtyTabs.add((FileTab) tab);
+                }
+            }
+        }
+
+        saveDirtyTabsFrom(dirtyTabs, 0, onAllSaved);
+    }
+
+    private void saveDirtyTabsFrom(Array<FileTab> dirtyTabs, int index, Runnable onAllSaved) {
+        if (index >= dirtyTabs.size) {
+            if (onAllSaved != null) onAllSaved.run();
+            return;
+        }
+
+        saveTabThen(dirtyTabs.get(index), () -> saveDirtyTabsFrom(dirtyTabs, index + 1, onAllSaved));
     }
 
     public void newProject (IProject project) {
@@ -173,28 +284,17 @@ public class ProjectController {
 
     public void createNewProjectTab(IProject project, String fileName) {
         FileTab prevTab = currentTab;
+        boolean removingUnworthy = prevTab != null
+                && prevTab.getProjectType() == project && prevTab.isUnworthy();
 
-        boolean removingUnworthy = false;
-
-        if(currentTab != null) {
-            if(currentTab.getProjectType() == project && currentTab.isUnworthy()) {
-                removingUnworthy = true;
-                clearCache(currentTab.getFileName());
-            }  else {
-                saveProjectToCache(currentProjectPath);
-            }
-        }
+        cacheCurrentTab();
 
         final FileTab tab = new FileTab(Gdx.files.local(fileName), project);
-
         tab.setUnworthy(); // all new projects are unworthy, and will only become worthy when worked on
-        TalosMain.Instance().UIStage().tabbedPane.add(tab);
 
         TalosMain.Instance().FileTracker().addTab(tab);
-
-        currentProject.resetToNew();
-        snapshotTracker.reset(currentProject.getProjectString(true));
-        currentProjectPath = null;
+        // adding the tab selects it, and selecting it is what resets the project to a new one, see loadFromTab
+        tabbedPane().add(tab);
 
         if(removingUnworthy) {
             safeRemoveTab(prevTab);
@@ -206,14 +306,16 @@ public class ProjectController {
      */
     public void safeRemoveTab(FileTab tab) {
         FileTab tmp = currentTab;
-        TalosMain.Instance().UIStage().tabbedPane.remove(tab);
-        currentTab = tmp;
+        tabbedPane().remove(tab, true);
+        if (tmp != tab) {
+            currentTab = tmp;
+        }
     }
 
     public String getNewFilename(IProject project) {
         int index = 1;
         String name = project.getProjectNameTemplate() + index + project.getExtension();
-        while (fileCache.containsKey(name)) {
+        while (isNameTaken(name)) {
             index++;
             name = project.getProjectNameTemplate() + index + project.getExtension();
         }
@@ -221,26 +323,56 @@ public class ProjectController {
         return name;
     }
 
+    private String getUniqueFilename(String preferred) {
+        if (!isNameTaken(preferred)) return preferred;
+
+        int dot = preferred.lastIndexOf(".");
+        String base = dot > 0 ? preferred.substring(0, dot) : preferred;
+        String extension = dot > 0 ? preferred.substring(dot) : "";
+
+        int index = 2;
+        while (isNameTaken(base + index + extension)) {
+            index++;
+        }
+
+        return base + index + extension;
+    }
+
+    private boolean isNameTaken(String fileName) {
+        for (Tab tab : tabbedPane().getTabs()) {
+            if (((FileTab) tab).getFileName().equals(fileName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public boolean isBoundToFile() {
-        return currentProjectPath != null;
+        return currentTab != null && currentTab.isBoundToFile();
     }
 
     public void unbindFromFile() {
-        currentProjectPath = null;
+        if (currentTab != null) {
+            currentTab.setBoundPath(null);
+        }
     }
 
     public String getCurrentProjectPath () {
-        return currentProjectPath;
+        return currentTab == null ? null : currentTab.getBoundPath();
     }
 
-
     public void setDirty() {
-        if(!loading) {
+        if(!loading && currentTab != null) {
             currentTab.setDirty(true);
             currentTab.setWorthy();
 
-            // also add this as snapshot
-            snapshotTracker.addSnapshot(getProjectString(true));
+            try {
+                // also add this as snapshot
+                currentTab.getSnapshotTracker().addSnapshot(getProjectString(true));
+            } catch (Exception e) {
+                TalosMain.Instance().reportException(e);
+            }
         }
     }
 
@@ -248,46 +380,70 @@ public class ProjectController {
         return currentProject.getProjectString(toMemory);
     }
 
+    /**
+     * Makes the given tab the one being edited. This is the only place that fills the live model, and it
+     * always fills it: from the tab's own cache, from the file it is bound to, or with an empty project.
+     * It never leaves on screen what the previous tab was showing.
+     */
     public void loadFromTab(FileTab tab) {
+        if (tab == null || tab == currentTab) return;
+
+        cacheCurrentTab();
+
+        currentTab = tab; // trackers and dirty reporting need to know what current tab is before loading
+        currentProject = tab.getProjectType();
+
+        boolean loaded = false;
         loading = true;
-        String fileName = tab.getFileName();
+        try {
+            String data = tab.getCachedData();
+            boolean fromMemory = tab.isCachedFromMemory();
 
-        if (currentTab != null && currentTab != tab) {
-            saveProjectToCache(currentProjectPath);
+            if (data == null && tab.isBoundToFile()) {
+                FileHandle handle = Gdx.files.absolute(tab.getBoundPath());
+                if (handle.exists()) {
+                    data = handle.readString();
+                    fromMemory = false;
+                }
+            }
+
+            if (data != null) {
+                currentProject.loadProject(tab.getProjectFileHandle(), data, fromMemory);
+                loaded = true;
+            } else {
+                currentProject.resetToNew();
+            }
+
+            if (tab.getSnapshotTracker().isEmpty()) {
+                tab.getSnapshotTracker().reset(currentProject.getProjectString(true));
+            }
+        } catch (Exception e) {
+            TalosMain.Instance().reportException(e);
+        } finally {
+            loading = false;
         }
 
-        if (fileCache.containsKey(fileName)) {
-            currentProject = tab.getProjectType();
-            currentTab = tab;
-            final FileHandle projectFileHandle = tab.getProjectFileHandle();
-            final String fileData = fileCache.get(tab.getFileName());
-            currentProject.loadProject(projectFileHandle, fileData, true);
+        if (loaded) {
+            try {
+                TalosMain.Instance().FileTracker().addSavedResourcePathsFor(tab, currentProject.getSavedResourcePaths());
+            } catch (Exception e) {
+                TalosMain.Instance().reportException(e);
+            }
         }
 
-        currentProjectPath = tab.getProjectFileHandle().path();
-        projectFileName = fileName;
-        currentTab = tab;
-        currentProject = currentTab.getProjectType();
-        if (tab.getProjectType() == TLS) {
+        if (currentProject == TLS) {
             TalosMain.Instance().UIStage().swapToTalosContent();
         } else {
             currentProject.initUIContent();
         }
         TalosMain.Instance().resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        loading = false;
     }
 
     public void removeTab(FileTab tab) {
-        String fileName = tab.getFileName();
-        clearCache(fileName);
+        TalosMain.Instance().FileTracker().removeTab(tab);
         if(tab == currentTab) {
             currentTab = null;
         }
-    }
-
-    public void clearCache(String fileName) {
-        pathCache.remove(fileName);
-        fileCache.remove(fileName);
     }
 
     public void setProject(IProject project) {
@@ -310,6 +466,7 @@ public class ProjectController {
 
         // local is priority, then the path, then the default lookup
         // do we currently have project loaded?
+        String currentProjectPath = getCurrentProjectPath();
         if(currentProjectPath != null) {
             // we can look for local file then
             FileHandle currentProjectHandle = Gdx.files.absolute(currentProjectPath);
@@ -336,7 +493,9 @@ public class ProjectController {
     }
 
     public void exportProject(FileHandle fileHandle) {
-        exporthPathCache.put(projectFileName, fileHandle.path());
+        if (currentTab != null) {
+            currentTab.setExportPath(fileHandle.path());
+        }
 
         String data = currentProject.exportProject();
         fileHandle.writeString(data, false);
@@ -365,18 +524,13 @@ public class ProjectController {
     }
 
     public String getExportPath() {
-        return exporthPathCache.get(projectFileName);
-    }
-
-    public void lastDirTrackingDisable() {
-        lastDirTracking = false;
-    }
-
-    public void lastDirTrackingEnable() {
-        lastDirTracking = true;
+        return currentTab == null ? null : currentTab.getExportPath();
     }
 
     public void undo() {
+        if (currentTab == null) return;
+
+        SnapshotTracker snapshotTracker = currentTab.getSnapshotTracker();
         boolean changed = snapshotTracker.moveBack();
         if (changed) {
             getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
@@ -384,6 +538,9 @@ public class ProjectController {
     }
 
     public void redo() {
+        if (currentTab == null) return;
+
+        SnapshotTracker snapshotTracker = currentTab.getSnapshotTracker();
         boolean changed = snapshotTracker.moveForward();
         if (changed) {
             getProjectFromString(snapshotTracker.getCurrentSnapshot(), true);
@@ -391,7 +548,9 @@ public class ProjectController {
     }
 
     public void closeCurrentTab() {
-        safeRemoveTab(currentTab);
+        if (currentTab != null) {
+            tabbedPane().remove(currentTab, true);
+        }
     }
 
     public static class RecentsEntry {

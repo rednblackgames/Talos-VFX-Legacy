@@ -3,6 +3,7 @@ package games.rednblack.talos.editor.widgets.ui;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
+import games.rednblack.talos.TalosMain;
 import games.rednblack.talos.editor.dialogs.TalosDialog;
 
 /**
@@ -16,7 +17,7 @@ public class TalosTabbedPane extends TabbedPane {
     }
 
     @Override
-    public boolean remove(final Tab tab, boolean ignoreTabDirty) {
+    public boolean remove (final Tab tab, boolean ignoreTabDirty) {
         if (ignoreTabDirty) {
             return super.remove(tab, true);
         }
@@ -26,10 +27,10 @@ public class TalosTabbedPane extends TabbedPane {
             TalosDialog.showSaveConfirm(stage,
                     "Unsaved Changes",
                     "Do you want to save changes before closing?",
-                    () -> {
-                        tab.save();
-                        super.remove(tab, true);
-                    },
+                    // the tab only goes away once its own content really reached the disk, which for a
+                    // project that was never saved means after the user picked a destination
+                    () -> TalosMain.Instance().ProjectController().saveTabThen((FileTab) tab,
+                            () -> super.remove(tab, true)),
                     () -> super.remove(tab, true),
                     null
             );

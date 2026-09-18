@@ -47,6 +47,10 @@ public class SnapshotTracker {
         return snapshots.get(index);
     }
 
+    public boolean isEmpty() {
+        return snapshots.size == 0;
+    }
+
     public void reset(String data) {
         snapshots.clear();
         cursor = 0;

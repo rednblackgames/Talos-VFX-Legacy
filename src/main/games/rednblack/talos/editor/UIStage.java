@@ -94,6 +94,8 @@ public class UIStage {
 	private Table mainLayout;
 	private Table customLayout;
 
+	private boolean exitDialogShown = false;
+
 
 	public UIStage (Skin skin) {
 		this.stage = new Stage(new ScreenViewport(), new PolygonSpriteBatch());
@@ -344,8 +346,20 @@ public class UIStage {
 	}
 
 	public void saveAsProjectAction() {
+		saveAsProjectAction(null);
+	}
+
+	/**
+	 * @param onSaved run once the project has been written, never if the user backs out of the chooser
+	 */
+	public void saveAsProjectAction(final Runnable onSaved) {
 		IProject projectType = TalosMain.Instance().ProjectController().getProject();
-		String defaultLocation = TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
+		final FileTab currentTab = TalosMain.Instance().ProjectController().currentTab;
+
+		// an anonymous project remembers where it came from, so saving does not land in an unrelated folder
+		String defaultLocation = currentTab != null && currentTab.getSuggestedDir() != null
+				? currentTab.getSuggestedDir()
+				: TalosMain.Instance().ProjectController().getLastDir("Save", projectType);
 		fileChooser.setDirectory(defaultLocation);
 
 		final String ext = projectType.getExtension();
@@ -370,13 +384,61 @@ public class UIStage {
 					path += ext;
 				}
 				FileHandle handle = Gdx.files.absolute(path);
-				TalosMain.Instance().ProjectController().saveProject(handle);
+				// the chooser outlives the click, so name the tab explicitly instead of trusting the active one
+				TalosMain.Instance().ProjectController().saveProject(currentTab, handle);
+
+				if(onSaved != null) onSaved.run();
 			}
 		});
 
-		fileChooser.setDefaultFileName(TalosMain.Instance().ProjectController().currentTab.getFileName());
+		fileChooser.setDefaultFileName(currentTab == null ? "" : currentTab.getFileName());
 
 		stage.addActor(fileChooser.fadeIn());
+	}
+
+	/** menu entry: ask about unsaved work, then quit */
+	public void exitAction() {
+		if (requestExit()) {
+			Gdx.app.exit();
+		}
+	}
+
+	/**
+	 * @return true when the editor can be closed straight away, false when the user has been asked what to
+	 *         do with the projects holding unsaved changes: quitting is then up to their answer
+	 */
+	public boolean requestExit() {
+		final ProjectController projectController = TalosMain.Instance().ProjectController();
+		if (projectController == null) return true; // asked before the editor was even up
+
+		int unsavedCount = projectController.getUnsavedTabCount();
+		if (unsavedCount == 0) {
+			return true;
+		}
+
+		if (exitDialogShown) return false; // already asking, a second window close must not stack dialogs
+		exitDialogShown = true;
+
+		String message = unsavedCount == 1
+				? "One project has unsaved changes. Save it before exiting?"
+				: unsavedCount + " projects have unsaved changes. Save them before exiting?";
+
+		TalosDialog.showSaveConfirm(stage,
+				"Unsaved Changes",
+				message,
+				() -> {
+					exitDialogShown = false;
+					// quitting waits for every project to be written, a cancelled chooser keeps us here
+					projectController.saveAllDirtyTabsThen(() -> Gdx.app.exit());
+				},
+				() -> {
+					exitDialogShown = false;
+					Gdx.app.exit();
+				},
+				() -> exitDialogShown = false
+		);
+
+		return false;
 	}
 
 	public void openDialog(VisWindow dialog) {
@@ -532,11 +594,9 @@ public class UIStage {
 				public void clicked (InputEvent event, float x, float y) {
 					super.clicked(event, x, y);
 					//openProject(fileName);
-					TalosMain.Instance().ProjectController().lastDirTrackingDisable();
 					TalosMain.Instance().ProjectController().setProject(ProjectController.TLS);
-					TalosMain.Instance().ProjectController().loadProject(Gdx.files.internal("samples/" + fileName));
-					TalosMain.Instance().ProjectController().lastDirTrackingEnable();
-					TalosMain.Instance().ProjectController().unbindFromFile();
+					// examples open as anonymous projects: they are never written back, saving asks where to
+					TalosMain.Instance().ProjectController().loadProject(Gdx.files.internal("samples/" + fileName), true);
 				}
 			});
 		}
